@@ -47,9 +47,9 @@ def build_echo_model(weights_path=None):
 
     if weights_path:
         model.load_weights(weights_path)
-        print(f"Weights loaded from: {weights_path} ✅")
+        print(f"Weights loaded from: {weights_path}")
     else:
-        print("Fresh model built with ImageNet weights ✅")
+        print("Fresh model built with ImageNet weights")
 
     model.compile(
         optimizer = tf.keras.optimizers.Adam(learning_rate=1e-4),
