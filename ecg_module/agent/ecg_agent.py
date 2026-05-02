@@ -1,309 +1,313 @@
 from __future__ import annotations
 
-from functools import lru_cache
+import logging
 from pathlib import Path
-from threading import Lock
-from typing import Any, Dict, Optional, Union
+from typing import Dict, List, Literal, TypedDict, Union
 
 import numpy as np
 import torch
 
-from ecg_module.models.ecg_model_loader import ECGModelLoader
-from ecg_module.utils.preprocessing import coerce_ecg_array, prepare_ecg_tensor
-
-
-DEFAULT_MODEL_PATH = (
-    Path(__file__).resolve().parent.parent / "models" / "ecg_attention_calibrated.pth"
+from ecg_module.model.ecg_model_loader import ECGModelLoader, ModelLoadingError
+from ecg_module.utils.image_to_signal import (
+    ECGImageProcessingError,
+    extract_signal_from_image,
 )
-DEFAULT_NUM_LEADS = 12
-DEFAULT_TARGET_LENGTH = 1000
-DEFAULT_SAMPLING_RATE = 100
+from ecg_module.utils.preprocessing import (
+    ECGPreprocessingError,
+    coerce_ecg_signal,
+    load_ecg_csv,
+    prepare_signal_tensor,
+)
 
-PredictionResponse = Dict[str, Any]
-InternalPrediction = Dict[str, Any]
 
-CLASS_LEVEL_MAP = {
+LOGGER = logging.getLogger(__name__)
+
+SignalSource = Literal["signal", "csv", "image"]
+
+DISPLAY_LABEL_MAP: Dict[str, str] = {
+    "NORM": "Normal rhythm",
+    "MI": "Myocardial infarction",
+    "AMI": "Acute myocardial infarction",
+    "STEMI": "ST-elevation myocardial infarction",
+    "STTC": "ST/T changes",
+    "CD": "Conduction disturbance",
+    "HYP": "Hypertrophy",
+}
+
+CLINICAL_LEVEL_MAP: Dict[str, str] = {
     "NORM": "Low",
-    "MI": "High",
     "STTC": "Medium",
-    "CD": "Medium",
     "HYP": "Medium",
+    "CD": "Medium",
+    "MI": "High",
+    "AMI": "High",
+    "STEMI": "High",
 }
 
-CLASS_REASON_MAP = {
-    "NORM": (
-        "The ECG pattern is closest to a normal rhythm profile, so it is treated as low concern."
-    ),
-    "MI": (
-        "The ECG pattern is most consistent with myocardial infarction related changes, so it is treated as high concern."
-    ),
-    "STTC": (
-        "The ECG pattern shows ST/T change features, so it is treated as medium concern."
-    ),
-    "CD": (
-        "The ECG pattern is most consistent with a conduction disturbance pattern, so it is treated as medium concern."
-    ),
-    "HYP": (
-        "The ECG pattern suggests hypertrophy related changes, so it is treated as medium concern."
-    ),
-}
+ERROR_LEVEL = "Low"
+ERROR_SCORE = 0.0
+LOW_CONFIDENCE_THRESHOLD = 0.58
+MEDIUM_CONFIDENCE_THRESHOLD = 0.70
 
 
-def _gaussian_pulse(
-    time_axis: np.ndarray,
-    center: float,
-    width: float,
-    amplitude: float,
-) -> np.ndarray:
-    return amplitude * np.exp(-0.5 * ((time_axis - center) / width) ** 2)
+class ECGPredictionResponse(TypedDict):
+    """Strict response contract for ECG predictions."""
 
-
-def simulate_ecg_input(
-    num_leads: int = DEFAULT_NUM_LEADS,
-    target_length: int = DEFAULT_TARGET_LENGTH,
-    sampling_rate: int = DEFAULT_SAMPLING_RATE,
-    seed: Optional[int] = None,
-) -> np.ndarray:
-    """Generate a realistic synthetic ECG segment for testing."""
-
-    rng = np.random.default_rng(seed)
-    duration_seconds = target_length / float(sampling_rate)
-    time_axis = np.linspace(
-        0.0,
-        duration_seconds,
-        target_length,
-        endpoint=False,
-        dtype=np.float32,
-    )
-
-    heart_rate_bpm = rng.uniform(58.0, 86.0)
-    rr_interval = 60.0 / heart_rate_bpm
-    beat_times = []
-    current_time = 0.35
-    while current_time < duration_seconds + 0.4:
-        beat_times.append(current_time)
-        current_time += rr_interval + rng.normal(0.0, 0.04)
-
-    lead_scales = rng.normal(1.0, 0.08, size=num_leads)
-    lead_shifts = rng.normal(0.0, 0.004, size=num_leads)
-    lead_offsets = rng.normal(0.0, 0.015, size=num_leads)
-
-    signal = np.zeros((num_leads, target_length), dtype=np.float32)
-    for lead_index in range(num_leads):
-        lead_signal = np.zeros(target_length, dtype=np.float32)
-        amplitude_scale = float(lead_scales[lead_index])
-        shift = float(lead_shifts[lead_index])
-
-        for beat_time in beat_times:
-            center = beat_time + shift
-            lead_signal += _gaussian_pulse(
-                time_axis,
-                center - 0.20,
-                0.025,
-                0.10 * amplitude_scale,
-            )
-            lead_signal += _gaussian_pulse(
-                time_axis,
-                center - 0.04,
-                0.010,
-                -0.14 * amplitude_scale,
-            )
-            lead_signal += _gaussian_pulse(
-                time_axis,
-                center,
-                0.012,
-                1.00 * amplitude_scale,
-            )
-            lead_signal += _gaussian_pulse(
-                time_axis,
-                center + 0.04,
-                0.015,
-                -0.24 * amplitude_scale,
-            )
-            lead_signal += _gaussian_pulse(
-                time_axis,
-                center + 0.28,
-                0.050,
-                0.32 * amplitude_scale,
-            )
-
-        baseline_frequency = rng.uniform(0.15, 0.35)
-        baseline_phase = rng.uniform(0.0, 2.0 * np.pi)
-        baseline = 0.04 * np.sin(
-            2.0 * np.pi * baseline_frequency * time_axis + baseline_phase
-        )
-        noise = rng.normal(0.0, 0.02, size=target_length).astype(np.float32)
-        signal[lead_index] = (
-            lead_signal + baseline + noise + lead_offsets[lead_index]
-        )
-
-    return signal.astype(np.float32)
+    Level: str
+    Score: float
+    Reason: str
 
 
 class ECGAgent:
-    """Callable ECG inference agent for offline and real-time workflows."""
+    """Production-ready ECG agent for CSV and image-based inference."""
 
-    def __init__(
-        self,
-        model_path: Optional[Union[str, Path]] = None,
-        label_map: Optional[Dict[int, str]] = None,
-    ) -> None:
+    def __init__(self, model_path: Union[str, Path, None] = None) -> None:
         self.device = torch.device("cpu")
-        self.loader = ECGModelLoader(
-            model_path=model_path or DEFAULT_MODEL_PATH,
-            device=self.device,
-        )
-        self.artifact = self.loader.load()
+        self.loader = ECGModelLoader(model_path=model_path, device=self.device)
+
+        try:
+            self.artifact = self.loader.load()
+        except ModelLoadingError:
+            LOGGER.exception(
+                "Failed to initialize ECGAgent from checkpoint %s",
+                self.loader.model_path,
+            )
+            raise
+
         self.model = self.artifact.model
         self.model.eval()
+        self.label_map = self.artifact.label_map
+        self.class_labels = self.artifact.class_labels
 
-        self.num_leads = self.artifact.num_leads
-        self.target_length = self.artifact.target_length
-        self.normalization_mean = self.artifact.normalization_mean
-        self.normalization_std = self.artifact.normalization_std
-        self.label_map = label_map or self.artifact.label_map
+    def predict_from_csv(self, file_path: Union[str, Path]) -> ECGPredictionResponse:
+        """Load ECG data from CSV and run prediction."""
 
-        self._stream_lock = Lock()
-        self._stream_buffer = np.empty((self.num_leads, 0), dtype=np.float32)
-
-    def __call__(self, ecg_signal: Any) -> PredictionResponse:
-        """Allow the agent instance to be called like a function."""
-
-        return self.predict(ecg_signal)
-
-    def predict(self, ecg_signal: Any) -> PredictionResponse:
-        """Run single-window ECG inference and return a clean response."""
-
+        LOGGER.info("Starting ECG CSV prediction for %s", file_path)
         try:
-            tensor = self._prepare_input_tensor(ecg_signal)
-            internal_prediction = self._run_inference(tensor)
-            return self._standardize_success_response(internal_prediction)
-        except Exception as exc:  # pragma: no cover - API safety
-            return self._error_response(exc)
-
-    def predict_simulated(
-        self,
-        seed: Optional[int] = None,
-        sampling_rate: int = DEFAULT_SAMPLING_RATE,
-    ) -> PredictionResponse:
-        """Generate a simulated ECG segment and run inference on it."""
-
-        simulated_signal = simulate_ecg_input(
-            num_leads=self.num_leads,
-            target_length=self.target_length,
-            sampling_rate=sampling_rate,
-            seed=seed,
-        )
-        return self.predict(simulated_signal)
-
-    def predict_realtime(self, ecg_stream_chunk: Any) -> PredictionResponse:
-        """Accept one ECG chunk, buffer it, and predict when ready."""
-
-        try:
-            chunk = coerce_ecg_array(
-                ecg_input=ecg_stream_chunk,
-                num_leads=self.num_leads,
-                target_length=None,
+            ecg_signal = load_ecg_csv(file_path=file_path)
+            return self._predict_signal(ecg_signal=ecg_signal, source="csv")
+        except (FileNotFoundError, ECGPreprocessingError) as exc:
+            LOGGER.warning("CSV prediction failed for %s: %s", file_path, exc)
+            return self._build_error_response(f"Prediction failed: {exc}")
+        except Exception as exc:
+            LOGGER.exception("Unexpected CSV prediction failure for %s", file_path)
+            return self._build_error_response(
+                f"Prediction failed: unexpected CSV inference error: {exc}"
             )
-            buffered_samples = self._append_stream_chunk(chunk)
 
-            if buffered_samples < self.target_length:
-                return self._buffering_response(buffered_samples)
+    def predict_from_image(
+        self,
+        image_path: Union[str, Path],
+    ) -> ECGPredictionResponse:
+        """Load ECG data from image, extract signal, and run prediction."""
 
-            with self._stream_lock:
-                window = self._stream_buffer.copy()
+        LOGGER.info("Starting ECG image prediction for %s", image_path)
+        try:
+            ecg_signal = extract_signal_from_image(image_path=image_path)
+            return self._predict_signal(ecg_signal=ecg_signal, source="image")
+        except (FileNotFoundError, ECGImageProcessingError) as exc:
+            LOGGER.warning("Image prediction failed for %s: %s", image_path, exc)
+            return self._build_error_response(f"Prediction failed: {exc}")
+        except Exception as exc:
+            LOGGER.exception("Unexpected image prediction failure for %s", image_path)
+            return self._build_error_response(
+                f"Prediction failed: unexpected image inference error: {exc}"
+            )
 
-            return self.predict(window)
-        except Exception as exc:  # pragma: no cover - API safety
-            return self._error_response(exc)
+    def predict(self, ecg_signal: np.ndarray) -> ECGPredictionResponse:
+        """Run prediction on an in-memory ECG signal array."""
 
-    def reset_realtime_buffer(self) -> None:
-        """Reset buffered real-time samples."""
+        LOGGER.info("Starting ECG signal-array prediction.")
+        try:
+            return self._predict_signal(ecg_signal=ecg_signal, source="signal")
+        except ECGPreprocessingError as exc:
+            LOGGER.warning("Signal-array prediction failed: %s", exc)
+            return self._build_error_response(f"Prediction failed: {exc}")
+        except Exception as exc:
+            LOGGER.exception("Unexpected signal-array prediction failure.")
+            return self._build_error_response(
+                f"Prediction failed: unexpected signal inference error: {exc}"
+            )
 
-        with self._stream_lock:
-            self._stream_buffer = np.empty((self.num_leads, 0), dtype=np.float32)
+    def _predict_signal(
+        self,
+        ecg_signal: np.ndarray,
+        source: SignalSource,
+    ) -> ECGPredictionResponse:
+        """Shared inference path for CSV, image, and in-memory signal inputs."""
 
-    def _prepare_input_tensor(self, ecg_signal: Any) -> torch.Tensor:
-        return prepare_ecg_tensor(
-            ecg_input=ecg_signal,
-            num_leads=self.num_leads,
-            target_length=self.target_length,
+        signal = coerce_ecg_signal(ecg_signal)
+        input_tensor = prepare_signal_tensor(
+            ecg_signal=signal,
+            train_mean=self.artifact.train_mean,
+            train_std=self.artifact.train_std,
             device=self.device,
-            mean=self.normalization_mean,
-            std=self.normalization_std,
         )
 
-    def _run_inference(self, tensor: torch.Tensor) -> InternalPrediction:
-        with torch.no_grad():
-            logits = self.model(tensor)
+        with torch.inference_mode():
+            logits = self.model(input_tensor)
             probabilities = torch.softmax(logits, dim=1)
             confidence_tensor, prediction_tensor = torch.max(probabilities, dim=1)
 
-        prediction = int(prediction_tensor.item())
-        confidence = round(float(confidence_tensor.item()), 6)
-        label = self.label_map.get(prediction, "UNKNOWN")
+        prediction_index = int(prediction_tensor.item())
+        confidence = float(confidence_tensor.item())
+        predicted_label = self.label_map.get(prediction_index, "UNKNOWN")
+        clinical_level = self._map_clinical_level(predicted_label)
+        final_level = self._adjust_level_by_confidence(clinical_level, confidence)
+        probability_values = probabilities.squeeze(0).cpu().tolist()
+        reason = self._build_reason(
+            predicted_label=predicted_label,
+            confidence=confidence,
+            clinical_level=clinical_level,
+            final_level=final_level,
+            probabilities=probability_values,
+            source=source,
+        )
 
-        return {
-            "prediction": prediction,
-            "label": label,
-            "confidence": confidence,
-        }
-
-    def _append_stream_chunk(self, chunk: np.ndarray) -> int:
-        with self._stream_lock:
-            self._stream_buffer = np.concatenate((self._stream_buffer, chunk), axis=1)
-            if self._stream_buffer.shape[1] > self.target_length:
-                self._stream_buffer = self._stream_buffer[:, -self.target_length :]
-            return int(self._stream_buffer.shape[1])
-
-    def _standardize_success_response(
-        self,
-        internal_prediction: InternalPrediction,
-    ) -> PredictionResponse:
-        label = str(internal_prediction["label"])
-        level = CLASS_LEVEL_MAP.get(label, "Medium")
-        reason = CLASS_REASON_MAP.get(
-            label,
-            "The ECG pattern matches an intermediate abnormality profile, so it is treated as medium concern.",
+        LOGGER.info(
+            "Completed ECG %s prediction with label %s, confidence %.4f, level %s",
+            source,
+            predicted_label,
+            confidence,
+            final_level,
         )
 
         return {
-            "level": level,
-            "score": float(internal_prediction["confidence"]),
-            "reason": reason,
-        }
-
-    def _buffering_response(self, buffered_samples: int) -> PredictionResponse:
-        return {
-            "level": None,
-            "score": None,
-            "reason": "The agent is waiting for more ECG samples before it can score the signal.",
-            "received_samples": buffered_samples,
-            "required_samples": self.target_length,
+            "Level": final_level,
+            "Score": round(confidence, 6),
+            "Reason": reason,
         }
 
     @staticmethod
-    def _error_response(exc: Exception) -> PredictionResponse:
+    def _build_error_response(message: str) -> ECGPredictionResponse:
+        """Return a strict error-shaped response."""
+
         return {
-            "level": None,
-            "score": None,
-            "reason": str(exc),
+            "Level": ERROR_LEVEL,
+            "Score": ERROR_SCORE,
+            "Reason": message,
         }
 
+    @staticmethod
+    def _map_clinical_level(predicted_label: str) -> str:
+        """Map the predicted class label to a clinical risk level."""
 
-@lru_cache(maxsize=4)
-def get_ecg_agent(model_path: Optional[str] = None) -> ECGAgent:
-    """Return a cached ECG agent instance for repeated inference calls."""
+        return CLINICAL_LEVEL_MAP.get(predicted_label, "Medium")
 
-    resolved_path = str(Path(model_path).resolve()) if model_path else str(DEFAULT_MODEL_PATH)
-    return ECGAgent(model_path=resolved_path)
+    @staticmethod
+    def _adjust_level_by_confidence(
+        mapped_level: str,
+        confidence: float,
+    ) -> str:
+        """Adjust the alert level according to confidence thresholds."""
 
+        if confidence < LOW_CONFIDENCE_THRESHOLD:
+            return "Low"
+        if confidence < MEDIUM_CONFIDENCE_THRESHOLD:
+            return "Medium"
+        return mapped_level
 
-def predict_ecg_signal(
-    ecg_signal: Any,
-    model_path: Optional[str] = None,
-) -> PredictionResponse:
-    """Callable helper function for one-shot ECG prediction."""
+    def _build_reason(
+        self,
+        predicted_label: str,
+        confidence: float,
+        clinical_level: str,
+        final_level: str,
+        probabilities: List[float],
+        source: SignalSource,
+    ) -> str:
+        """Generate a clinically readable explanation from prediction outputs."""
 
-    agent = get_ecg_agent(model_path=model_path)
-    return agent.predict(ecg_signal)
+        display_name = DISPLAY_LABEL_MAP.get(predicted_label, predicted_label)
+        confidence_phrase = self._confidence_phrase(confidence)
+        base_reason = self._base_clinical_reason(predicted_label, confidence_phrase)
+        level_sentence = self._level_adjustment_reason(
+            clinical_level=clinical_level,
+            final_level=final_level,
+            confidence=confidence,
+        )
+        score_summary = self._format_score_summary(probabilities)
+        source_sentence = ""
+
+        if source == "image":
+            source_sentence = (
+                " This result comes from approximate waveform extraction from an ECG image "
+                "and should be confirmed with raw signal data when available."
+            )
+
+        return (
+            f"{base_reason} The strongest matching class is {display_name}. "
+            f"{level_sentence} Class scores: {score_summary}.{source_sentence}"
+        )
+
+    @staticmethod
+    def _base_clinical_reason(predicted_label: str, confidence_phrase: str) -> str:
+        """Return a class-specific clinical explanation sentence."""
+
+        if predicted_label == "NORM":
+            return (
+                "The ECG waveform appears normal with stable rhythm patterns "
+                f"and {confidence_phrase}."
+            )
+        if predicted_label in {"MI", "AMI", "STEMI"}:
+            return (
+                "The ECG indicates patterns consistent with myocardial infarction, "
+                f"which is a high-risk condition, with {confidence_phrase}."
+            )
+        if predicted_label == "STTC":
+            return (
+                "The ECG shows ST/T waveform changes that may reflect repolarization "
+                f"abnormality, with {confidence_phrase}."
+            )
+        if predicted_label == "CD":
+            return (
+                "The ECG shows conduction-related waveform changes suggesting possible "
+                f"conduction disturbance, with {confidence_phrase}."
+            )
+        if predicted_label == "HYP":
+            return (
+                "The ECG shows voltage and waveform patterns that may be consistent with "
+                f"hypertrophy, with {confidence_phrase}."
+            )
+        return (
+            f"The ECG most closely matches the {DISPLAY_LABEL_MAP.get(predicted_label, predicted_label)} "
+            f"pattern, with {confidence_phrase}."
+        )
+
+    @staticmethod
+    def _confidence_phrase(confidence: float) -> str:
+        """Convert a confidence score into a readable phrase."""
+
+        if confidence >= MEDIUM_CONFIDENCE_THRESHOLD:
+            return f"high confidence (score {confidence:.2f})"
+        if confidence >= LOW_CONFIDENCE_THRESHOLD:
+            return f"moderate confidence (score {confidence:.2f})"
+        return f"low confidence (score {confidence:.2f})"
+
+    @staticmethod
+    def _level_adjustment_reason(
+        clinical_level: str,
+        final_level: str,
+        confidence: float,
+    ) -> str:
+        """Explain whether confidence changed the final alert level."""
+
+        if final_level != clinical_level:
+            return (
+                f"The baseline clinical level is {clinical_level}, but the final Level is "
+                f"{final_level} because the confidence score is {confidence:.2f}."
+            )
+        return (
+            f"The final Level remains {final_level} because the confidence score is "
+            f"{confidence:.2f}."
+        )
+
+    def _format_score_summary(self, probabilities: List[float]) -> str:
+        """Format class probabilities into a stable readable summary."""
+
+        score_parts: List[str] = []
+        for class_index, class_label in enumerate(self.class_labels):
+            class_name = DISPLAY_LABEL_MAP.get(class_label, class_label)
+            class_score = probabilities[class_index] if class_index < len(probabilities) else 0.0
+            score_parts.append(f"{class_name} {class_score:.3f}")
+        return ", ".join(score_parts)

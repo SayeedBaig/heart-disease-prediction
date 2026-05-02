@@ -1,49 +1,117 @@
 from __future__ import annotations
 
+import argparse
 import json
+import logging
 import sys
 from pathlib import Path
+from typing import Dict
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from ecg_module.agent.ecg_agent import ECGAgent, simulate_ecg_input
+from ecg_module.agent.ecg_agent import ECGAgent, ECGPredictionResponse
+from ecg_module.model.ecg_model_loader import ModelLoadingError
 
 
-def run_realtime_demo(agent: ECGAgent, signal) -> dict:
-    final_result = {}
-    chunk_size = 200
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments for CSV and image ECG testing."""
 
-    for start_index in range(0, signal.shape[1], chunk_size):
-        chunk = signal[:, start_index : start_index + chunk_size]
-        final_result = agent.predict_realtime(chunk)
+    parser = argparse.ArgumentParser(
+        description="Test the ECG agent with CSV and/or image inputs."
+    )
+    parser.add_argument(
+        "--csv-file",
+        type=str,
+        default=None,
+        help="Path to a CSV ECG file with shape (1000, 12).",
+    )
+    parser.add_argument(
+        "--image-file",
+        type=str,
+        default=None,
+        help="Path to an ECG image file for approximate waveform extraction.",
+    )
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=None,
+        help="Optional path to the trained .pth checkpoint.",
+    )
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Logging verbosity for the test runner.",
+    )
+    args = parser.parse_args()
+    if not args.csv_file and not args.image_file:
+        parser.error("Provide at least one of --csv-file or --image-file.")
+    return args
 
-    return final_result
 
+def configure_logging(level: str) -> None:
+    """Configure application logging for CLI execution."""
 
-def main() -> None:
-    model_path = Path(__file__).resolve().parent / "models" / "ecg_attention_calibrated.pth"
-    agent = ECGAgent(model_path=model_path)
-
-    simulated_signal = simulate_ecg_input(
-        num_leads=12,
-        target_length=1000,
-        sampling_rate=100,
-        seed=42,
+    logging.basicConfig(
+        level=getattr(logging, level.upper(), logging.INFO),
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
 
-    prediction_result = agent.predict(simulated_signal)
-    agent.reset_realtime_buffer()
-    realtime_result = run_realtime_demo(agent, simulated_signal)
 
-    print("Offline Prediction:")
-    print(json.dumps(prediction_result, indent=4))
+def print_result(title: str, result: ECGPredictionResponse) -> None:
+    """Print a labeled ECG prediction response."""
+
+    print(f"{title}:")
+    print(json.dumps(result, indent=4))
     print()
-    print("Real-Time Prediction:")
-    print(json.dumps(realtime_result, indent=4))
+
+
+def is_error_response(result: Dict[str, object]) -> bool:
+    """Detect whether a response represents an operational failure."""
+
+    reason = str(result.get("Reason", ""))
+    return reason.startswith("Prediction failed:")
+
+
+def main() -> int:
+    """Run the ECG agent for the requested CSV and/or image inputs."""
+
+    args = parse_args()
+    configure_logging(args.log_level)
+    logger = logging.getLogger(__name__)
+
+    try:
+        agent = ECGAgent(model_path=args.model_path)
+    except ModelLoadingError as exc:
+        logger.exception("Unable to initialize ECG agent.")
+        result: ECGPredictionResponse = {
+            "Level": "Low",
+            "Score": 0.0,
+            "Reason": f"Prediction failed: {exc}",
+        }
+        print(json.dumps(result, indent=4))
+        return 1
+
+    exit_code = 0
+
+    if args.csv_file:
+        csv_result = agent.predict_from_csv(args.csv_file)
+        print_result("CSV Prediction", csv_result)
+        if is_error_response(csv_result):
+            exit_code = 1
+
+    if args.image_file:
+        image_result = agent.predict_from_image(args.image_file)
+        print_result("Image Prediction", image_result)
+        if is_error_response(image_result):
+            exit_code = 1
+
+    return exit_code
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
