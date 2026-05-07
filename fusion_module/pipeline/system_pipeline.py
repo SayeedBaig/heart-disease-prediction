@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     pipeline = SystemPipeline()
 
-    print("\n===== HEART DISEASE SYSTEM (WEEK-6) =====\n")
+    print("\n===== HEART DISEASE SYSTEM  =====\n")
 
     # 🔹 Clinical Input
     age = int(input("Age: "))

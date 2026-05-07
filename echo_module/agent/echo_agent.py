@@ -23,7 +23,7 @@ import numpy as np
 
 # ── Constants ──────────────────────────────────────────────────────────────
 VALID_LEVELS   = {"Low", "Medium", "High"}
-DUMMY_DEFAULT  = {"level": "Low", "score": 0.5, "source": "dummy", "error": None}
+DUMMY_DEFAULT  = {"level": "Low", "score": 0.5, "source": "dummy", "error": None, "reason": "Dummy mode: no video provided"}
 
 
 # ── Internal helpers ───────────────────────────────────────────────────────
@@ -73,11 +73,20 @@ def _build_output(level, score, source="real", error=None):
         level  = "Unknown"
         error  = error or f"Unexpected level value received from model: '{level}'"
 
+    reason_map = {
+        "Low": "Normal cardiac structure observed",
+        "Medium": "Moderate structural abnormality detected",
+        "High": "Severe cardiac dysfunction detected",
+        "Unknown": "Echo analysis inconclusive"
+    }
+    reason = reason_map.get(level, "Echo analysis inconclusive")
+
     return {
         "level":  level,
         "score":  round(score, 4),
         "source": source,
         "error":  error,
+        "reason": reason,
     }
 
 
