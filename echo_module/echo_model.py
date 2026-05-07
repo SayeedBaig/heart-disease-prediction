@@ -1,5 +1,8 @@
 import os
 import numpy as np
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
 from echo_module.models.final_echo_model import build_echo_model, RISK_MAP, LABEL_MAP
 from echo_module.utils.dataset_loader import extract_frames
 

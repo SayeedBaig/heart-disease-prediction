@@ -311,3 +311,75 @@ class ECGAgent:
             class_score = probabilities[class_index] if class_index < len(probabilities) else 0.0
             score_parts.append(f"{class_name} {class_score:.3f}")
         return ", ".join(score_parts)
+
+
+_DEFAULT_AGENT: ECGAgent | None = None
+
+
+def _get_default_agent() -> ECGAgent:
+    """Reuse one lazily initialized ECG agent for legacy pipeline calls."""
+
+    global _DEFAULT_AGENT
+    if _DEFAULT_AGENT is None:
+        _DEFAULT_AGENT = ECGAgent()
+    return _DEFAULT_AGENT
+
+
+def _normalize_legacy_response(result: ECGPredictionResponse) -> Dict[str, object]:
+    """Map the strict ECG response to the older fusion-pipeline contract."""
+
+    reason = str(result.get("Reason", ""))
+    level = result.get("Level")
+    if reason.startswith("Prediction failed:"):
+        level = None
+
+    return {
+        "level": level,
+        "score": float(result.get("Score", 0.0)),
+        "reason": reason,
+    }
+
+
+def predict_ecg_signal(
+    ecg_input: Union[np.ndarray, str, Path],
+) -> Dict[str, object]:
+    """Backward-compatible function entry point expected by system_pipeline."""
+
+    try:
+        agent = _get_default_agent()
+
+        if isinstance(ecg_input, (str, Path)):
+            ecg_path = Path(ecg_input)
+            suffix = ecg_path.suffix.lower()
+
+            if suffix == ".csv":
+                result = agent.predict_from_csv(ecg_path)
+            elif suffix in {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"}:
+                result = agent.predict_from_image(ecg_path)
+            else:
+                return {
+                    "level": None,
+                    "score": 0.0,
+                    "reason": (
+                        "Prediction failed: unsupported ECG file type. "
+                        "Provide a .csv signal file or an ECG image."
+                    ),
+                }
+        else:
+            result = agent.predict(np.asarray(ecg_input, dtype=np.float32))
+    except ModelLoadingError as exc:
+        LOGGER.warning("Legacy ECG pipeline initialization failed: %s", exc)
+        return {
+            "level": None,
+            "score": 0.0,
+            "reason": f"Prediction failed: {exc}",
+        }
+    except Exception as exc:
+        LOGGER.exception("Unexpected legacy ECG pipeline failure.")
+        return {
+            "level": None,
+            "score": 0.0,
+            "reason": f"Prediction failed: unexpected ECG inference error: {exc}",
+        }
+
+    return _normalize_legacy_response(result)
