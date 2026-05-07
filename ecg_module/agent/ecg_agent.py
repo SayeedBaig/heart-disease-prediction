@@ -311,14 +311,3 @@ class ECGAgent:
             class_score = probabilities[class_index] if class_index < len(probabilities) else 0.0
             score_parts.append(f"{class_name} {class_score:.3f}")
         return ", ".join(score_parts)
-
-
-# Module-level function for easy import
-def predict_ecg_signal(ecg_signal):
-    """
-    Standalone function to predict ECG from signal array.
-    Creates an ECGAgent instance and calls predict.
-    """
-    agent = ECGAgent()
-    response = agent.predict(ecg_signal)
-    return response
