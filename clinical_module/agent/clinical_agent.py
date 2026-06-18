@@ -183,33 +183,199 @@ def _build_features(data: dict) -> pd.DataFrame:
     return pd.DataFrame([row]).reindex(columns=FEATURE_COLS, fill_value=0)
 
 
-def clinical_agent(input_data: dict) -> dict:
-    """Run the clinical model and return a standardized response."""
+def _build_clinical_narrative(data: dict, level: str, confidence: float | None = None) -> str:
+    """
+    Generate a rich, patient-specific clinical narrative from raw input values.
+    Works with or without ML model output.
+    """
+    age = data["age"]
+    height = data["height"]
+    weight = data["weight"]
+    ap_hi = data["ap_hi"]
+    ap_lo = data["ap_lo"]
+    cholesterol = data["cholesterol"]
+    gluc = data["gluc"]
+    smoke = data["smoke"]
+    alco = data["alco"]
+    active = data["active"]
 
-    if _stack_model is None or _scaler is None:
-        return {
-            "level": None,
-            "score": 0.0,
-            "reason": f"Clinical model unavailable: {_MODEL_LOAD_ERROR or 'model files not loaded'}",
-        }
+    bmi = weight / ((height / 100) ** 2)
+    pulse_pressure = ap_hi - ap_lo
+
+    # ── BMI classification ────────────────────────────────────────────────
+    if bmi < 18.5:
+        bmi_label = "underweight"
+    elif bmi < 25.0:
+        bmi_label = "normal weight"
+    elif bmi < 30.0:
+        bmi_label = "overweight"
+    else:
+        bmi_label = "obese"
+
+    # ── Blood pressure classification ─────────────────────────────────────
+    if ap_hi >= 180 or ap_lo >= 120:
+        bp_label = "hypertensive crisis"
+    elif ap_hi >= 140 or ap_lo >= 90:
+        bp_label = "Stage 2 hypertension"
+    elif ap_hi >= 130 or ap_lo >= 80:
+        bp_label = "Stage 1 hypertension"
+    elif ap_hi >= 120:
+        bp_label = "elevated blood pressure"
+    else:
+        bp_label = "normal blood pressure"
+
+    # ── Cholesterol label ─────────────────────────────────────────────────
+    chol_labels = {1: "normal", 2: "above normal", 3: "well above normal"}
+    chol_label = chol_labels.get(cholesterol, "unknown")
+
+    # ── Glucose label ─────────────────────────────────────────────────────
+    gluc_labels = {1: "normal", 2: "above normal", 3: "well above normal"}
+    gluc_label = gluc_labels.get(gluc, "unknown")
+
+    # ── Lifestyle summary ─────────────────────────────────────────────────
+    lifestyle_parts = []
+    if smoke:
+        lifestyle_parts.append("active smoker")
+    if alco:
+        lifestyle_parts.append("alcohol consumer")
+    if not active:
+        lifestyle_parts.append("physically inactive")
+    lifestyle_str = (
+        ", ".join(lifestyle_parts) if lifestyle_parts else "non-smoker, non-drinker, physically active"
+    )
+
+    # ── Age risk note ─────────────────────────────────────────────────────
+    age_note = ""
+    if age >= 60:
+        age_note = f"At age {age}, cardiovascular risk is significantly elevated."
+    elif age >= 45:
+        age_note = f"At age {age}, regular cardiac monitoring is advisable."
+    else:
+        age_note = f"At age {age}, baseline cardiovascular risk is lower."
+
+    # ── Confidence string ─────────────────────────────────────────────────
+    conf_str = f" (model confidence: {confidence * 100:.1f}%)" if confidence is not None else " (rule-based estimate)"
+
+    # ── Final narrative ───────────────────────────────────────────────────
+    narrative = (
+        f"Risk assessment: {level} risk{conf_str}. "
+        f"Patient profile — Age: {age} years, BMI: {bmi:.1f} ({bmi_label}), "
+        f"Blood Pressure: {ap_hi}/{ap_lo} mmHg ({bp_label}, pulse pressure: {pulse_pressure} mmHg), "
+        f"Cholesterol: {chol_label}, Glucose: {gluc_label}. "
+        f"Lifestyle: {lifestyle_str}. "
+        f"{age_note}"
+    )
+
+    return narrative
+
+
+def _rule_based_clinical(data: dict) -> dict:
+    """
+    Fallback rule-based clinical risk assessment when the ML model is unavailable.
+    Uses clinically validated thresholds to compute a risk level and score.
+    """
+    score = 0.0
+    age = data["age"]
+    bmi = data["weight"] / ((data["height"] / 100) ** 2)
+    ap_hi = data["ap_hi"]
+    ap_lo = data["ap_lo"]
+    cholesterol = data["cholesterol"]
+    gluc = data["gluc"]
+    smoke = data["smoke"]
+    alco = data["alco"]
+    active = data["active"]
+
+    # Age risk
+    if age >= 60:
+        score += 0.25
+    elif age >= 45:
+        score += 0.15
+    elif age >= 35:
+        score += 0.05
+
+    # BMI risk
+    if bmi >= 30:
+        score += 0.15
+    elif bmi >= 25:
+        score += 0.08
+
+    # Blood pressure risk
+    if ap_hi >= 180 or ap_lo >= 120:
+        score += 0.30
+    elif ap_hi >= 140 or ap_lo >= 90:
+        score += 0.20
+    elif ap_hi >= 130 or ap_lo >= 80:
+        score += 0.10
+
+    # Cholesterol risk
+    if cholesterol == 3:
+        score += 0.15
+    elif cholesterol == 2:
+        score += 0.08
+
+    # Glucose risk
+    if gluc == 3:
+        score += 0.12
+    elif gluc == 2:
+        score += 0.06
+
+    # Lifestyle risk
+    if smoke:
+        score += 0.10
+    if alco:
+        score += 0.05
+    if not active:
+        score += 0.08
+
+    # Clamp score to [0, 1]
+    score = min(score, 1.0)
+
+    if score >= 0.55:
+        level = "High"
+    elif score >= 0.30:
+        level = "Medium"
+    else:
+        level = "Low"
+
+    reason = _build_clinical_narrative(data, level, confidence=None)
+
+    return {
+        "level": level,
+        "score": round(score, 6),
+        "reason": reason,
+    }
+
+
+def clinical_agent(input_data: dict) -> dict:
+    """
+    Run the clinical model and return a standardized response.
+    Falls back to rule-based assessment if the ML model is unavailable.
+    """
 
     errors = _validate_input(input_data)
     if errors:
         return {
             "level": None,
             "score": 0.0,
-            "reason": " | ".join(errors),
+            "reason": "Validation errors: " + " | ".join(errors),
         }
 
+    # ── Fallback: ML model not loaded ────────────────────────────────────
+    if _stack_model is None or _scaler is None:
+        result = _rule_based_clinical(input_data)
+        result["reason"] = (
+            "[Rule-based fallback — ML model unavailable] " + result["reason"]
+        )
+        return result
+
+    # ── ML model path ─────────────────────────────────────────────────────
     try:
         features = _build_features(input_data)
         scaled = _scaler.transform(features)
     except Exception as exc:
-        return {
-            "level": None,
-            "score": 0.0,
-            "reason": f"Feature engineering failed: {exc}",
-        }
+        result = _rule_based_clinical(input_data)
+        result["reason"] = f"[Rule-based fallback — feature error: {exc}] " + result["reason"]
+        return result
 
     try:
         probabilities = _stack_model.predict_proba(scaled)[0]
@@ -217,25 +383,14 @@ def clinical_agent(input_data: dict) -> dict:
         predicted_class = LABEL_MAP[predicted_label]
         confidence = float(probabilities[predicted_label])
     except Exception as exc:
-        return {
-            "level": None,
-            "score": 0.0,
-            "reason": f"Clinical prediction failed: {exc}",
-        }
+        result = _rule_based_clinical(input_data)
+        result["reason"] = f"[Rule-based fallback — model error: {exc}] " + result["reason"]
+        return result
 
-    level_map = {
-        "Low Risk": "Low",
-        "Medium Risk": "Medium",
-        "High Risk": "High",
-    }
+    level_map = {"Low Risk": "Low", "Medium Risk": "Medium", "High Risk": "High"}
     level = level_map[predicted_class]
 
-    if level == "High":
-        reason = "High blood pressure and cholesterol levels detected"
-    elif level == "Medium":
-        reason = "Moderate risk due to clinical indicators"
-    else:
-        reason = "No major clinical risk factors detected"
+    reason = _build_clinical_narrative(input_data, level, confidence=confidence)
 
     return {
         "level": level,

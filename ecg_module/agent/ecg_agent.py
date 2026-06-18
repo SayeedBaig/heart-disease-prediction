@@ -311,3 +311,30 @@ class ECGAgent:
             class_score = probabilities[class_index] if class_index < len(probabilities) else 0.0
             score_parts.append(f"{class_name} {class_score:.3f}")
         return ", ".join(score_parts)
+
+
+# Module-level function for easy import
+def predict_ecg_signal(ecg_input):
+    """
+    Standalone function to predict ECG from a file path (CSV or image) or a numpy array.
+    Automatically routes to the correct method based on input type.
+    """
+    agent = ECGAgent()
+
+    if isinstance(ecg_input, np.ndarray):
+        return agent.predict(ecg_input)
+
+    if isinstance(ecg_input, str) and ecg_input.strip():
+        path = Path(ecg_input.strip())
+        suffix = path.suffix.lower()
+        if suffix == ".csv":
+            return agent.predict_from_csv(path)
+        if suffix in {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".tif"}:
+            return agent.predict_from_image(path)
+        # Fallback: try CSV first, then image
+        try:
+            return agent.predict_from_csv(path)
+        except Exception:
+            return agent.predict_from_image(path)
+
+    return agent._build_error_response("Invalid ECG input: provide a file path (.csv or image) or a numpy array.")

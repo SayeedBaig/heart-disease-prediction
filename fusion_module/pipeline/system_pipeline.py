@@ -210,9 +210,40 @@ def _print_fusion_section(result: dict) -> None:
     else:
         formatted_percentage = f"{risk_percentage}%"
     _print_field("Risk Percentage", formatted_percentage)
-    _print_field("Summary", rag_output.get("explanation"))
-    detail_items = [f"- {item}" for item in rag_output.get("details", [])]
-    _print_list_field("Details", detail_items)
+
+    # Summary — printed as a wrapped paragraph
+    print()
+    summary_text = rag_output.get("explanation") or ""
+    wrapped_summary = textwrap.fill(
+        summary_text,
+        width=96,
+        initial_indent="  Summary           : ",
+        subsequent_indent="                     ",
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+    print(wrapped_summary)
+
+    # Details — each line printed individually, preserving bullet formatting
+    details = rag_output.get("details", [])
+    if details:
+        print()
+        print("  Details:")
+        for item in details:
+            # Section headers (e.g. "Recommendations:") printed as-is
+            if item.strip().endswith(":") and not item.strip().startswith("•"):
+                print(f"\n    {item.strip()}")
+            else:
+                wrapped = textwrap.fill(
+                    item,
+                    width=96,
+                    initial_indent="    ",
+                    subsequent_indent="         ",
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                )
+                print(wrapped)
+
 
 
 def _print_report(result: dict) -> None:
