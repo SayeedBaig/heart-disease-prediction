@@ -1,2 +1,41 @@
-__pycache__/
+# Python
+
+**pycache**/
 *.pyc
+*.pyo
+
+# Virtual Environment
+
+venv/
+.venv/
+
+# Environment Variables
+
+.env
+
+# Frontend
+
+node_modules/
+dist/
+
+# Database
+
+db/chroma/
+
+# IDE
+
+.vscode/
+.idea/
+
+# OS Files
+
+.DS_Store
+Thumbs.db
+
+# Reports
+
+*.pdf
+
+# Logs
+
+*.log
