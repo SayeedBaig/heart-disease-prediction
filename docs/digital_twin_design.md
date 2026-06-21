@@ -250,7 +250,7 @@ The frontend can display:
 
 ---
 
-## 1. References
+## 10. References
 
 1. World Health Organization (WHO) HEARTS Technical Package.
 2. ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease.
