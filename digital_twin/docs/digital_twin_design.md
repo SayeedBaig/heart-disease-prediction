@@ -126,7 +126,7 @@ Each Digital Twin instance represents a single patient.
 - Alcohol Consumption
 - Physical Activity
 - Weight
-- Diet (optional)
+- Diet 
 
 ### Existing Model Outputs
 - Clinical Risk Score
