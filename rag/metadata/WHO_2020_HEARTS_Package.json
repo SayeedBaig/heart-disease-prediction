@@ -1,0 +1,9 @@
+{
+  "filename": "WHO_2020_HEARTS_Package.pdf",
+  "source": "WHO",
+  "year": 2020,
+  "title": "HEARTS Technical Package for Cardiovascular Disease Management",
+  "category": "lifestyle_recommendations",
+  "topics": ["lifestyle", "diet", "exercise", "smoking cessation", "medication adherence"],
+  "location": "rag/corpus/lifestyle_recommendations/WHO_2020_HEARTS_Package.pdf"
+}

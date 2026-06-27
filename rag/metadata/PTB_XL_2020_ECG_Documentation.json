@@ -1,0 +1,9 @@
+{
+  "filename": "PTB_XL_2020_ECG_Documentation.pdf",
+  "source": "PhysioNet",
+  "year": 2020,
+  "title": "PTB-XL: A Large Publicly Available Electrocardiography Dataset",
+  "category": "ecg_findings",
+  "topics": ["ECG", "NORM", "MI", "STTC", "CD", "HYP", "12-lead ECG", "arrhythmia"],
+  "location": "rag/corpus/ecg_findings/PTB_XL_2020_ECG_Documentation.pdf"
+}
