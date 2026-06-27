@@ -4,6 +4,7 @@ import ProgressBar from "../components/ProgressBar";
 import StepOne from "../components/StepOne";
 import StepTwo from "../components/StepTwo";
 import StepThree from "../components/StepThree";
+import api from "../services/api";
 
 function DiagnosePage() {
   const [step, setStep] = useState(1);
@@ -24,7 +25,8 @@ function DiagnosePage() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-const [error, setError] = useState("");
+  const [error, setError] = useState("");
+  const [result, setResult] = useState(null);
 
   // ---------------- Handle Input ----------------
 
@@ -131,7 +133,9 @@ const [error, setError] = useState("");
 
   // ---------------- Submit ----------------
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
+
+  
 
   if (!validateStepThree()) {
     return;
@@ -142,19 +146,31 @@ const [error, setError] = useState("");
 
   try {
 
-    console.log("Sending Data...");
-    console.log(formData);
+    console.log("Sending Data:", formData);
 
-    // Backend integration will go here
-    // const response = await api.post("/predict", formData);
+    const response = await api.post("/predict", formData);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Backend Response:", response.data);
 
-    alert("Patient data validated successfully.\nBackend integration will be connected next.");
+    setResult(response.data);
+
+    alert("Prediction completed successfully!");
 
   } catch (err) {
 
-    setError("Prediction failed. Please try again.");
+  console.error("Full Error:", err);
+
+  if (err.response) {
+  console.log("Status:", err.response.status);
+  console.log("Response:", err.response.data);
+} else if (err.request) {
+  console.log("No response received from backend.");
+} else {
+  console.log("Error:", err.message);
+}
+
+  setError("Prediction failed. Please try again.");
+
 
   } finally {
 
@@ -163,13 +179,11 @@ const [error, setError] = useState("");
   }
 
 };
-
   return (
     <>
       <Navbar />
 
       <div className="min-h-screen bg-gray-100 py-10">
-
         <ProgressBar step={step} />
 
         {step === 1 && (
@@ -193,16 +207,15 @@ const [error, setError] = useState("");
 
         {step === 3 && (
           <StepThree
-    formData={formData}
-    handleChange={handleChange}
-    prevStep={prevStep}
-    errors={errors}
-    handleSubmit={handleSubmit}
-    loading={loading}
-    error={error}
-/>
+            formData={formData}
+            handleChange={handleChange}
+            prevStep={prevStep}
+            errors={errors}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+          />
         )}
-
       </div>
     </>
   );
