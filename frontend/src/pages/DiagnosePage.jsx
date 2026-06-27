@@ -5,6 +5,7 @@ import StepOne from "../components/StepOne";
 import StepTwo from "../components/StepTwo";
 import StepThree from "../components/StepThree";
 import api from "../services/api";
+import ResultCard from "../components/ResultCard";
 
 function DiagnosePage() {
   const [step, setStep] = useState(1);
@@ -154,7 +155,6 @@ const handleSubmit = async () => {
 
     setResult(response.data);
 
-    alert("Prediction completed successfully!");
 
   } catch (err) {
 
@@ -216,6 +216,7 @@ const handleSubmit = async () => {
             error={error}
           />
         )}
+        {result && <ResultCard result={result} />}
       </div>
     </>
   );
