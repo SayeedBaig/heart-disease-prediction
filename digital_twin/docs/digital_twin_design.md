@@ -267,7 +267,108 @@ The Digital Twin should generate:
 ---
 
 
-## 9. Future Visualization
+## 9. Historical Timeline
+
+The Digital Twin maintains a temporal representation of patient health progression over multiple years.
+
+### Timeline Representation
+
+Year 0
+
+Current Patient State
+
+↓
+
+Year 1
+
+Projected Health State
+
+↓
+
+Year 2
+
+Projected Health State
+
+↓
+
+Year 3
+
+Projected Health State
+
+↓
+
+Year 4
+
+Projected Health State
+
+↓
+
+Year 5
+
+Projected Health State
+
+The timeline enables longitudinal tracking of cardiovascular risk progression and comparison between intervention strategies.
+
+---
+
+## 10. Twin Update Workflow
+
+The Digital Twin updates patient states by applying simulation scenarios and recalculating projected outcomes.
+
+### Workflow
+
+Patient State
+
+↓
+
+Apply Selected Scenario
+
+↓
+
+Update Simulation Variables
+
+↓
+
+Recompute Clinical Features
+
+↓
+
+Generate Updated Clinical Prediction
+
+↓
+
+Combine with Baseline ECG and Echo Results
+
+↓
+
+Recalculate Fusion Risk
+
+↓
+
+Store Historical State
+
+↓
+
+Return Updated Patient State
+
+### Purpose
+
+The Twin Update Workflow ensures that every intervention scenario produces a new patient state while preserving historical information for future comparison and analysis.
+
+---
+
+
+## 11. References
+
+1. World Health Organization (WHO) HEARTS Technical Package.
+2. ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease.
+3. Corral-Acero et al., The Digital Twin to Enable the Vision of Precision Cardiology.
+4. PTB-XL: A Large Publicly Available Electrocardiography Dataset.
+5. American Society of Echocardiography Guidelines.
+
+---
+
+## 12. Future Visualization
 
 The frontend can display:
 
@@ -276,13 +377,3 @@ The frontend can display:
 * Scenario Comparison Dashboard
 * Best Intervention Highlight
 * Interactive Simulation Controls
-
----
-
-## 10. References
-
-1. World Health Organization (WHO) HEARTS Technical Package.
-2. ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease.
-3. Corral-Acero et al., The Digital Twin to Enable the Vision of Precision Cardiology.
-4. PTB-XL: A Large Publicly Available Electrocardiography Dataset.
-5. American Society of Echocardiography Guidelines.
