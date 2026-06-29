@@ -1,9 +1,9 @@
 import copy
 
-from scenarios.bp_scenario import lower_bp
-from scenarios.cholesterol_scenario import improve_cholesterol
-from scenarios.weight_scenario import reduce_weight
-from scenarios.smoking_scenario import smoking_cessation
+from digital_twin.scenarios.bp_scenario import lower_bp
+from digital_twin.scenarios.cholesterol_scenario import improve_cholesterol
+from digital_twin.scenarios.weight_scenario import reduce_weight
+from digital_twin.scenarios.smoking_scenario import smoking_cessation
 
 
 def simulate(patient):

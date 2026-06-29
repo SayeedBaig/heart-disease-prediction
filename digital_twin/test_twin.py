@@ -1,4 +1,4 @@
-from engine.twin_engine import TwinEngine
+from digital_twin.engine.twin_engine import TwinEngine
 
 
 patient = {

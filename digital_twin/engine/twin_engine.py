@@ -1,6 +1,6 @@
-from models.twin_model import PatientTwin
+from digital_twin.models.twin_model import PatientTwin
 
-from simulation.simulator import simulate
+from digital_twin.simulation.simulator import simulate
 
 
 class TwinEngine:
