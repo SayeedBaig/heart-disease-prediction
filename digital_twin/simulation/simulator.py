@@ -1,65 +1,68 @@
-import copy
+from digital_twin.engine.twin_engine import TwinEngine
 
-from scenarios.bp_scenario import lower_bp
-from scenarios.cholesterol_scenario import improve_cholesterol
-from scenarios.weight_scenario import reduce_weight
-from scenarios.smoking_scenario import smoking_cessation
+from digital_twin.scenarios.medication import simulate as medication
+from digital_twin.scenarios.exercise import simulate as exercise
+from digital_twin.scenarios.diabetes import simulate as diabetes
+from digital_twin.scenarios.lifestyle import simulate as lifestyle
 
-
-def simulate(patient):
-
-    baseline = patient.risk
-
-    results = []
-
-    scenario_list = [
-
-        ("Lower BP", lower_bp),
-
-        ("Improve Cholesterol",
-         improve_cholesterol),
-
-        ("Weight Reduction",
-         reduce_weight),
-
-        ("Smoking Cessation",
-         smoking_cessation)
-
-    ]
+from digital_twin.scenarios.smoking_scenario import simulate as smoking
+from digital_twin.scenarios.weight_scenario import simulate as weight
+from digital_twin.scenarios.bp_scenario import simulate as bp
+from digital_twin.scenarios.cholesterol_scenario import simulate as cholesterol
 
 
-    for name, func in scenario_list:
+class TwinSimulator:
 
-        p = copy.deepcopy(patient)
+    def __init__(self):
 
-        p = func(p)
+        self.engine = TwinEngine()
 
-        results.append(
+    def run_all(self, patient):
 
-            {
+        results = []
+
+        scenarios = {
+
+            "Smoking Cessation": smoking,
+
+            "Weight Reduction": weight,
+
+            "BP Control": bp,
+
+            "Cholesterol Control": cholesterol,
+
+            "Exercise Improvement": exercise,
+
+            "Medication Adherence": medication,
+
+            "Diabetes Control": diabetes,
+
+            "Combined Lifestyle": lifestyle
+
+        }
+
+        for name, func in scenarios.items():
+
+            updated_patient = func(patient)
+
+            projected_risk = self.engine.calculate_risk(
+                updated_patient
+            )
+
+            results.append({
 
                 "scenario": name,
 
-                "risk":
+                "risk_after": projected_risk,
 
-                    round(p.risk,3),
+                "bp": updated_patient.systolic_bp,
 
-                "change":
+                "cholesterol": updated_patient.cholesterol,
 
-                    round(
+                "glucose": updated_patient.glucose,
 
-                    (
+                "bmi": updated_patient.bmi
 
-                    (baseline-p.risk)
+            })
 
-                    / baseline
-
-                    )*100
-
-                    ,1)
-
-            }
-
-        )
-
-    return results
+        return results

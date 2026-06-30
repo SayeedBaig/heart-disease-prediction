@@ -1,7 +1,12 @@
-def smoking_cessation(patient):
+from copy import deepcopy
 
-    patient.smoking = 0
+from digital_twin.models.patient_profile import PatientProfile
 
-    patient.risk *= 0.85
 
-    return patient
+def simulate(patient: PatientProfile):
+
+    updated = deepcopy(patient)
+
+    updated.smoking_status = False
+
+    return updated
