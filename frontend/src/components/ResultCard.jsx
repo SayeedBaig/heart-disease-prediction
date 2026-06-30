@@ -1,5 +1,8 @@
 import RiskBadge from "./RiskBadge";
 import ConfidenceBar from "./ConfidenceBar";
+import ExplanationCard from "./ExplanationCard";
+import TwinSimulationCard from "./TwinSimulationCard";
+import RecommendationCard from "./RecommendationCard";
 
 function ResultCard({ result }) {
   const prediction = result.prediction;
@@ -108,72 +111,13 @@ function ResultCard({ result }) {
 
       </div>
 
-      {/* ================= AI Recommendation ================= */}
+      <RecommendationCard prediction={prediction} />
 
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+      
 
-        <h3 className="text-2xl font-bold text-gray-800 mb-4">
-          🤖 AI Recommendation
-        </h3>
+      <ExplanationCard explanation={result.explanation} />
 
-        <p className="leading-8 text-gray-700 mb-6">
-          {prediction.rag.explanation}
-        </p>
-
-        <ul className="space-y-3">
-
-          {prediction.rag.details.map((item, index) => (
-
-            <li
-              key={index}
-              className="flex items-start gap-3 text-gray-700"
-            >
-              <span>✅</span>
-              <span>{item}</span>
-            </li>
-
-          ))}
-
-        </ul>
-
-      </div>
-
-      {/* ================= Explanation Placeholder ================= */}
-
-      <div className="bg-blue-50 border border-blue-200 rounded-xl shadow-sm p-6 mb-6">
-
-        <h3 className="text-2xl font-bold text-blue-700 mb-4">
-          📚 Explanation
-        </h3>
-
-        <p className="mb-2">
-          <strong>Status:</strong> {result.explanation.status}
-        </p>
-
-        <p className="text-gray-700">
-          {result.explanation.message}
-        </p>
-
-      </div>
-
-      {/* ================= Digital Twin Placeholder ================= */}
-
-      <div className="bg-purple-50 border border-purple-200 rounded-xl shadow-sm p-6">
-
-        <h3 className="text-2xl font-bold text-purple-700 mb-4">
-          🧬 Digital Twin
-        </h3>
-
-        <p className="mb-2">
-          <strong>Status:</strong> {result.digital_twin.status}
-        </p>
-
-        <p className="text-gray-700">
-          {result.digital_twin.message}
-        </p>
-
-      </div>
-
+      <TwinSimulationCard digitalTwin={result.digital_twin} />
     </div>
   );
 }
