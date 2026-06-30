@@ -1,7 +1,15 @@
-def improve_cholesterol(patient):
+from copy import deepcopy
 
-    patient.cholesterol -= 30
+from digital_twin.models.patient_profile import PatientProfile
 
-    patient.risk *= 0.90
 
-    return patient
+def simulate(patient: PatientProfile):
+
+    updated = deepcopy(patient)
+
+    updated.cholesterol = max(
+        0,
+        patient.cholesterol - 30
+    )
+
+    return updated

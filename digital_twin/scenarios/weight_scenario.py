@@ -1,7 +1,20 @@
-def reduce_weight(patient):
+from copy import deepcopy
 
-    patient.bmi -= 2
+from digital_twin.models.patient_profile import PatientProfile
 
-    patient.risk *= 0.88
 
-    return patient
+def simulate(patient: PatientProfile):
+
+    updated = deepcopy(patient)
+
+    updated.weight = max(
+        0,
+        patient.weight - 10
+    )
+
+    updated.bmi = max(
+        0,
+        patient.bmi - 3
+    )
+
+    return updated
