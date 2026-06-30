@@ -1,4 +1,31 @@
+# ==========================
+# Backend Framework
+# ==========================
 fastapi
 uvicorn[standard]
 python-multipart
 pydantic>=2.0
+
+# ==========================
+# Environment Variables
+# ==========================
+python-dotenv
+
+# ==========================
+# Scientific Computing
+# ==========================
+numpy
+
+# ==========================
+# RAG Pipeline
+# ==========================
+faiss-cpu
+sentence-transformers
+groq
+
+# ==========================
+# Optional (RAG Index Builder)
+# Only required when rebuilding
+# the FAISS index from PDFs.
+# ==========================
+PyMuPDF

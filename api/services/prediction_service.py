@@ -61,10 +61,9 @@ class PredictionService:
             prediction
         )
 
-        digital_twin = (
-            self.digital_twin_service.simulate_future(
-                prediction
-            )
+        digital_twin = self.digital_twin_service.simulate_future(
+            patient,
+            prediction
         )
 
         response = self.response_builder.build(
