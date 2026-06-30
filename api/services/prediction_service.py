@@ -61,9 +61,19 @@ class PredictionService:
             prediction
         )
 
+        self.shared_memory.set(
+            "latest_explanation",
+            explanation,
+        )
+
         digital_twin = self.digital_twin_service.simulate_future(
             patient,
             prediction
+        )
+
+        self.shared_memory.set(
+            "latest_digital_twin",
+            digital_twin,
         )
 
         response = self.response_builder.build(
