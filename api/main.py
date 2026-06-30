@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-
+from api.routes.reports import router as reports_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -39,6 +39,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(predict_router)
+app.include_router(reports_router)
 
 @app.get("/")
 def root():

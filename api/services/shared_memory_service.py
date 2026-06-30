@@ -10,8 +10,7 @@ class SharedMemoryService:
     of calling the prediction pipeline again.
     """
 
-    def __init__(self):
-        self._memory: Dict[str, Any] = {}
+    _memory: Dict[str, Any] = {}   # class-level: shared across ALL instances
 
     def set(self, key: str, value: Any) -> None:
         self._memory[key] = value
