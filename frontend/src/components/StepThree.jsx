@@ -1,6 +1,8 @@
 function StepThree({
   formData,
   handleChange,
+  handleImageChange,
+  handleCsvChange,
   prevStep,
   errors,
   handleSubmit,
@@ -66,7 +68,7 @@ function StepThree({
 
       {/* Physical Activity */}
 
-      <div className="mb-8">
+      <div className="mb-6">
         <label className="block mb-2 font-semibold">
           Physically Active
         </label>
@@ -89,13 +91,61 @@ function StepThree({
         )}
       </div>
 
-      {/* Error Message */}
+      {/* ECG IMAGE */}
+
+      <div className="mb-6">
+        <label className="block mb-2 font-semibold text-blue-900">
+          Upload ECG Image
+        </label>
+
+        <input
+          type="file"
+          accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff"
+          onChange={handleImageChange}
+          className="w-full border rounded-lg p-3"
+        />
+
+        {formData.ecgImage && (
+          <p className="text-green-700 mt-2 text-sm">
+            Selected Image: {formData.ecgImage.name}
+          </p>
+        )}
+      </div>
+
+      {/* ECG CSV */}
+
+      <div className="mb-8">
+        <label className="block mb-2 font-semibold text-blue-900">
+          Upload ECG CSV
+        </label>
+
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleCsvChange}
+          className="w-full border rounded-lg p-3"
+        />
+
+        {formData.ecgCsv && (
+          <p className="text-green-700 mt-2 text-sm">
+            Selected CSV: {formData.ecgCsv.name}
+          </p>
+        )}
+
+        <p className="text-gray-500 text-sm mt-2">
+          Upload either an ECG Image or an ECG CSV file.
+        </p>
+      </div>
+
+      {/* Error */}
 
       {error && (
         <p className="text-red-600 font-semibold mb-4">
           {error}
         </p>
       )}
+
+      {/* Buttons */}
 
       <div className="flex justify-between">
 

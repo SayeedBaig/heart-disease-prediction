@@ -22,6 +22,8 @@ function DiagnosePage() {
     smoke: "",
     alco: "",
     active: "",
+    ecgImage: null,
+    ecgCsv: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -37,6 +39,20 @@ function DiagnosePage() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleImageChange = (e) => {
+  setFormData((prev) => ({
+    ...prev,
+    ecgImage: e.target.files[0],
+  }));
+};
+
+const handleCsvChange = (e) => {
+  setFormData((prev) => ({
+    ...prev,
+    ecgCsv: e.target.files[0],
+  }));
+};
 
   // ---------------- Step 1 Validation ----------------
 
@@ -207,16 +223,31 @@ const handleSubmit = async () => {
 
         {step === 3 && (
           <StepThree
-            formData={formData}
-            handleChange={handleChange}
-            prevStep={prevStep}
-            errors={errors}
-            handleSubmit={handleSubmit}
-            loading={loading}
-            error={error}
-          />
+        formData={formData}
+        handleChange={handleChange}
+        handleImageChange={handleImageChange}
+        handleCsvChange={handleCsvChange}
+        prevStep={prevStep}
+        errors={errors}
+        handleSubmit={handleSubmit}
+        loading={loading}
+        error={error}
+/>
         )}
-        {result && <ResultCard result={result} />}
+        {result && (
+  <>
+    <ResultCard result={result} />
+
+    <div className="flex justify-center mt-8 mb-10">
+      <button
+        onClick={() => (window.location.href = "/reports")}
+        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
+      >
+        📄 View Reports
+      </button>
+    </div>
+  </>
+)}
       </div>
     </>
   );
