@@ -79,4 +79,8 @@ class UploadService:
             f"Uploaded file saved: {filepath}"
         )
 
-        return str(filepath)
+        relative_path = filepath.relative_to(
+            upload_dir.parent.parent
+        )
+
+        return str(relative_path).replace("\\", "/")
