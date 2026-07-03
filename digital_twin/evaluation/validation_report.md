@@ -37,3 +37,17 @@ Digital Twin simulations are inference-only.
 Outputs are not reused for model training.
 
 Synthetic scenarios excluded from datasets.
+
+## Advanced Digital Twin
+
+✔ Medication adherence
+
+✔ Exercise improvement
+
+✔ Diabetes management
+
+✔ Future risk simulation
+
+✔ Patient monitoring
+
+✔ Trend analysis
