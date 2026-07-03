@@ -22,8 +22,8 @@ function DiagnosePage() {
     smoke: "",
     alco: "",
     active: "",
-    ecgImage: null,
-    ecgCsv: null,
+    ecgFile: null,
+    echoFile: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -40,17 +40,17 @@ function DiagnosePage() {
     });
   };
 
-  const handleImageChange = (e) => {
+  const handleECGFileChange = (e) => {
   setFormData((prev) => ({
     ...prev,
-    ecgImage: e.target.files[0],
+    ecgFile: e.target.files[0],
   }));
 };
 
-const handleCsvChange = (e) => {
+const handleEchoFileChange = (e) => {
   setFormData((prev) => ({
     ...prev,
-    ecgCsv: e.target.files[0],
+    echoFile: e.target.files[0],
   }));
 };
 
@@ -147,13 +147,41 @@ const handleCsvChange = (e) => {
   const prevStep = () => {
     setStep(step - 1);
   };
+  // ---------------- Upload ECG ----------------
 
-  // ---------------- Submit ----------------
+const uploadECG = async () => {
+  if (!formData.ecgFile) return null;
+
+  const data = new FormData();
+  data.append("file", formData.ecgFile);
+
+  const response = await api.post("/upload/ecg", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data.file_path;
+};
+
+// ---------------- Upload Echo ----------------
+
+const uploadEcho = async () => {
+  if (!formData.echoFile) return null;
+
+  const data = new FormData();
+  data.append("file", formData.echoFile);
+
+  const response = await api.post("/upload/echo", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data.file_path;
+};
 
 const handleSubmit = async () => {
-
-  
-
   if (!validateStepThree()) {
     return;
   }
@@ -163,37 +191,51 @@ const handleSubmit = async () => {
 
   try {
 
-    console.log("Sending Data:", formData);
+    // Upload ECG
+    const ecgPath = await uploadECG();
 
-    const response = await api.post("/predict", formData);
+    // Upload Echo
+    const echoPath = await uploadEcho();
 
-    console.log("Backend Response:", response.data);
+    console.log("Uploaded ECG:", ecgPath);
+    console.log("Uploaded Echo:", echoPath);
+
+    // Clinical data only
+    const clinicalData = {
+  age: Number(formData.age),
+  gender: Number(formData.gender),
+  height: Number(formData.height),
+  weight: Number(formData.weight),
+  ap_hi: Number(formData.ap_hi),
+  ap_lo: Number(formData.ap_lo),
+  cholesterol: Number(formData.cholesterol),
+  gluc: Number(formData.gluc),
+  smoke: Number(formData.smoke),
+  alco: Number(formData.alco),
+  active: Number(formData.active),
+
+  // Backend upload paths
+  ecg_path: ecgPath,
+  echo_path: echoPath,
+};
+
+    const response = await api.post("/predict", clinicalData);
+
+    console.log(response.data);
 
     setResult(response.data);
 
-
   } catch (err) {
 
-  console.error("Full Error:", err);
+    console.error(err);
 
-  if (err.response) {
-  console.log("Status:", err.response.status);
-  console.log("Response:", err.response.data);
-} else if (err.request) {
-  console.log("No response received from backend.");
-} else {
-  console.log("Error:", err.message);
-}
-
-  setError("Prediction failed. Please try again.");
-
+    setError("Prediction failed.");
 
   } finally {
 
     setLoading(false);
 
   }
-
 };
   return (
     <>
@@ -223,15 +265,15 @@ const handleSubmit = async () => {
 
         {step === 3 && (
           <StepThree
-        formData={formData}
-        handleChange={handleChange}
-        handleImageChange={handleImageChange}
-        handleCsvChange={handleCsvChange}
-        prevStep={prevStep}
-        errors={errors}
-        handleSubmit={handleSubmit}
-        loading={loading}
-        error={error}
+  formData={formData}
+  handleChange={handleChange}
+  handleECGFileChange={handleECGFileChange}
+  handleEchoFileChange={handleEchoFileChange}
+  prevStep={prevStep}
+  errors={errors}
+  handleSubmit={handleSubmit}
+  loading={loading}
+  error={error}
 />
         )}
         {result && (

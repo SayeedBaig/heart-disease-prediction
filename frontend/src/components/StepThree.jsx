@@ -1,8 +1,8 @@
 function StepThree({
   formData,
   handleChange,
-  handleImageChange,
-  handleCsvChange,
+  handleECGFileChange,
+  handleEchoFileChange,
   prevStep,
   errors,
   handleSubmit,
@@ -91,49 +91,53 @@ function StepThree({
         )}
       </div>
 
-      {/* ECG IMAGE */}
+      {/* ECG Upload */}
 
       <div className="mb-6">
         <label className="block mb-2 font-semibold text-blue-900">
-          Upload ECG Image
+          Upload ECG File
         </label>
 
         <input
           type="file"
-          accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff"
-          onChange={handleImageChange}
+          accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff,.csv"
+          onChange={handleECGFileChange}
           className="w-full border rounded-lg p-3"
         />
 
-        {formData.ecgImage && (
+        {formData.ecgFile && (
           <p className="text-green-700 mt-2 text-sm">
-            Selected Image: {formData.ecgImage.name}
-          </p>
-        )}
-      </div>
-
-      {/* ECG CSV */}
-
-      <div className="mb-8">
-        <label className="block mb-2 font-semibold text-blue-900">
-          Upload ECG CSV
-        </label>
-
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleCsvChange}
-          className="w-full border rounded-lg p-3"
-        />
-
-        {formData.ecgCsv && (
-          <p className="text-green-700 mt-2 text-sm">
-            Selected CSV: {formData.ecgCsv.name}
+            ✅ Selected ECG File: {formData.ecgFile.name}
           </p>
         )}
 
         <p className="text-gray-500 text-sm mt-2">
-          Upload either an ECG Image or an ECG CSV file.
+          Supported formats: PNG, JPG, JPEG, BMP, TIFF and CSV
+        </p>
+      </div>
+
+      {/* Echo Upload */}
+
+      <div className="mb-8">
+        <label className="block mb-2 font-semibold text-blue-900">
+          Upload Echo Video (Optional)
+        </label>
+
+        <input
+          type="file"
+          accept=".mp4,.avi,.mov,.mkv"
+          onChange={handleEchoFileChange}
+          className="w-full border rounded-lg p-3"
+        />
+
+        {formData.echoFile && (
+          <p className="text-green-700 mt-2 text-sm">
+            ✅ Selected Echo Video: {formData.echoFile.name}
+          </p>
+        )}
+
+        <p className="text-gray-500 text-sm mt-2">
+          Supported formats: MP4, AVI, MOV and MKV
         </p>
       </div>
 
