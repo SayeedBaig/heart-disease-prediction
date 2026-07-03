@@ -14,6 +14,8 @@ prediction_service = PredictionService()
 def predict(clinical_data: ClinicalInput):
     try:
         patient = clinical_data.model_dump()
+        ecg_path = patient.pop("ecg_path", None)
+        echo_path = patient.pop("echo_path", None)
 
         errors = validate_patient_data(patient)
 
@@ -25,8 +27,8 @@ def predict(clinical_data: ClinicalInput):
 
         result = prediction_service.predict(
             clinical_data=patient,
-            ecg_input="sample_ecg.csv",
-            echo_input="",
+            ecg_input=ecg_path,
+            echo_input=echo_path,
         )
 
         return result

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from typing import Optional
 class ClinicalInput(BaseModel):
     model_config = {
         "json_schema_extra": {
@@ -34,3 +34,6 @@ class ClinicalInput(BaseModel):
     smoke: int = Field(..., ge=0, le=1)
     alco: int = Field(..., ge=0, le=1)
     active: int = Field(..., ge=0, le=1)
+
+    ecg_path: Optional[str] = None
+    echo_path: Optional[str] = None
