@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "risk_level": "High",
+        "ecg_class": "MI",
+        "ef_value": 35,
+        "expected_source": "ACC_AHA_2019_Primary_Prevention.pdf"
+    },
+    {
+        "id": 2,
+        "risk_level": "Medium",
+        "ecg_class": "STTC",
+        "ef_value": 48,
+        "expected_source": "ESC_2021_CVD_Prevention.pdf"
+    },
+    {
+        "id": 3,
+        "risk_level": "Low",
+        "ecg_class": "NORM",
+        "ef_value": 60,
+        "expected_source": "WHO_2020_HEARTS_Package.pdf"
+    }
+]

@@ -1,0 +1,138 @@
+{
+  "results": [
+    {
+      "test": "High risk + MI + Low EF",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 0.5,
+      "category_coverage": 0.5,
+      "avg_confidence": 0.08,
+      "duplicate_sources": 3,
+      "sources": [
+        "ESC_2021_CVD_Prevention.pdf p.4",
+        "ESC_2021_CVD_Prevention.pdf p.82",
+        "ESC_2021_CVD_Prevention.pdf p.69",
+        "ESC_2021_CVD_Prevention.pdf p.66"
+      ]
+    },
+    {
+      "test": "Low risk + NORM",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.124,
+      "duplicate_sources": 2,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.5",
+        "WHO_2020_HEARTS_Package.pdf p.10",
+        "WHO_2020_HEARTS_Package.pdf p.79",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.34"
+      ]
+    },
+    {
+      "test": "Medium risk + STTC",
+      "chunks_retrieved": 3,
+      "keyword_coverage": 0.667,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.026,
+      "duplicate_sources": 0,
+      "sources": [
+        "AHA_2021_Heart_Stroke_Statistics.pdf p.343",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.3",
+        "ESC_2021_CVD_Prevention.pdf p.1"
+      ]
+    },
+    {
+      "test": "High risk + HYP",
+      "chunks_retrieved": 3,
+      "keyword_coverage": 0.667,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.035,
+      "duplicate_sources": 1,
+      "sources": [
+        "ESC_2021_CVD_Prevention.pdf p.81",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.39",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.30"
+      ]
+    },
+    {
+      "test": "Medium risk + CD",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 0.667,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.08,
+      "duplicate_sources": 1,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.3",
+        "WHO_2020_HEARTS_Package.pdf p.21",
+        "WHO_2020_HEARTS_Package.pdf p.1",
+        "ESC_2021_CVD_Prevention.pdf p.1"
+      ]
+    },
+    {
+      "test": "Edge case \u2014 No ECG no EF (clinical only)",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.068,
+      "duplicate_sources": 2,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.3",
+        "WHO_2020_HEARTS_Package.pdf p.21",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.5",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.39"
+      ]
+    },
+    {
+      "test": "Edge case \u2014 Low risk no EF",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.124,
+      "duplicate_sources": 2,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.5",
+        "WHO_2020_HEARTS_Package.pdf p.10",
+        "WHO_2020_HEARTS_Package.pdf p.79",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.34"
+      ]
+    },
+    {
+      "test": "Edge case \u2014 Very low EF (severe HF)",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.08,
+      "duplicate_sources": 3,
+      "sources": [
+        "ESC_2021_CVD_Prevention.pdf p.4",
+        "ESC_2021_CVD_Prevention.pdf p.82",
+        "ESC_2021_CVD_Prevention.pdf p.69",
+        "ESC_2021_CVD_Prevention.pdf p.66"
+      ]
+    }
+  ],
+  "summary": {
+    "total_tests": 8,
+    "avg_keyword_coverage": 0.813,
+    "avg_category_coverage": 0.938,
+    "avg_confidence": 0.077,
+    "total_duplicates_found": 14,
+    "edge_cases_tested": 3,
+    "edge_cases_handled": 3,
+    "data_leakage_check": "PASS \u2014 No data leakage detected",
+    "overall_quality": "GOOD"
+  },
+  "data_leakage_verification": {
+    "corpus_documents": [
+      "ACC_AHA_2019_Primary_Prevention.pdf",
+      "ESC_2021_CVD_Prevention.pdf",
+      "AHA_2021_Heart_Stroke_Statistics.pdf",
+      "WHO_2020_HEARTS_Package.pdf",
+      "AHA_2019_Echo_Appropriate_Use.pdf",
+      "PTB_XL_2020_ECG_Documentation.pdf"
+    ],
+    "leakage_detected": false,
+    "leakage_details": "None",
+    "verdict": "PASS \u2014 No data leakage detected"
+  }
+}
