@@ -20,6 +20,21 @@ class PredictionRepository:
             risk_percentage=prediction["prediction"]["fusion"]["risk_percentage"],
             rag_explanation=prediction["prediction"]["rag"]["explanation"],
         )
+    def get_by_patient_id(self, patient_db_id: int):
+        return (
+            self.db.query(Prediction)
+            .filter(Prediction.patient_id == patient_db_id)
+            .order_by(Prediction.created_at.desc())
+            .all()
+        )
+
+
+    def get_by_id(self, prediction_id: int):
+        return (
+                self.db.query(Prediction)
+                .filter(Prediction.id == prediction_id)
+                .first()
+        )   
 
         self.db.add(prediction_db)
         self.db.commit()

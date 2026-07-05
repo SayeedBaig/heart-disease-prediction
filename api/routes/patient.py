@@ -5,6 +5,12 @@ from api.database.session import get_db
 from api.schemas.patient_request import PatientRegisterRequest
 from api.schemas.patient_response import PatientRegisterResponse
 from api.services.patient_registration_service import PatientRegistrationService
+from api.services.prediction_history_service import PredictionHistoryService
+from api.schemas.prediction_history_response import (
+    PredictionHistoryItem,
+    PredictionHistoryResponse,
+)
+
 
 router = APIRouter(
     prefix="/patients",
@@ -12,32 +18,37 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/register",
-    response_model=PatientRegisterResponse
+@router.get(
+    "/{patient_id}/predictions",
+    response_model=PredictionHistoryResponse
 )
-def register_patient(
-    request: PatientRegisterRequest,
+def get_prediction_history(
+    patient_id: str,
     db: Session = Depends(get_db)
 ):
-    try:
-        service = PatientRegistrationService(db)
+    service = PredictionHistoryService(db)
 
-        patient = service.register_patient(
-            request.model_dump()
-        )
+    predictions = service.get_prediction_history(patient_id)
 
-        return {
-            "id": patient.id,
-            "patient_id": patient.patient_id,
-            "full_name": patient.full_name,
-            "email": patient.email,
-            "message": "Patient registered successfully",
-            "created_at": patient.created_at
-        }
-
-    except ValueError as e:
+    if predictions is None:
         raise HTTPException(
-            status_code=400,
-            detail=str(e)
+            status_code=404,
+            detail="Patient not found"
         )
+
+    return PredictionHistoryResponse(
+        patient_id=patient_id,
+        total_predictions=len(predictions),
+        predictions=[
+            PredictionHistoryItem(
+                prediction_id=prediction.id,
+                risk_level=prediction.risk_level,
+                risk_percentage=prediction.risk_percentage,
+                clinical_level=prediction.clinical_level,
+                ecg_level=prediction.ecg_level,
+                echo_level=prediction.echo_level,
+                created_at=prediction.created_at,
+            )
+            for prediction in predictions
+        ]
+    )

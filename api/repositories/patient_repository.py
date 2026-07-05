@@ -38,7 +38,7 @@ class PatientRepository:
             .first()
         )  
 
-    def get_by_patient_id(self, patient_id: str):
+    def get_by_public_id(self, patient_id: str):
         return (
             self.db.query(Patient)
             .filter(Patient.patient_id == patient_id)

@@ -2,8 +2,8 @@ from datetime import datetime, date
 from sqlalchemy.orm import relationship
 from sqlalchemy import Date, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
-
 from api.database.base import Base
+
 
 
 class Patient(Base):

@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 
 class PatientReport:
@@ -10,6 +10,7 @@ class PatientReport:
         self,
         prediction: Dict[str, Any],
         explanation: Dict[str, Any],
+        patient: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
 
         fusion = prediction.get("fusion", {})
@@ -55,6 +56,8 @@ class PatientReport:
             ),
 
             "follow_up_advice": recommendations,
+
+            "patient": patient,
 
             "generated_by": "CardioAI",
 

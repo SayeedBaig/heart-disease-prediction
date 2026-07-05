@@ -3,6 +3,14 @@ from fastapi import APIRouter, HTTPException
 from reports.report_generator import ReportGenerator
 from api.services.shared_memory_service import SharedMemoryService
 
+from fastapi.responses import StreamingResponse
+
+from api.reports.renderers.pdf_renderer import PdfRenderer
+from api.services.report_service import ReportService
+from api.database.session import get_db
+from sqlalchemy.orm import Session
+from fastapi import Depends
+
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 report_generator = ReportGenerator()
@@ -51,4 +59,40 @@ def get_patient_report():
     return report_generator.generate_patient_report(
         prediction,
         explanation,
+    )
+
+@router.get("/doctor/pdf")
+def download_doctor_report(
+    patient_id: str,
+    db: Session = Depends(get_db),
+):
+    report = ReportService(db).generate_doctor_report(patient_id)
+
+    pdf = PdfRenderer().render(report)
+
+    return StreamingResponse(
+        pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition":
+            f'attachment; filename="doctor_report_{patient_id}.pdf"'
+        },
+    )
+
+@router.get("/patient/pdf")
+def download_patient_report(
+    patient_id: str,
+    db: Session = Depends(get_db),
+):
+    report = ReportService(db).generate_patient_report(patient_id)
+
+    pdf = PdfRenderer().render(report)
+
+    return StreamingResponse(
+        pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition":
+            f'attachment; filename="patient_report_{patient_id}.pdf"'
+        },
     )
