@@ -1,5 +1,5 @@
 from datetime import datetime, date
-
+from sqlalchemy.orm import relationship
 from sqlalchemy import Date, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -57,4 +57,10 @@ class Patient(Base):
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow
+    )
+
+    predictions = relationship(
+        "Prediction",
+        back_populates="patient",
+        cascade="all, delete-orphan"
     )

@@ -37,3 +37,4 @@ class ClinicalInput(BaseModel):
 
     ecg_path: Optional[str] = None
     echo_path: Optional[str] = None
+    patient_id: Optional[str] = None

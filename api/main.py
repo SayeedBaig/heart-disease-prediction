@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routes.upload import router as upload_router
 from api.routes.health import router as health_router
 from api.routes.predict import router as predict_router
+from api.routes.patient import router as patient_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,6 +44,7 @@ app.include_router(health_router)
 app.include_router(predict_router)
 app.include_router(reports_router)
 app.include_router(upload_router)
+app.include_router(patient_router)
 
 @app.get("/")
 def root():
