@@ -11,7 +11,15 @@ from api.utils.exception_handler import handle_prediction_exception
 router = APIRouter()
 
 
-@router.post("/predict")
+@router.post(
+    "/predict",
+    summary="Predict heart disease risk",
+    description=(
+        "Runs the complete CardioAI prediction pipeline using "
+        "clinical data, ECG, and Echocardiography inputs."
+    ),
+    response_description="Prediction completed successfully.",
+)
 def predict(
     clinical_data: ClinicalInput,
     db: Session = Depends(get_db),

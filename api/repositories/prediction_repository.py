@@ -4,10 +4,12 @@ from api.models.prediction import Prediction
 
 
 class PredictionRepository:
-    def __init__(self, db: Session):
+
+    def __init__(self, db: Session) -> None:
         self.db = db
 
-    def save(self, patient_db_id: int, prediction: dict):
+    def save(self, patient_db_id: int, prediction: dict) -> Prediction:
+        """Persist a new prediction record and return it."""
         prediction_db = Prediction(
             patient_id=patient_db_id,
             clinical_level=prediction["prediction"]["clinical"]["level"],
@@ -20,7 +22,15 @@ class PredictionRepository:
             risk_percentage=prediction["prediction"]["fusion"]["risk_percentage"],
             rag_explanation=prediction["prediction"]["rag"]["explanation"],
         )
-    def get_by_patient_id(self, patient_db_id: int):
+
+        self.db.add(prediction_db)
+        self.db.commit()
+        self.db.refresh(prediction_db)
+
+        return prediction_db
+
+    def get_by_patient_id(self, patient_db_id: int) -> list:
+        """Return all predictions for a patient, newest first."""
         return (
             self.db.query(Prediction)
             .filter(Prediction.patient_id == patient_db_id)
@@ -28,16 +38,10 @@ class PredictionRepository:
             .all()
         )
 
-
     def get_by_id(self, prediction_id: int):
+        """Return a single prediction by its primary key."""
         return (
-                self.db.query(Prediction)
-                .filter(Prediction.id == prediction_id)
-                .first()
-        )   
-
-        self.db.add(prediction_db)
-        self.db.commit()
-        self.db.refresh(prediction_db)
-
-        return prediction_db
+            self.db.query(Prediction)
+            .filter(Prediction.id == prediction_id)
+            .first()
+        )

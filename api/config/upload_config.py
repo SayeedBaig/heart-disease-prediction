@@ -30,3 +30,6 @@ ALLOWED_ECHO_EXTENSIONS = {
     ".mov",
     ".mkv",
 }
+
+# File retention period (days)
+FILE_RETENTION_DAYS = 7

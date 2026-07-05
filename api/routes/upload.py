@@ -10,7 +10,12 @@ router = APIRouter(
 upload_service = UploadService()
 
 
-@router.post("/ecg")
+@router.post(
+    "/ecg",
+    summary="Upload ECG file",
+    description="Uploads an ECG file for heart disease prediction.",
+    response_description="ECG uploaded successfully.",
+)
 def upload_ecg(
     file: UploadFile = File(...),
 ):
@@ -26,7 +31,12 @@ def upload_ecg(
     }
 
 
-@router.post("/echo")
+@router.post(
+    "/echo",
+    summary="Upload Echocardiography file",
+    description="Uploads an echocardiography video for heart disease prediction.",
+    response_description="Echo uploaded successfully.",
+)
 def upload_echo(
     file: UploadFile = File(...),
 ):
