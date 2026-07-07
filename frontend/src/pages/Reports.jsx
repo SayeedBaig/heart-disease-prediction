@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
+import Navbar from "../components/Navbar";
 import DoctorReportCard from "../components/DoctorReportCard";
 import PatientReportCard from "../components/PatientReportCard";
 
@@ -8,6 +9,7 @@ function Reports() {
   const [doctorReport, setDoctorReport] = useState(null);
   const [patientReport, setPatientReport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadReports = async () => {
@@ -19,8 +21,9 @@ function Reports() {
 
         setDoctorReport(doctor.data);
         setPatientReport(patient.data);
-      } catch (error) {
-        console.error("Failed to load reports:", error);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load reports. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -31,24 +34,52 @@ function Reports() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto mt-10">
-        <h2 className="text-2xl font-bold">
-          Loading Reports...
-        </h2>
-      </div>
+      <>
+        <Navbar />
+
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <h2 className="text-3xl font-semibold text-blue-700 animate-pulse">
+            Loading Reports...
+          </h2>
+        </div>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Navbar />
+
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+          <h2 className="text-xl text-red-600 font-semibold">
+            {error}
+          </h2>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-10 px-6">
-      <h1 className="text-5xl font-bold text-blue-800 mb-10">
-        Reports
-      </h1>
+    <>
+      <Navbar />
 
-      <DoctorReportCard report={doctorReport} />
+      <div className="min-h-screen bg-gray-100 py-10">
+        <div className="max-w-7xl mx-auto px-6">
 
-      <PatientReportCard report={patientReport} />
-    </div>
+          <h1 className="text-5xl font-bold text-blue-800 mb-10 text-center">
+            Reports
+          </h1>
+
+          <DoctorReportCard report={doctorReport} />
+
+          <div className="my-8" />
+
+          <PatientReportCard report={patientReport} />
+
+        </div>
+      </div>
+    </>
   );
 }
 

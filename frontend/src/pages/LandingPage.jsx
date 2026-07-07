@@ -1,42 +1,77 @@
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import Workflow from "../components/Workflow";
 import FeatureCard from "../components/FeatureCard";
 import Footer from "../components/Footer";
+
+import {
+  Stethoscope,
+  Activity,
+  HeartPulse,
+} from "lucide-react";
 
 function LandingPage() {
   return (
     <>
+      {/* Navbar */}
       <Navbar />
 
+      {/* Hero Section */}
       <Hero />
 
-      <section className="bg-gray-100 py-20">
-        <h2 className="text-4xl font-bold text-center text-blue-900 mb-12">
-          Our AI Modules
-        </h2>
+      {/* Workflow Section */}
+      <Workflow />
 
-        <div className="grid md:grid-cols-3 gap-10 max-w-7xl mx-auto px-6">
+      {/* AI Modules Section */}
+      <section className="py-24 bg-gradient-to-b from-slate-50 to-white">
 
-          <FeatureCard
-            icon="🩺"
-            title="Clinical Analysis"
-            description="Predict heart disease using patient history and clinical parameters."
-          />
+        <div className="max-w-7xl mx-auto px-6">
 
-          <FeatureCard
-            icon="📈"
-            title="ECG Analysis"
-            description="Deep Learning based ECG signal analysis for cardiovascular prediction."
-          />
+          {/* Section Heading */}
 
-          <FeatureCard
-            icon="🫀"
-            title="Echo Analysis"
-            description="Analyze Echocardiography videos to estimate cardiac function."
-          />
+          <div className="text-center mb-16">
+
+            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-5">
+              Multi-Modal AI Modules
+            </h2>
+
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-8">
+              CardioAI combines multiple Artificial Intelligence models to
+              provide accurate, explainable, and reliable cardiovascular
+              risk prediction through a unified AI pipeline.
+            </p>
+
+          </div>
+
+          {/* Cards */}
+
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-10">
+
+            <FeatureCard
+              icon={Stethoscope}
+              title="Clinical Analysis"
+              description="Predict cardiovascular risk using patient demographics, blood pressure, cholesterol, glucose and lifestyle information."
+            />
+
+            <FeatureCard
+              icon={Activity}
+              title="ECG Analysis"
+              description="Deep Learning based ECG analysis identifies cardiac abnormalities and improves prediction accuracy."
+            />
+
+            <FeatureCard
+              icon={HeartPulse}
+              title="Echo Analysis"
+              description="AI-powered Echocardiography analysis evaluates cardiac function and strengthens multi-modal prediction."
+            />
+
+          </div>
 
         </div>
+
       </section>
+
+      {/* Footer */}
 
       <Footer />
     </>

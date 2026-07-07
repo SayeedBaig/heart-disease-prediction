@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
+import StepUploadECG from "../components/StepUploadECG";
+import StepUploadEcho from "../components/StepUploadEcho";
+
 import StepOne from "../components/StepOne";
 import StepTwo from "../components/StepTwo";
 import StepThree from "../components/StepThree";
@@ -8,6 +12,7 @@ import api from "../services/api";
 import ResultCard from "../components/ResultCard";
 
 function DiagnosePage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
@@ -133,22 +138,41 @@ const handleEchoFileChange = (e) => {
   // ---------------- Navigation ----------------
 
   const nextStep = () => {
-    if (step === 1 && !validateStepOne()) {
-      return;
-    }
 
-    if (step === 2 && !validateStepTwo()) {
-      return;
-    }
+  // ECG Upload
+  if (step === 1) {
+    setStep(2);
+    return;
+  }
 
-    setStep(step + 1);
-  };
+  // Echo Upload
+  if (step === 2) {
+    setStep(3);
+    return;
+  }
 
-  const prevStep = () => {
-    setStep(step - 1);
-  };
+  // Patient Details
+  if (step === 3) {
+    if (!validateStepOne()) return;
+
+    setStep(4);
+    return;
+  }
+
+  // Health Details
+  if (step === 4) {
+    if (!validateStepTwo()) return;
+
+    setStep(5);
+    return;
+  }
+
+};
+
   // ---------------- Upload ECG ----------------
-
+const prevStep = () => {
+  setStep((prev) => prev - 1);
+};
 const uploadECG = async () => {
   if (!formData.ecgFile) return null;
 
@@ -188,6 +212,7 @@ const handleSubmit = async () => {
 
   setLoading(true);
   setError("");
+  setResult(null);
 
   try {
 
@@ -227,11 +252,14 @@ const handleSubmit = async () => {
 
   } catch (err) {
 
-    console.error(err);
+  console.error(err);
 
-    setError("Prediction failed.");
+  setError(
+    err.response?.data?.detail ||
+    "Prediction failed. Please try again."
+  );
 
-  } finally {
+} finally {
 
     setLoading(false);
 
@@ -244,45 +272,67 @@ const handleSubmit = async () => {
       <div className="min-h-screen bg-gray-100 py-10">
         <ProgressBar step={step} />
 
-        {step === 1 && (
-          <StepOne
-            formData={formData}
-            handleChange={handleChange}
-            nextStep={nextStep}
-            errors={errors}
-          />
-        )}
+        {/* Step 1 - ECG Upload */}
+{step === 1 && (
+  <StepUploadECG
+    formData={formData}
+    handleECGFileChange={handleECGFileChange}
+    nextStep={nextStep}
+  />
+)}
 
-        {step === 2 && (
-          <StepTwo
-            formData={formData}
-            handleChange={handleChange}
-            nextStep={nextStep}
-            prevStep={prevStep}
-            errors={errors}
-          />
-        )}
+{/* Step 2 - Echo Upload */}
+{step === 2 && (
+  <StepUploadEcho
+    formData={formData}
+    handleEchoFileChange={handleEchoFileChange}
+    nextStep={nextStep}
+    prevStep={prevStep}
+  />
+)}
 
-        {step === 3 && (
-          <StepThree
+{/* Step 3 - Patient Details */}
+{step === 3 && (
+  <StepOne
+    formData={formData}
+    handleChange={handleChange}
+    nextStep={nextStep}
+    prevStep={prevStep}
+    errors={errors}
+  />
+)}
+
+{/* Step 4 - Health Details */}
+{step === 4 && (
+  <StepTwo
+    formData={formData}
+    handleChange={handleChange}
+    nextStep={nextStep}
+    prevStep={prevStep}
+    errors={errors}
+  />
+)}
+
+{/* Step 5 - Lifestyle & Predict */}
+{step === 5 && (
+  <StepThree
   formData={formData}
   handleChange={handleChange}
-  handleECGFileChange={handleECGFileChange}
-  handleEchoFileChange={handleEchoFileChange}
   prevStep={prevStep}
   errors={errors}
   handleSubmit={handleSubmit}
   loading={loading}
   error={error}
-/>
-        )}
+
+  />
+)}
         {result && (
   <>
     <ResultCard result={result} />
 
     <div className="flex justify-center mt-8 mb-10">
       <button
-        onClick={() => (window.location.href = "/reports")}
+        onClick={() => navigate("/reports")}
         className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
       >
         📄 View Reports

@@ -1,8 +1,6 @@
 function StepThree({
   formData,
   handleChange,
-  handleECGFileChange,
-  handleEchoFileChange,
   prevStep,
   errors,
   handleSubmit,
@@ -91,62 +89,14 @@ function StepThree({
         )}
       </div>
 
-      {/* ECG Upload */}
-
-      <div className="mb-6">
-        <label className="block mb-2 font-semibold text-blue-900">
-          Upload ECG File
-        </label>
-
-        <input
-          type="file"
-          accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff,.csv"
-          onChange={handleECGFileChange}
-          className="w-full border rounded-lg p-3"
-        />
-
-        {formData.ecgFile && (
-          <p className="text-green-700 mt-2 text-sm">
-            ✅ Selected ECG File: {formData.ecgFile.name}
-          </p>
-        )}
-
-        <p className="text-gray-500 text-sm mt-2">
-          Supported formats: PNG, JPG, JPEG, BMP, TIFF and CSV
-        </p>
-      </div>
-
-      {/* Echo Upload */}
-
-      <div className="mb-8">
-        <label className="block mb-2 font-semibold text-blue-900">
-          Upload Echo Video (Optional)
-        </label>
-
-        <input
-          type="file"
-          accept=".mp4,.avi,.mov,.mkv"
-          onChange={handleEchoFileChange}
-          className="w-full border rounded-lg p-3"
-        />
-
-        {formData.echoFile && (
-          <p className="text-green-700 mt-2 text-sm">
-            ✅ Selected Echo Video: {formData.echoFile.name}
-          </p>
-        )}
-
-        <p className="text-gray-500 text-sm mt-2">
-          Supported formats: MP4, AVI, MOV and MKV
-        </p>
-      </div>
-
       {/* Error */}
 
       {error && (
-        <p className="text-red-600 font-semibold mb-4">
-          {error}
-        </p>
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-4">
+          <p className="text-red-700 font-medium">
+            {error}
+          </p>
+        </div>
       )}
 
       {/* Buttons */}
@@ -155,7 +105,7 @@ function StepThree({
 
         <button
           onClick={prevStep}
-          className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition"
         >
           Back
         </button>
@@ -163,13 +113,13 @@ function StepThree({
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className={`px-8 py-3 rounded-lg text-white transition ${
+          className={`px-8 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-300 ${
             loading
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-900 hover:bg-blue-800"
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 hover:shadow-xl"
           }`}
         >
-          {loading ? "Predicting..." : "Predict Risk"}
+          {loading ? "🔄 Running AI Prediction..." : "🫀 Predict Risk"}
         </button>
 
       </div>
