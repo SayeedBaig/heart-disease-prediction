@@ -12,7 +12,6 @@ anyio==4.11.0
 asttokens==3.0.1
 astunparse==1.6.3
 attrs==25.4.0
-audioop-lts==0.2.2
 Authlib==1.6.9
 beartype==0.22.9
 beautifulsoup4==4.14.3
