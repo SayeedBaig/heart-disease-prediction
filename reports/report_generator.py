@@ -1,37 +1,52 @@
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
-from reports.doctor_report import DoctorReport
-from reports.patient_report import PatientReport
+from api.reports.report_builder import ReportBuilder
+from api.reports.renderers.json_renderer import JsonRenderer
 
 
 class ReportGenerator:
+    """
+    Public facade consumed by api/routes/reports.py.
 
-    def __init__(self):
+    Public method signatures are unchanged — existing routes
+    require no modification.
 
-        self.doctor_report = DoctorReport()
+    Internally delegates data assembly to ReportBuilder and
+    format rendering to JsonRenderer.
+    """
 
-        self.patient_report = PatientReport()
+    def __init__(self) -> None:
+        self._builder = ReportBuilder()
+        self._renderer = JsonRenderer()
 
     def generate_doctor_report(
         self,
         prediction: Dict[str, Any],
         explanation: Dict[str, Any],
         digital_twin: Dict[str, Any],
-    ):
+        patient: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
 
-        return self.doctor_report.generate(
+        report_data = self._builder.build_doctor_report(
             prediction,
             explanation,
             digital_twin,
+            patient,
         )
+
+        return self._renderer.render(report_data)
 
     def generate_patient_report(
         self,
         prediction: Dict[str, Any],
         explanation: Dict[str, Any],
-    ):
+        patient: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
 
-        return self.patient_report.generate(
+        report_data = self._builder.build_patient_report(
             prediction,
             explanation,
+            patient,
         )
+
+        return self._renderer.render(report_data)

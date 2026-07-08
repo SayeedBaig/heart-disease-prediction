@@ -39,3 +39,11 @@ Thumbs.db
 # Logs
 
 *.log
+
+# Runtime uploads
+uploads/ecg/*
+uploads/echo/*
+
+# Keep folders in Git
+!uploads/ecg/.gitkeep
+!uploads/echo/.gitkeep

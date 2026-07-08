@@ -1,5 +1,7 @@
+
 from fusion_module.pipeline.system_pipeline import SystemPipeline
 
+from api.repositories.prediction_repository import PredictionRepository
 from api.services.digital_twin_service import DigitalTwinService
 from api.services.patient_service import PatientService
 from api.services.rag_service import RAGService
@@ -11,15 +13,14 @@ from api.utils.validators import validate_patient_data
 
 
 class PredictionService:
-    def __init__(self):
+    def __init__(self, db):
         self.pipeline = SystemPipeline()
         self.patient_service = PatientService()
         self.shared_memory = SharedMemoryService()
-
         self.rag_service = RAGService()
         self.digital_twin_service = DigitalTwinService()
         self.response_builder = ResponseBuilder()
-
+        self.prediction_repository = PredictionRepository(db)
         self.logger = get_logger(__name__)
 
     def predict(
@@ -27,6 +28,7 @@ class PredictionService:
         clinical_data: dict,
         ecg_input,
         echo_input=None,
+        patient_record=None,
     ):
         """
         Run complete CardioAI prediction pipeline.
@@ -83,5 +85,11 @@ class PredictionService:
         )
 
         self.logger.info("Prediction completed successfully")
+
+        if patient_record:
+            self.prediction_repository.save(
+                patient_db_id=patient_record.id,
+                prediction=response,
+            )
 
         return response

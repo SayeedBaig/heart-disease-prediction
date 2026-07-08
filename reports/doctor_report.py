@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 
 class DoctorReport:
@@ -11,6 +11,7 @@ class DoctorReport:
         prediction: Dict[str, Any],
         explanation: Dict[str, Any],
         digital_twin: Dict[str, Any],
+        patient: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
 
         return {
@@ -38,6 +39,8 @@ class DoctorReport:
             ),
 
             "digital_twin": digital_twin,
+
+            "patient": patient,
 
             "generated_by": "CardioAI",
 
