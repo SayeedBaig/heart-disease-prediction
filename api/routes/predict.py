@@ -34,8 +34,8 @@ def predict(
         patient_record = None
         if patient_id:
             repo = PatientRepository(db)
-            patient_record = repo.get_by_patient_id(patient_id)
-
+            patient_record = repo.get_by_public_id(patient_id)
+            
             if patient_record is None:
                 raise HTTPException(
                     status_code=404,
