@@ -56,11 +56,11 @@ function Hero() {
           <div className="flex gap-5 mt-10 flex-wrap">
 
             <Link
-              to="/diagnose"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              Start Diagnosis
-            </Link>
+  to="/register"
+  className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+>
+  Start Diagnosis
+</Link>
 
             <button className="border border-slate-300 hover:border-blue-600 hover:text-blue-600 px-7 py-4 rounded-xl font-semibold transition-all duration-300">
               Explore Features →

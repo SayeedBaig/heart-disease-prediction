@@ -63,7 +63,7 @@ function Navbar() {
         <nav className="hidden md:flex gap-10">
 
           {navItem("/", "Home")}
-          {navItem("/diagnose", "Diagnose")}
+          {navItem("/register", "Diagnose")}
           {navItem("/reports", "Reports")}
 
         </nav>
@@ -71,7 +71,7 @@ function Navbar() {
         {/* CTA Button */}
 
         <Link
-          to="/diagnose"
+  to="/register"
           className="
             rounded-xl
             bg-blue-600
