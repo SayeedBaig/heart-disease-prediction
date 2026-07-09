@@ -37,8 +37,9 @@ function RegisterPage() {
         "patient_name",
         response.data.full_name
       );
+     localStorage.setItem("patient_email", formData.email);
 
-      navigate("/diagnose");
+      navigate("/dashboard");
 
     } catch (err) {
       console.error(err);

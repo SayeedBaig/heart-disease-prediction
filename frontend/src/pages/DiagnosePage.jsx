@@ -227,6 +227,8 @@ const handleSubmit = async () => {
 
     // Clinical data only
     const clinicalData = {
+  patient_id: localStorage.getItem("patient_id"),
+
   age: Number(formData.age),
   gender: Number(formData.gender),
   height: Number(formData.height),
@@ -239,11 +241,10 @@ const handleSubmit = async () => {
   alco: Number(formData.alco),
   active: Number(formData.active),
 
-  // Backend upload paths
   ecg_path: ecgPath,
   echo_path: echoPath,
 };
-
+    console.log(clinicalData);
     const response = await api.post("/predict", clinicalData);
 
     console.log(response.data);
