@@ -13,6 +13,45 @@ function DoctorReportCard({ report }) {
       <h2 className="text-3xl font-bold text-blue-700 mb-6">
         👨‍⚕️ Doctor Report
       </h2>
+      <div className="flex gap-4 mb-6">
+
+  <button
+    onClick={() => {
+      const patientId = localStorage.getItem("patient_id");
+
+      window.open(
+        `http://localhost:8000/reports/doctor/pdf?patient_id=${patientId}`,
+        "_blank"
+      );
+    }}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
+  >
+    📥 Download Doctor PDF
+  </button>
+  <button
+  onClick={async () => {
+    const patientId = localStorage.getItem("patient_id");
+
+    try {
+      await fetch(
+        `http://localhost:8000/reports/doctor/email?patient_id=${patientId}`,
+        {
+          method: "POST",
+        }
+      );
+
+      alert("Doctor report emailed successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send email.");
+    }
+  }}
+  className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold"
+>
+  📧 Email Doctor Report
+</button>
+
+</div>
 
       {/* Final Prediction */}
 

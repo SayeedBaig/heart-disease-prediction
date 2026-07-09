@@ -8,19 +8,43 @@ import PatientReportCard from "../components/PatientReportCard";
 function Reports() {
   const [doctorReport, setDoctorReport] = useState(null);
   const [patientReport, setPatientReport] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // NEW
+  const [activeTab, setActiveTab] = useState("doctor");
 
   useEffect(() => {
     const loadReports = async () => {
       try {
+        const patientId = localStorage.getItem("patient_id");
+
+        if (!patientId) {
+          setError("Patient ID not found.");
+          setLoading(false);
+          return;
+        }
+
         const [doctor, patient] = await Promise.all([
-          api.get("/reports/doctor"),
-          api.get("/reports/patient"),
+          api.get("/reports/doctor", {
+            params: {
+              patient_id: patientId,
+            },
+          }),
+
+          api.get("/reports/patient", {
+            params: {
+              patient_id: patientId,
+            },
+          }),
         ]);
 
         setDoctorReport(doctor.data);
         setPatientReport(patient.data);
+
+        console.log("Doctor Report:", doctor.data);
+        console.log("Patient Report:", patient.data);
       } catch (err) {
         console.error(err);
         setError("Unable to load reports. Please try again.");
@@ -71,11 +95,41 @@ function Reports() {
             Reports
           </h1>
 
-          <DoctorReportCard report={doctorReport} />
+          {/* Tabs */}
 
-          <div className="my-8" />
+          <div className="flex justify-center gap-4 mb-8">
 
-          <PatientReportCard report={patientReport} />
+            <button
+              onClick={() => setActiveTab("doctor")}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === "doctor"
+                  ? "bg-blue-600 text-white shadow-lg"
+                  : "bg-white text-gray-700 border hover:bg-blue-50"
+              }`}
+            >
+              👨‍⚕️ Doctor Report
+            </button>
+
+            <button
+              onClick={() => setActiveTab("patient")}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === "patient"
+                  ? "bg-green-600 text-white shadow-lg"
+                  : "bg-white text-gray-700 border hover:bg-green-50"
+              }`}
+            >
+              🩺 Patient Report
+            </button>
+
+          </div>
+
+          {/* Selected Report */}
+
+          {activeTab === "doctor" ? (
+            <DoctorReportCard report={doctorReport} />
+          ) : (
+            <PatientReportCard report={patientReport} />
+          )}
 
         </div>
       </div>

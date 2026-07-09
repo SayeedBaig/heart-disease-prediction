@@ -12,6 +12,45 @@ function PatientReportCard({ report }) {
       <h2 className="text-2xl font-bold text-green-700 mb-4">
         🩺 Patient Report
       </h2>
+      <div className="flex gap-4 mb-6">
+
+  <button
+    onClick={() => {
+      const patientId = localStorage.getItem("patient_id");
+
+      window.open(
+        `http://localhost:8000/reports/patient/pdf?patient_id=${patientId}`,
+        "_blank"
+      );
+    }}
+    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
+  >
+    📥 Download Patient PDF
+  </button>
+  <button
+  onClick={async () => {
+    const patientId = localStorage.getItem("patient_id");
+
+    try {
+      await fetch(
+        `http://localhost:8000/reports/patient/email?patient_id=${patientId}`,
+        {
+          method: "POST",
+        }
+      );
+
+      alert("Patient report emailed successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send email.");
+    }
+  }}
+  className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold"
+>
+  📧 Email Patient Report
+</button>
+
+</div>
 
       <p>
         <strong>Risk Level:</strong> {report.risk_level}
