@@ -9,12 +9,14 @@ import {
 } from "lucide-react";
 
 import heart from "../assets/heart.png";
+import AnimatedBackground from "./AnimatedBackground";
 
 function Hero() {
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-white flex items-center overflow-hidden">
-      <div className="max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
-
+   <section className="hero-background relative min-h-screen flex items-center overflow-hidden">
+      <AnimatedBackground />
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
         {/* LEFT SECTION */}
 
         <motion.div
@@ -132,15 +134,63 @@ function Hero() {
         {/* RIGHT SECTION */}
 
         <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1 }}
-          className="relative flex justify-center"
-        >
+  initial={{ opacity: 0, x: 60 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 1 }}
+  className="relative flex justify-center items-center"
+>
 
-          {/* Glow */}
+        {/* Blue Glow */}
 
-          <div className="absolute w-[620px] h-[620px] rounded-full bg-blue-100 blur-[120px] opacity-50"></div>
+<motion.div
+  className="absolute
+             w-[650px]
+             h-[650px]
+             rounded-full
+             bg-gradient-to-r
+             from-blue-300
+             via-cyan-200
+             to-blue-400
+             blur-[140px]
+             opacity-25"
+  animate={{
+    scale: [1, 1.08, 1],
+    opacity: [0.18, 0.28, 0.18],
+  }}
+  transition={{
+    duration: 6,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+/>
+
+{/* White Center Glow */}
+
+<motion.div
+  className="absolute
+             w-[420px]
+             h-[420px]
+             rounded-full
+             bg-white
+             blur-[120px]"
+  animate={{
+    opacity: [0.55, 0.75, 0.55],
+  }}
+  transition={{
+    duration: 5,
+    repeat: Infinity,
+    ease: "easeInOut",
+  }}
+/>
+<div
+  className="absolute
+             bottom-12
+             w-[260px]
+             h-[70px]
+             bg-black/20
+             blur-3xl
+             rounded-full"
+/>
 
           {/* Heart */}
 
@@ -149,13 +199,16 @@ function Hero() {
             alt="Heart"
             className="relative w-[450px] lg:w-[560px] z-10"
             animate={{
-              y: [0, -10, 0],
-              scale: [1, 1.02, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 4,
-            }}
+  y: [0, -6, 0],
+  scale: [1, 1.03, 1, 1.05, 1],
+  rotate: [0, 1, 0, -1, 0],
+}}
+
+transition={{
+  duration: 2.2,
+  repeat: Infinity,
+  ease: "easeInOut",
+}}
           />
 
           {/* ECG Card */}
@@ -163,7 +216,7 @@ function Hero() {
           <motion.div
             animate={{ y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 3 }}
-            className="absolute top-8 left-2 bg-white rounded-2xl shadow-xl p-5"
+            className="absolute top-8 left-2 bg-white/80 backdrop-blur-xl border border-white/70 rounded-3xl shadow-2xl px-5 py-4"
           >
 
             <div className="flex items-center gap-3">
@@ -191,7 +244,7 @@ function Hero() {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
-            className="absolute bottom-24 left-4 bg-white rounded-2xl shadow-xl p-5"
+            className="absolute bottom-24 left-4 bg-white/80 backdrop-blur-xl border border-white/70 rounded-3xl shadow-2xl px-5 py-4"
           >
 
             <div className="flex items-center gap-3">
@@ -223,7 +276,7 @@ function Hero() {
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 5 }}
-            className="absolute bottom-8 right-2 bg-white rounded-2xl shadow-xl p-5"
+            className="absolute bottom-8 right-2 bg-white/80 backdrop-blur-xl border border-white/70 rounded-3xl shadow-2xl px-5 py-4"
           >
 
             <div className="flex items-center gap-3">
