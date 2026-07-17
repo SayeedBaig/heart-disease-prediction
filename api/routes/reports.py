@@ -12,98 +12,89 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 
 
 @router.get(
-    "/doctor",
+    "/{prediction_id}/doctor",
     summary="Generate Doctor Report",
-    description="Generates a detailed doctor report from the latest prediction.",
+    description="Generates a detailed doctor report from a prediction.",
     response_description="Doctor report generated successfully.",
 )
 def get_doctor_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-    return ReportService(db).generate_doctor_report(
-        patient_id
-    )
+    return ReportService(db).generate_doctor_report(prediction_id)
 
 
 @router.get(
-    "/patient",
+    "/{prediction_id}/patient",
     summary="Generate Patient Report",
-    description="Generates a simplified patient-facing report from the latest prediction.",
+    description="Generates a simplified patient-facing report from a prediction.",
     response_description="Patient report generated successfully.",
 )
 def get_patient_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-    return ReportService(db).generate_patient_report(
-        patient_id
-    )
+    return ReportService(db).generate_patient_report(prediction_id)
+
 
 @router.get(
-    "/doctor/pdf",
+    "/{prediction_id}/doctor/pdf",
     summary="Generate Doctor PDF",
-    description="Generates and downloads a detailed doctor report PDF for the given patient.",
+    description="Generates and downloads a detailed doctor report PDF for the given prediction.",
     response_description="Doctor PDF generated successfully.",
 )
 def download_doctor_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-    report = ReportService(db).generate_doctor_report(patient_id)
-
+    report = ReportService(db).generate_doctor_report(prediction_id)
     pdf = PdfRenderer().render(report)
 
     return StreamingResponse(
         pdf,
         media_type="application/pdf",
         headers={
-            "Content-Disposition":
-            f'attachment; filename="doctor_report_{patient_id}.pdf"'
+            "Content-Disposition": f'attachment; filename="doctor_report_{prediction_id}.pdf"'
         },
     )
 
+
 @router.get(
-    "/patient/pdf",
+    "/{prediction_id}/patient/pdf",
     summary="Generate Patient PDF",
-    description="Generates and downloads a patient-facing report PDF for the given patient.",
+    description="Generates and downloads a patient-facing report PDF for the given prediction.",
     response_description="Patient PDF generated successfully.",
 )
 def download_patient_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-    report = ReportService(db).generate_patient_report(patient_id)
-
+    report = ReportService(db).generate_patient_report(prediction_id)
     pdf = PdfRenderer().render(report)
 
     return StreamingResponse(
         pdf,
         media_type="application/pdf",
         headers={
-            "Content-Disposition":
-            f'attachment; filename="patient_report_{patient_id}.pdf"'
+            "Content-Disposition": f'attachment; filename="patient_report_{prediction_id}.pdf"'
         },
     )
+
+
 @router.post(
-    "/patient/email",
+    "/{prediction_id}/patient/email",
     summary="Email Patient Report",
     description="Generates a patient PDF report and emails it to the registered patient.",
     response_description="Email sent successfully.",
 )
 async def email_patient_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-
-    report = ReportService(db).generate_patient_report(
-        patient_id
-    )
-
+    report = ReportService(db).generate_patient_report(prediction_id)
     pdf_buffer = PdfRenderer().render(report)
 
     patient = report.get("patient")
-
     if not patient:
         raise HTTPException(
             status_code=404,
@@ -114,7 +105,7 @@ async def email_patient_report(
         recipient_email=patient["email"],
         subject="CardioAI Medical Report – Heart Disease Risk Assessment",
         pdf_bytes=pdf_buffer.getvalue(),
-        filename=f"patient_report_{patient_id}.pdf",
+        filename=f"patient_report_{prediction_id}.pdf",
     )
 
     return {
@@ -124,24 +115,19 @@ async def email_patient_report(
 
 
 @router.post(
-    "/doctor/email",
+    "/{prediction_id}/doctor/email",
     summary="Email Doctor Report",
     description="Generates a doctor PDF report and emails it to the registered patient.",
     response_description="Email sent successfully.",
 )
 async def email_doctor_report(
-    patient_id: str,
+    prediction_id: int,
     db: Session = Depends(get_db),
 ):
-
-    report = ReportService(db).generate_doctor_report(
-        patient_id
-    )
-
+    report = ReportService(db).generate_doctor_report(prediction_id)
     pdf_buffer = PdfRenderer().render(report)
 
     patient = report.get("patient")
-
     if not patient:
         raise HTTPException(
             status_code=404,
@@ -152,7 +138,7 @@ async def email_doctor_report(
         recipient_email=patient["email"],
         subject="CardioAI Doctor Report – Heart Disease Risk Assessment",
         pdf_bytes=pdf_buffer.getvalue(),
-        filename=f"doctor_report_{patient_id}.pdf",
+        filename=f"doctor_report_{prediction_id}.pdf",
     )
 
     return {

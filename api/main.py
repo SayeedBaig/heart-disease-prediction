@@ -12,9 +12,12 @@ from api.routes.predict import router as predict_router
 from api.routes.reports import router as reports_router
 from api.routes.upload import router as upload_router
 from api.routes.doctor import router as doctor_router
+from api.routes.history import router as history_router
+from api.routes.doctor_note import router as doctor_note_router
 from api.services.upload_cleanup_service import UploadCleanupService
 from api.utils.logger import get_logger
 from api.routes.appointment import router as appointment_router
+from api.routes.diagnosis import router as diagnosis_router
 
 
 logger = get_logger(__name__)
@@ -75,6 +78,9 @@ app.include_router(upload_router)
 app.include_router(patient_router)
 app.include_router(doctor_router)
 app.include_router(appointment_router)
+app.include_router(diagnosis_router)
+app.include_router(history_router)
+app.include_router(doctor_note_router)
 
 @app.get("/")
 def root():

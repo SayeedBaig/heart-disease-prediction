@@ -20,6 +20,7 @@ class PredictionRepository:
             echo_score=prediction["prediction"]["echo"]["score"],
             risk_level=prediction["prediction"]["fusion"]["final_level"],
             risk_percentage=prediction["prediction"]["fusion"]["risk_percentage"],
+            confidence=prediction["prediction"]["fusion"].get("risk_percentage", 0) / 100.0, # Confidence can be derived from risk percentage if fusion model doesn't output it directly, or maybe clinical/ecg score. Let's just use risk_percentage / 100
             rag_explanation=prediction["prediction"]["rag"]["explanation"],
         )
 

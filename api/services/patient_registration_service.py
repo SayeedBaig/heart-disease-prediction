@@ -1,8 +1,11 @@
+from sqlalchemy.orm import Session
+
 from api.repositories.patient_repository import PatientRepository
 
 
 class PatientRegistrationService:
-    def __init__(self, db):
+    def __init__(self, db: Session):
+        self.db = db
         self.patient_repository = PatientRepository(db)
 
     def register_patient(self, patient_data: dict):
@@ -23,4 +26,12 @@ class PatientRegistrationService:
 
         patient_data["patient_id"] = f"PT{patient_number:06d}"
 
-        return self.patient_repository.create(patient_data)
+        try:
+            patient = self.patient_repository.create(patient_data)
+            self.db.commit()
+            self.db.refresh(patient)
+        except Exception:
+            self.db.rollback()
+            raise
+
+        return patient

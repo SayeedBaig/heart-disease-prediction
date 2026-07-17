@@ -1,15 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from api.database.session import get_db
 from api.schemas.patient_request import PatientRegisterRequest
-from api.schemas.patient_response import PatientRegisterResponse
+from api.schemas.patient_response import (
+    PatientRegisterResponse,
+    PatientResponse,
+    PatientUpdateRequest,
+)
 from api.schemas.prediction_history_response import (
     PredictionHistoryItem,
     PredictionHistoryResponse,
 )
 from api.services.patient_registration_service import PatientRegistrationService
+from api.services.patient_service import PatientService
 from api.services.prediction_history_service import PredictionHistoryService
+from api.utils.auth import get_current_doctor
 
 
 router = APIRouter(
@@ -17,6 +23,10 @@ router = APIRouter(
     tags=["Patients"],
 )
 
+
+# ------------------------------------------------------------------
+# Registration (Public)
+# ------------------------------------------------------------------
 
 @router.post(
     "/register",
@@ -46,6 +56,123 @@ def register_patient(
     )
 
 
+# ------------------------------------------------------------------
+# Search (must be above /{patient_id} to avoid path conflict)
+# ------------------------------------------------------------------
+
+@router.get(
+    "/search",
+    summary="Search patients",
+    description="Search patients by name, email, or patient ID.",
+    response_description="Matching patients retrieved.",
+    response_model=list[PatientResponse],
+)
+def search_patients(
+    q: str = Query(..., min_length=1, description="Search query"),
+    _current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+    patients = service.search_patients(q)
+
+    return [PatientResponse.model_validate(p) for p in patients]
+
+
+# ------------------------------------------------------------------
+# List All
+# ------------------------------------------------------------------
+
+@router.get(
+    "/",
+    summary="List all patients",
+    description="Returns a paginated list of all registered patients.",
+    response_description="Patients list retrieved.",
+    response_model=list[PatientResponse],
+)
+def list_patients(
+    skip: int = 0,
+    limit: int = 100,
+    _current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+    patients = service.get_all_patients(skip=skip, limit=limit)
+
+    return [PatientResponse.model_validate(p) for p in patients]
+
+
+# ------------------------------------------------------------------
+# Get / Update / Delete by ID
+# ------------------------------------------------------------------
+
+@router.get(
+    "/{patient_id}",
+    summary="Get patient by ID",
+    description="Returns a single patient by their integer primary key.",
+    response_description="Patient retrieved.",
+    response_model=PatientResponse,
+)
+def get_patient(
+    patient_id: int,
+    _current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+
+    try:
+        patient = service.get_patient(patient_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    return PatientResponse.model_validate(patient)
+
+
+@router.put(
+    "/{patient_id}",
+    summary="Update patient",
+    description="Updates profile fields for an existing patient.",
+    response_description="Patient updated.",
+    response_model=PatientResponse,
+)
+def update_patient(
+    patient_id: int,
+    updates: PatientUpdateRequest,
+    _current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+
+    try:
+        patient = service.update_patient(patient_id, updates.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+    return PatientResponse.model_validate(patient)
+
+
+@router.delete(
+    "/{patient_id}",
+    summary="Delete patient",
+    description="Permanently removes a patient record.",
+    response_description="Patient deleted.",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_patient(
+    patient_id: int,
+    _current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+
+    try:
+        service.delete_patient(patient_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+# ------------------------------------------------------------------
+# Prediction History
+# ------------------------------------------------------------------
 
 @router.get(
     "/{patient_id}/predictions",

@@ -31,6 +31,7 @@ class Prediction(Base):
 
     risk_level: Mapped[str] = mapped_column(String(10))
     risk_percentage: Mapped[float] = mapped_column(Float)
+    confidence: Mapped[float] = mapped_column(Float, nullable=True)
 
     rag_explanation: Mapped[str] = mapped_column(Text)
 
