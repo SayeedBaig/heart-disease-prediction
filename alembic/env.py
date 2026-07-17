@@ -20,6 +20,16 @@ from api.database.base import Base
 import api.models  # noqa: F401 — registers all models with Base.metadata
 target_metadata = Base.metadata
 
+import os
+from dotenv import load_dotenv
+
+# Force load the .env file so Alembic acts exactly like the app
+load_dotenv()
+
+# Override sqlalchemy.url in alembic.ini with the value from .env
+if os.environ.get("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
