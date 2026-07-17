@@ -83,3 +83,160 @@ class EmailService:
         )
 
         logger.info("Email sent successfully to %s", recipient_email)
+
+    # ------------------------------------------------------------------
+    # Appointment Notifications
+    # ------------------------------------------------------------------
+
+    async def send_appointment_booked(
+        self,
+        patient_email: str,
+        patient_name: str,
+        doctor_name: str,
+        preferred_date: str,
+        preferred_time: str,
+    ) -> None:
+        """Notify the patient that their appointment has been booked."""
+        subject = "CardioAI – Appointment Booked"
+        body = self._build_appointment_body(
+            greeting_name=patient_name,
+            heading="Appointment Booked Successfully",
+            message=(
+                f"Your appointment with <strong>Dr. {doctor_name}</strong> has been "
+                f"submitted and is currently <strong>Pending</strong> approval."
+            ),
+            date=preferred_date,
+            time=preferred_time,
+        )
+        await self._send_html(patient_email, subject, body)
+
+    async def send_appointment_approved(
+        self,
+        patient_email: str,
+        patient_name: str,
+        doctor_name: str,
+        preferred_date: str,
+        preferred_time: str,
+    ) -> None:
+        """Notify the patient that their appointment has been approved."""
+        subject = "CardioAI – Appointment Approved"
+        body = self._build_appointment_body(
+            greeting_name=patient_name,
+            heading="Appointment Approved",
+            message=(
+                f"Your appointment with <strong>Dr. {doctor_name}</strong> "
+                f"has been <strong>Approved</strong>. Please be on time."
+            ),
+            date=preferred_date,
+            time=preferred_time,
+        )
+        await self._send_html(patient_email, subject, body)
+
+    async def send_appointment_rejected(
+        self,
+        patient_email: str,
+        patient_name: str,
+        doctor_name: str,
+        preferred_date: str,
+        preferred_time: str,
+    ) -> None:
+        """Notify the patient that their appointment has been rejected."""
+        subject = "CardioAI – Appointment Rejected"
+        body = self._build_appointment_body(
+            greeting_name=patient_name,
+            heading="Appointment Rejected",
+            message=(
+                f"Unfortunately, your appointment with <strong>Dr. {doctor_name}</strong> "
+                f"has been <strong>Rejected</strong>. Please book a new appointment "
+                f"or contact the clinic for further assistance."
+            ),
+            date=preferred_date,
+            time=preferred_time,
+        )
+        await self._send_html(patient_email, subject, body)
+
+    async def send_appointment_completed(
+        self,
+        patient_email: str,
+        patient_name: str,
+        doctor_name: str,
+        preferred_date: str,
+        preferred_time: str,
+    ) -> None:
+        """Notify the patient that their appointment has been completed."""
+        subject = "CardioAI – Appointment Completed"
+        body = self._build_appointment_body(
+            greeting_name=patient_name,
+            heading="Appointment Completed",
+            message=(
+                f"Your appointment with <strong>Dr. {doctor_name}</strong> "
+                f"has been marked as <strong>Completed</strong>. "
+                f"Thank you for choosing CardioAI."
+            ),
+            date=preferred_date,
+            time=preferred_time,
+        )
+        await self._send_html(patient_email, subject, body)
+
+    # ------------------------------------------------------------------
+    # Internal Helpers
+    # ------------------------------------------------------------------
+
+    async def _send_html(
+        self, recipient_email: str, subject: str, html_body: str
+    ) -> None:
+        """Send a plain HTML email via SMTP.  Shared by all notification methods."""
+        if not all([self.smtp_host, self.smtp_email, self.smtp_password]):
+            logger.warning(
+                "SMTP not configured – skipping email to %s", recipient_email
+            )
+            return
+
+        message = EmailMessage()
+        message["From"]    = self.smtp_email
+        message["To"]      = recipient_email
+        message["Subject"] = subject
+        message.set_content(html_body, subtype="html")
+
+        logger.info(
+            "Sending appointment email to %s (subject: %s)",
+            recipient_email,
+            subject,
+        )
+
+        await aiosmtplib.send(
+            message,
+            hostname=self.smtp_host,
+            port=self.smtp_port,
+            username=self.smtp_email,
+            password=self.smtp_password,
+            start_tls=True,
+        )
+
+        logger.info("Appointment email sent successfully to %s", recipient_email)
+
+    @staticmethod
+    def _build_appointment_body(
+        greeting_name: str,
+        heading: str,
+        message: str,
+        date: str,
+        time: str,
+    ) -> str:
+        """Return a simple HTML email body for appointment notifications."""
+        return (
+            f"<div style='font-family:Arial,sans-serif;max-width:520px;margin:auto'>"
+            f"<h2 style='color:#1a73e8'>{heading}</h2>"
+            f"<p>Dear {greeting_name},</p>"
+            f"<p>{message}</p>"
+            f"<table style='border-collapse:collapse;margin:16px 0'>"
+            f"<tr><td style='padding:6px 12px;font-weight:bold'>Date</td>"
+            f"<td style='padding:6px 12px'>{date}</td></tr>"
+            f"<tr><td style='padding:6px 12px;font-weight:bold'>Time</td>"
+            f"<td style='padding:6px 12px'>{time}</td></tr>"
+            f"</table>"
+            f"<p style='color:#555;font-size:13px'>"
+            f"This is an automated notification from CardioAI.<br>"
+            f"RV Institute of Technology and Management, Bengaluru.</p>"
+            f"</div>"
+        )
