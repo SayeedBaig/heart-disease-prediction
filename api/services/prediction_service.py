@@ -87,9 +87,10 @@ class PredictionService:
         self.logger.info("Prediction completed successfully")
 
         if patient_record:
-            self.prediction_repository.save(
+            prediction_db = self.prediction_repository.save(
                 patient_db_id=patient_record.id,
                 prediction=response,
             )
+            response["prediction_id"] = prediction_db.id
 
         return response

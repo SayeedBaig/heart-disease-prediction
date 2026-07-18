@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from api.database.session import get_db
 from api.repositories.patient_repository import PatientRepository
 from api.schemas.request import ClinicalInput
+from api.schemas.response import PredictEndpointResponse
 from api.services.prediction_service import PredictionService
 from api.utils.validators import validate_patient_data
 from api.utils.exception_handler import handle_prediction_exception
@@ -19,6 +20,7 @@ router = APIRouter()
         "clinical data, ECG, and Echocardiography inputs."
     ),
     response_description="Prediction completed successfully.",
+    responses={200: {"model": PredictEndpointResponse}},
 )
 def predict(
     clinical_data: ClinicalInput,
