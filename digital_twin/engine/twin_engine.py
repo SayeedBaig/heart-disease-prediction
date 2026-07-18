@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from digital_twin.models.patient_profile import PatientProfile
 
 
@@ -142,5 +144,136 @@ class TwinEngine:
             "risk": risk,
 
             "confidence": confidence
+
+        }
+
+    # -----------------------------
+    # Phase 2 Features
+    # -----------------------------
+
+    def simulate_custom(
+        self,
+        patient: PatientProfile,
+        changes: dict
+    ):
+        """
+        Apply doctor-defined changes to a copy of the patient
+        and calculate the projected future risk.
+        """
+
+        updated = deepcopy(patient)
+
+        for field, value in changes.items():
+
+            if hasattr(updated, field):
+
+                setattr(updated, field, value)
+
+        return {
+
+            "updated_patient": updated,
+
+            "risk": self.calculate_risk(updated),
+
+            "confidence": self.calculate_confidence(updated)
+
+        }
+
+    def compare_patients(
+        self,
+        original: PatientProfile,
+        modified: PatientProfile
+    ):
+        """
+        Compare two patient states.
+        """
+
+        current_risk = self.calculate_risk(original)
+
+        future_risk = self.calculate_risk(modified)
+
+        reduction = max(
+
+            0,
+
+            current_risk - future_risk
+
+        )
+
+        improvement_percentage = 0
+
+        if current_risk > 0:
+
+            improvement_percentage = (
+
+                reduction / current_risk
+
+            ) * 100
+
+        return {
+
+            "current_risk": round(
+
+                current_risk,
+
+                2
+
+            ),
+
+            "future_risk": round(
+
+                future_risk,
+
+                2
+
+            ),
+
+            "risk_reduction": round(
+
+                reduction,
+
+                2
+
+            ),
+
+            "improvement_percentage": round(
+
+                improvement_percentage,
+
+                2
+
+            )
+
+        }
+
+    def generate_report(
+        self,
+        patient: PatientProfile
+    ):
+        """
+        Returns a complete Digital Twin report.
+        """
+
+        return {
+
+            "patient_id": patient.patient_id,
+
+            "risk": self.calculate_risk(patient),
+
+            "confidence": self.calculate_confidence(patient),
+
+            "blood_pressure": f"{patient.systolic_bp}/{patient.diastolic_bp}",
+
+            "cholesterol": patient.cholesterol,
+
+            "glucose": patient.glucose,
+
+            "bmi": patient.bmi,
+
+            "weight": patient.weight,
+
+            "exercise_level": patient.exercise_level,
+
+            "smoking": patient.smoking_status
 
         }
