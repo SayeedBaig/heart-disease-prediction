@@ -15,12 +15,18 @@ class HistoryService:
             raise HTTPException(status_code=404, detail="Patient not found.")
             
         predictions = self.prediction_repo.get_by_patient_id(patient_id)
-        return predictions
+        return {
+            "patient_id": patient.id,
+            "patient_code": patient.patient_id,
+            "total_predictions": len(predictions),
+            "predictions": predictions
+        }
 
     def get_prediction_details(self, prediction_id: int):
         prediction = self.prediction_repo.get_by_id(prediction_id)
         if not prediction:
             raise HTTPException(status_code=404, detail="Prediction not found.")
+        setattr(prediction, "patient_code", prediction.patient.patient_id)
         return prediction
 
     def compare_predictions(self, patient_id: int):
@@ -38,6 +44,7 @@ class HistoryService:
         
         return {
             "patient_id": patient_id,
+            "patient_code": patient.patient_id,
             "latest": {
                 "id": latest.id,
                 "date": latest.created_at,
