@@ -248,9 +248,17 @@ const handleSubmit = async () => {
     console.log(clinicalData);
     const response = await api.post("/predict", clinicalData);
 
-    console.log(response.data);
+console.log(response.data);
 
-    setResult(response.data);
+// Save prediction_id for Reports page
+if (response.data.prediction_id) {
+  localStorage.setItem(
+    "prediction_id",
+    response.data.prediction_id
+  );
+}
+
+setResult(response.data);
 
   } catch (err) {
 

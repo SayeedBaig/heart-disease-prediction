@@ -18,27 +18,19 @@ function Reports() {
   useEffect(() => {
     const loadReports = async () => {
       try {
-        const patientId = localStorage.getItem("patient_id");
+        const predictionId = localStorage.getItem("prediction_id");
 
-        if (!patientId) {
-          setError("Patient ID not found.");
-          setLoading(false);
-          return;
-        }
+if (!predictionId) {
+  setError("Prediction ID not found.");
+  setLoading(false);
+  return;
+}
 
-        const [doctor, patient] = await Promise.all([
-          api.get("/reports/doctor", {
-            params: {
-              patient_id: patientId,
-            },
-          }),
+const [doctor, patient] = await Promise.all([
+  api.get(`/reports/${predictionId}/doctor`),
 
-          api.get("/reports/patient", {
-            params: {
-              patient_id: patientId,
-            },
-          }),
-        ]);
+  api.get(`/reports/${predictionId}/patient`),
+]);
 
         setDoctorReport(doctor.data);
         setPatientReport(patient.data);
