@@ -2,10 +2,8 @@ function StepThree({
   formData,
   handleChange,
   prevStep,
+  nextStep,
   errors,
-  handleSubmit,
-  loading,
-  error,
 }) {
   return (
     <div className="max-w-xl mx-auto bg-white shadow-lg rounded-xl p-8">
@@ -89,16 +87,6 @@ function StepThree({
         )}
       </div>
 
-      {/* Error */}
-
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-4">
-          <p className="text-red-700 font-medium">
-            {error}
-          </p>
-        </div>
-      )}
-
       {/* Buttons */}
 
       <div className="flex justify-between">
@@ -107,19 +95,14 @@ function StepThree({
           onClick={prevStep}
           className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition"
         >
-          Back
+          ← Back
         </button>
 
         <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className={`px-8 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-300 ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 hover:shadow-xl"
-          }`}
+          onClick={nextStep}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300"
         >
-          {loading ? "🔄 Running AI Prediction..." : "🫀 Predict Risk"}
+          Next →
         </button>
 
       </div>

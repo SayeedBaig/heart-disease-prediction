@@ -1,10 +1,10 @@
 function ProgressBar({ step }) {
   const steps = [
-    "ECG",
-    "Echo",
     "Patient",
     "Health",
     "Lifestyle",
+    "ECG",
+    "Echo",
   ];
 
   return (

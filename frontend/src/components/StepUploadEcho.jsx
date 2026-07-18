@@ -1,8 +1,10 @@
 function StepUploadEcho({
   formData,
   handleEchoFileChange,
-  nextStep,
   prevStep,
+  handleSubmit,
+  loading,
+  error,
 }) {
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-10">
@@ -47,10 +49,18 @@ function StepUploadEcho({
         </p>
 
         <p className="text-xs text-gray-400 mt-2">
-          This step is optional. If you don't have an echo video, you can continue.
+          This step is optional. If you don't have an echo video, you can still continue.
         </p>
 
       </div>
+
+      {error && (
+        <div className="mt-6 rounded-lg border border-red-300 bg-red-50 p-4">
+          <p className="text-red-700 font-medium">
+            {error}
+          </p>
+        </div>
+      )}
 
       <div className="flex justify-between mt-10">
 
@@ -62,10 +72,15 @@ function StepUploadEcho({
         </button>
 
         <button
-          onClick={nextStep}
-          className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-xl transition"
+          onClick={handleSubmit}
+          disabled={loading}
+          className={`px-8 py-3 rounded-xl text-white font-semibold transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-700 hover:bg-blue-800"
+          }`}
         >
-          Continue →
+          {loading ? "🔄 Running AI Prediction..." : "🫀 Predict Risk"}
         </button>
 
       </div>

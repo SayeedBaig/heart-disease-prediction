@@ -139,36 +139,37 @@ const handleEchoFileChange = (e) => {
 
   const nextStep = () => {
 
-  // ECG Upload
+  // Patient Details
   if (step === 1) {
+    if (!validateStepOne()) return;
+
     setStep(2);
     return;
   }
 
-  // Echo Upload
+  // Health Details
   if (step === 2) {
+    if (!validateStepTwo()) return;
+
     setStep(3);
     return;
   }
 
-  // Patient Details
+  // Lifestyle
   if (step === 3) {
-    if (!validateStepOne()) return;
+    if (!validateStepThree()) return;
 
     setStep(4);
     return;
   }
 
-  // Health Details
+  // ECG Upload
   if (step === 4) {
-    if (!validateStepTwo()) return;
-
     setStep(5);
     return;
   }
 
 };
-
   // ---------------- Upload ECG ----------------
 const prevStep = () => {
   setStep((prev) => prev - 1);
@@ -273,38 +274,18 @@ const handleSubmit = async () => {
       <div className="min-h-screen bg-gray-100 py-10">
         <ProgressBar step={step} />
 
-        {/* Step 1 - ECG Upload */}
+       {/* Step 1 - Patient Details */}
 {step === 1 && (
-  <StepUploadECG
-    formData={formData}
-    handleECGFileChange={handleECGFileChange}
-    nextStep={nextStep}
-  />
-)}
-
-{/* Step 2 - Echo Upload */}
-{step === 2 && (
-  <StepUploadEcho
-    formData={formData}
-    handleEchoFileChange={handleEchoFileChange}
-    nextStep={nextStep}
-    prevStep={prevStep}
-  />
-)}
-
-{/* Step 3 - Patient Details */}
-{step === 3 && (
   <StepOne
     formData={formData}
     handleChange={handleChange}
     nextStep={nextStep}
-    prevStep={prevStep}
     errors={errors}
   />
 )}
 
-{/* Step 4 - Health Details */}
-{step === 4 && (
+{/* Step 2 - Health Details */}
+{step === 2 && (
   <StepTwo
     formData={formData}
     handleChange={handleChange}
@@ -314,19 +295,41 @@ const handleSubmit = async () => {
   />
 )}
 
-{/* Step 5 - Lifestyle & Predict */}
-{step === 5 && (
+{/* Step 3 - Lifestyle */}
+{step === 3 && (
   <StepThree
   formData={formData}
   handleChange={handleChange}
+  nextStep={nextStep}
   prevStep={prevStep}
   errors={errors}
-  handleSubmit={handleSubmit}
-  loading={loading}
-  error={error}
+/>
+)}
 
+{/* Step 4 - ECG */}
+{step === 4 && (
+  <StepUploadECG
+    formData={formData}
+    handleECGFileChange={handleECGFileChange}
+    nextStep={nextStep}
+    prevStep={prevStep}
   />
 )}
+
+{/* Step 5 - Echo */}
+{step === 5 && (
+  <StepUploadEcho
+    formData={formData}
+    handleEchoFileChange={handleEchoFileChange}
+    prevStep={prevStep}
+    handleSubmit={handleSubmit}
+    loading={loading}
+    error={error}
+  />
+
+)}
+
+
         {result && (
   <>
     <ResultCard result={result} />
