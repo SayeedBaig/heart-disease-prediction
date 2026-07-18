@@ -7,6 +7,18 @@ const api = axios.create({
   },
 });
 
-export default api;
+// Automatically attach JWT token if available
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
 
-console.log(import.meta.env.VITE_API_URL);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export default api;

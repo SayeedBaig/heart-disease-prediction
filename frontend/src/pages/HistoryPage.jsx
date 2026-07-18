@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 function HistoryPage() {
-  const patientId = localStorage.getItem("patient_id");
+  const patientId = localStorage.getItem("selected_patient_id");
 
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,10 +27,10 @@ function HistoryPage() {
 
       try {
         const response = await api.get(
-          `/patients/${patientId}/predictions`
-        );
+  `/history/patient/${patientId}`
+);  
 
-        setHistory(response.data.predictions || []);
+       setHistory(response.data || []);
       } catch (err) {
         console.error("Failed to load history:", err);
       } finally {
@@ -200,7 +200,7 @@ function HistoryPage() {
 </p>
 
 <h3 className="text-3xl font-bold text-slate-800">
-  #{String(item.prediction_id).slice(-6)}
+  #{item.prediction_id ?? item.id}
 </h3>
 
       <div className="flex justify-end items-center gap-2 mt-4 text-gray-500">
