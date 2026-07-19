@@ -12,3 +12,10 @@ class DoctorChatRequest(BaseModel):
     risk_level: Optional[str] = None
     ecg_class: Optional[str] = None
     ef_value: Optional[float] = None
+
+
+class FoodRecommendationRequest(BaseModel):
+    risk_level: str
+    diabetes: Optional[bool] = False
+    smoker: Optional[bool] = False
+    age: Optional[int] = None

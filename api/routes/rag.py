@@ -5,12 +5,16 @@ from chat.public_chat_service import PublicChatService
 from chat.suggested_questions import get_public_suggested_questions
 from chat.doctor_chat_service import DoctorChatService
 from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest
+from chat.doctor_chat_service import DoctorChatService
+from food_recommendation.food_service import FoodRecommendationService
+from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest, FoodRecommendationRequest
 
 
 router = APIRouter(prefix="/rag", tags=["RAG - AI Assistant"])
 
 public_chat_service = PublicChatService()
 doctor_chat_service = DoctorChatService()
+food_recommendation_service = FoodRecommendationService()
 
 @router.post("/doctor/ask")
 def ask_doctor_assistant(chat_request: DoctorChatRequest):
@@ -77,3 +81,32 @@ def suggested_questions():
         "success": True,
         **get_public_suggested_questions()
     }
+
+@router.post("/food-recommendation")
+def get_food_recommendation(request: FoodRecommendationRequest):
+    """
+    Food & Lifestyle Recommendation Engine.
+    Input: prediction risk level + patient profile flags.
+    Output: recommended/avoid foods, water, exercise, sleep, lifestyle.
+    Author: Akash
+    """
+    try:
+        patient_profile = {
+            "diabetes": request.diabetes,
+            "smoker": request.smoker,
+            "age": request.age
+        }
+
+        result = food_recommendation_service.get_recommendations(
+            request.risk_level, patient_profile
+        )
+
+        return {
+            "success": True,
+            **result
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
