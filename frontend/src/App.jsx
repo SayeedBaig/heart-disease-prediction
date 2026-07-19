@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/HistoryPage";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import Patients from "./pages/Patients";
+import Appointments from "./pages/Appointments";
 
 function App() {
   return (
@@ -22,8 +23,8 @@ function App() {
 <Route path="/history" element={<HistoryPage />} />
 <Route path="/doctor/login" element={<DoctorLogin />} />
 <Route path="/doctor/dashboard" element={<DoctorDashboard />}/>
-<Route path="/doctor/patients"element={<Patients />}
-/>
+<Route path="/doctor/patients"element={<Patients />}/>
+<Route path="/appointments" element={<Appointments />}/>
 </Routes>
   );
 }

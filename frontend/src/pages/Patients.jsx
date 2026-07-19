@@ -38,6 +38,18 @@ function Patients() {
 
     navigate("/history");
   };
+  const handleBookAppointment = (patient) => {
+  // Database primary key
+  localStorage.setItem("selected_patient_id", patient.id);
+
+  // PT000007
+  localStorage.setItem("selected_patient_code", patient.patient_id);
+
+  // Patient name
+  localStorage.setItem("selected_patient_name", patient.full_name);
+
+  navigate("/appointments");
+};
 
   if (loading) {
     return (
@@ -104,12 +116,23 @@ function Patients() {
 
                 <td className="p-4 text-center">
 
-                  <button
-                    onClick={() => handleViewHistory(patient)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-                  >
-                    View History
-                  </button>
+                 <div className="flex justify-center gap-3">
+
+  <button
+    onClick={() => handleViewHistory(patient)}
+    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
+  >
+    View History
+  </button>
+
+  <button
+    onClick={() => handleBookAppointment(patient)}
+    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+  >
+    Book Appointment
+  </button>
+
+</div>
 
                 </td>
 
