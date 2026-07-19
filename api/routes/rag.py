@@ -2,13 +2,14 @@ from fastapi import APIRouter
 
 from api.schemas.rag_request import PublicChatRequest
 from chat.public_chat_service import PublicChatService
-from chat.suggested_questions import get_public_suggested_questions
+from chat.suggested_questions import get_public_suggested_questions, get_doctor_suggested_questions
 from chat.doctor_chat_service import DoctorChatService
 from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest
 from chat.doctor_chat_service import DoctorChatService
 from food_recommendation.food_service import FoodRecommendationService
 from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest, FoodRecommendationRequest
 from chat.patient_chat_service import PatientChatService
+
 
 from api.schemas.rag_request import (
     PublicChatRequest, DoctorChatRequest, FoodRecommendationRequest, PatientChatRequest
@@ -136,3 +137,15 @@ def ask_patient_assistant(chat_request: PatientChatRequest):
             "error": str(e),
             "answer": "Something went wrong. Please try again."
         }
+    
+
+@router.get("/doctor/suggested-questions")
+def doctor_suggested_questions():
+    """
+    Suggested clinical questions for the doctor dashboard.
+    Author: Akash
+    """
+    return {
+        "success": True,
+        **get_doctor_suggested_questions()
+    }

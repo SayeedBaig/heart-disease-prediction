@@ -18,6 +18,23 @@ PUBLIC_SUGGESTED_QUESTIONS = [
     "Can stress increase heart disease?",
 ]
 
+DOCTOR_SUGGESTED_QUESTIONS = [
+    "Why is this prediction High Risk?",
+    "Explain the ECG findings for this patient.",
+    "What diagnostic tests are recommended next?",
+    "What are the current clinical guidelines for this condition?",
+    "What treatment options should be considered?",
+    "Is there recent research relevant to this case?",
+]
+
+
+def get_doctor_suggested_questions() -> dict:
+    """
+    Returns the suggested clinical questions for the doctor dashboard.
+    """
+    return {
+        "questions": DOCTOR_SUGGESTED_QUESTIONS
+    }
 
 def get_public_suggested_questions() -> dict:
     """
@@ -30,6 +47,13 @@ def get_public_suggested_questions() -> dict:
 
 if __name__ == "__main__":
     print("=== Suggested Questions Test ===\n")
+
+    print("Public questions:")
     result = get_public_suggested_questions()
+    for i, q in enumerate(result["questions"], 1):
+        print(f"{i}. {q}")
+
+    print("\nDoctor questions:")
+    result = get_doctor_suggested_questions()
     for i, q in enumerate(result["questions"], 1):
         print(f"{i}. {q}")
