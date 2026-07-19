@@ -19,3 +19,8 @@ class FoodRecommendationRequest(BaseModel):
     diabetes: Optional[bool] = False
     smoker: Optional[bool] = False
     age: Optional[int] = None
+
+
+class PatientChatRequest(BaseModel):
+    question: str
+    risk_level: Optional[str] = None

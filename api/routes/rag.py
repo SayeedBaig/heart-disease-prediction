@@ -8,6 +8,11 @@ from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest
 from chat.doctor_chat_service import DoctorChatService
 from food_recommendation.food_service import FoodRecommendationService
 from api.schemas.rag_request import PublicChatRequest, DoctorChatRequest, FoodRecommendationRequest
+from chat.patient_chat_service import PatientChatService
+
+from api.schemas.rag_request import (
+    PublicChatRequest, DoctorChatRequest, FoodRecommendationRequest, PatientChatRequest
+)
 
 
 router = APIRouter(prefix="/rag", tags=["RAG - AI Assistant"])
@@ -15,6 +20,7 @@ router = APIRouter(prefix="/rag", tags=["RAG - AI Assistant"])
 public_chat_service = PublicChatService()
 doctor_chat_service = DoctorChatService()
 food_recommendation_service = FoodRecommendationService()
+patient_chat_service = PatientChatService()
 
 @router.post("/doctor/ask")
 def ask_doctor_assistant(chat_request: DoctorChatRequest):
@@ -109,4 +115,24 @@ def get_food_recommendation(request: FoodRecommendationRequest):
         return {
             "success": False,
             "error": str(e)
+        }
+
+@router.post("/patient/ask")
+def ask_patient_assistant(chat_request: PatientChatRequest):
+    """
+    Patient AI Assistant — simplified, jargon-free responses.
+    risk_level (optional) enables food/lifestyle-aware answers.
+    Author: Akash
+    """
+    try:
+        result = patient_chat_service.ask(chat_request.question, chat_request.risk_level)
+        return {
+            "success": True,
+            **result
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "answer": "Something went wrong. Please try again."
         }
