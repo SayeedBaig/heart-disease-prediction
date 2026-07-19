@@ -177,6 +177,37 @@ class RAGRetriever:
             "query": query,
             "chunks": chunks
         }
+    
+    def retrieve_for_query(self, user_query: str) -> dict:
+        """
+        Retrieve chunks for a free-text user question.
+        Used by Public/Doctor/Patient chatbots — NOT tied to a prediction.
+        Author: Akash
+        """
+        print(f"User query: {user_query}")
+
+        chunks = self.retrieve(user_query)
+
+        # Edge case: weak results on the raw question, try a broadened fallback
+        if len(chunks) < 2:
+            print("  WARNING: Insufficient results. Broadening query...")
+            fallback_query = f"{user_query} heart cardiovascular health"
+            chunks = self.retrieve(fallback_query)
+
+        if not chunks:
+            print("  WARNING: No relevant chunks found for this question.")
+            return {
+                "query": user_query,
+                "chunks": [],
+                "warning": "No relevant medical guidelines found for this question."
+            }
+
+        print(f"Retrieved {len(chunks)} chunks (after dedup)\n")
+
+        return {
+            "query": user_query,
+            "chunks": chunks
+        }
 
 
 if __name__ == "__main__":
@@ -197,3 +228,17 @@ if __name__ == "__main__":
     for i, chunk in enumerate(result["chunks"]):
         print(f"  {i+1}. [{chunk['source']} p.{chunk['page']}] "
               f"confidence={chunk['confidence']}")
+        
+
+    print("\n=== Free-Text Query Test (Module 1 prep) ===\n")
+    test_questions = [
+        "What causes chest pain?",
+        "Can diabetes increase heart disease risk?",
+        "What is ECG?"
+    ]
+    for q in test_questions:
+        result = retriever.retrieve_for_query(q)
+        print(f"Q: {q}")
+        for i, chunk in enumerate(result["chunks"]):
+            print(f"  {i+1}. [{chunk['source']} p.{chunk['page']}] confidence={chunk['confidence']}")
+        print()
