@@ -21,7 +21,7 @@ router = APIRouter(
 # ------------------------------------------------------------------
 
 @router.post(
-    "/",
+    "",
     summary="Book a new appointment",
     description="Creates a new appointment record for a patient with a doctor.",
     response_description="Appointment created successfully.",
@@ -74,7 +74,7 @@ def get_appointment(
 # ------------------------------------------------------------------
 
 @router.get(
-    "/",
+    "",
     summary="List all appointments",
     description="Returns a paginated list of all appointments.",
     response_description="Appointments list retrieved.",
