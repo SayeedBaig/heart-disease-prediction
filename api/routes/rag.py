@@ -40,7 +40,9 @@ def ask_doctor_assistant(chat_request: DoctorChatRequest):
                 "ef_value": chat_request.ef_value
             }
 
-        result = doctor_chat_service.ask(chat_request.question, prediction_context)
+        result = doctor_chat_service.ask(
+            chat_request.question, prediction_context, chat_request.history
+        )
         return {
             "success": True,
             **result

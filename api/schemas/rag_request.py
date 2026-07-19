@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class PublicChatRequest(BaseModel):
     question: str
 
-from typing import Optional
+from typing import List, Optional
 
 
 class DoctorChatRequest(BaseModel):
@@ -12,6 +12,7 @@ class DoctorChatRequest(BaseModel):
     risk_level: Optional[str] = None
     ecg_class: Optional[str] = None
     ef_value: Optional[float] = None
+    history: Optional[List[dict]] = None
 
 
 class FoodRecommendationRequest(BaseModel):

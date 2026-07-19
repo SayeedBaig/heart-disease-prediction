@@ -31,7 +31,7 @@ class DoctorChatService:
         self.retriever = RAGRetriever()
         print("Doctor Chat Service ready.\n")
 
-    def ask(self, user_query: str, prediction_context: dict = None) -> dict:
+    def ask(self, user_query: str, prediction_context: dict = None, history: list = None) -> dict:
         try:
             # Build retrieval query — if there's prediction context,
             # blend it into the search so retrieval is more targeted
@@ -57,7 +57,7 @@ class DoctorChatService:
                     "recommended_next_steps": []
                 }
 
-            result = generate_doctor_answer(user_query, chunks, prediction_context)
+            result = generate_doctor_answer(user_query, chunks, prediction_context, history)
 
             return {
                 "status": "success",
@@ -97,3 +97,12 @@ if __name__ == "__main__":
     print(f"Answer: {result['answer']}")
     print(f"Guidelines: {result['clinical_guidelines_cited']}")
     print(f"Next steps: {result['recommended_next_steps']}")
+
+    print("\n--- Test 3: History comparison question ---")
+    history = [
+        {"date": "2026-05-01", "risk_level": "Medium", "ecg_class": "Normal", "ef_value": 55.0},
+        {"date": "2026-07-01", "risk_level": "High", "ecg_class": "MI", "ef_value": 35.0}
+    ]
+    result = service.ask("Explain why risk increased compared to previous visit.", history=history)
+    print(f"Status: {result['status']}")
+    print(f"Answer: {result['answer']}")

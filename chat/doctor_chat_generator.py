@@ -15,6 +15,7 @@ import json
 import re
 from groq import Groq
 from dotenv import load_dotenv
+from chat.history_context_builder import format_history_for_prompt
 
 load_dotenv()
 
@@ -23,7 +24,8 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 MAX_TOKENS = 700
 
 
-def build_doctor_prompt(user_query: str, chunks: list, prediction_context: dict = None) -> str:
+def build_doctor_prompt(user_query: str, chunks: list, prediction_context: dict = None,
+                         history: list = None) -> str:
     context_text = ""
     for i, chunk in enumerate(chunks[:5]):
         context_text += (
@@ -40,25 +42,29 @@ ECG Classification: {prediction_context.get('ecg_class', 'N/A')}
 Ejection Fraction: {prediction_context.get('ef_value', 'N/A')}
 """
 
+    history_text = ""
+    if history:
+        history_text = "\n" + format_history_for_prompt(history)
+
     prompt = f"""You are a clinical decision-support assistant for doctors on a
 heart health platform. Respond with evidence-based, professional medical
 language — the audience is a licensed physician, not a patient.
 
 DOCTOR'S QUESTION:
 {user_query}
-{case_text}
+{case_text}{history_text}
 RETRIEVED CLINICAL GUIDELINES:
 {context_text}
 
 Generate a response in this EXACT JSON format (no markdown, no preamble):
 {{
-  "answer": "Clinical, evidence-based answer in 3-6 sentences, using proper medical terminology.",
+  "answer": "Clinical, evidence-based answer in 3-6 sentences, using proper medical terminology. If visit history is provided, explicitly compare visits and explain the change.",
   "clinical_guidelines_cited": ["Guideline source 1", "Guideline source 2"],
   "recommended_next_steps": ["step 1", "step 2"]
 }}
 
-Base your answer strictly on the retrieved guidelines and prediction context
-provided. Do not invent clinical facts or statistics."""
+Base your answer strictly on the retrieved guidelines and prediction/history
+context provided. Do not invent clinical facts or statistics."""
 
     return prompt
 
@@ -98,9 +104,10 @@ def parse_response(raw_text: str) -> dict:
         }
 
 
-def generate_doctor_answer(user_query: str, chunks: list, prediction_context: dict = None) -> dict:
+def generate_doctor_answer(user_query: str, chunks: list, prediction_context: dict = None,
+                            history: list = None) -> dict:
     print("Generating doctor chatbot answer...")
-    prompt = build_doctor_prompt(user_query, chunks, prediction_context)
+    prompt = build_doctor_prompt(user_query, chunks, prediction_context, history)
     raw_response = call_groq_api(prompt)
     result = parse_response(raw_response)
     print("Answer generated successfully.")
