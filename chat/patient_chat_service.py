@@ -2,12 +2,14 @@
 Patient Chat Service
 Author: Akash
 Module 3 — Patient AI Assistant
+Module 6 — Context Awareness
 
 Purpose:
     Entry point for the Patient AI Assistant. Reuses the same
     safety guardrail as Module 1 (patients shouldn't get diagnoses
     either). Pulls food/lifestyle context from Module 4 when the
-    patient has a known risk level.
+    patient has a known risk level. Uses conversation memory to
+    handle follow-up questions naturally.
 """
 
 import os
@@ -19,6 +21,7 @@ from rag.retriever.retriever import RAGRetriever
 from chat.safety_guardrails import check_query_safety
 from chat.patient_chat_generator import generate_patient_answer
 from food_recommendation.food_service import FoodRecommendationService
+from chat.conversation_memory import build_contextual_query, add_turn, get_history
 
 
 class PatientChatService:
@@ -26,6 +29,8 @@ class PatientChatService:
     Handles Patient AI Assistant requests (post-login, patient view).
     risk_level is optional — passed when we know the patient's
     prediction result, so food/lifestyle guidance can be included.
+    session_id is optional — passed to enable conversation memory
+    for follow-up questions.
     """
 
     def __init__(self):
@@ -34,7 +39,7 @@ class PatientChatService:
         self.food_service = FoodRecommendationService()
         print("Patient Chat Service ready.\n")
 
-    def ask(self, user_query: str, risk_level: str = None) -> dict:
+    def ask(self, user_query: str, risk_level: str = None, session_id: str = None) -> dict:
         try:
             # Step 1 — Safety check (same guardrail as public chatbot)
             safety = check_query_safety(user_query)
@@ -46,8 +51,12 @@ class PatientChatService:
                     "recommend_doctor": True
                 }
 
-            # Step 2 — Retrieve relevant medical chunks
-            retrieval = self.retriever.retrieve_for_query(user_query)
+            # Step 2 — Retrieve relevant medical chunks (context-aware if session_id given)
+            retrieval_query = user_query
+            if session_id:
+                retrieval_query = build_contextual_query(session_id, user_query)
+
+            retrieval = self.retriever.retrieve_for_query(retrieval_query)
             chunks = retrieval["chunks"]
 
             if not chunks:
@@ -72,8 +81,13 @@ class PatientChatService:
                         "exercise": food_result["exercise"]
                     }
 
-            # Step 4 — Generate simplified answer
-            result = generate_patient_answer(user_query, chunks, food_context)
+            # Step 4 — Generate simplified answer, passing conversation
+            # history so follow-ups are answered directly, not generically
+            conversation_history = get_history(session_id) if session_id else None
+            result = generate_patient_answer(user_query, chunks, food_context, conversation_history)
+
+            if session_id:
+                add_turn(session_id, user_query, result.get("answer", ""))
 
             return {
                 "status": "success",
@@ -99,17 +113,12 @@ if __name__ == "__main__":
     print("=== Patient Chat Service Test ===\n")
 
     service = PatientChatService()
+    session = "test-session"
 
-    test_cases = [
-        ("Can I eat rice?", "High"),
-        ("Do I have heart disease?", None),
-        ("Can I exercise?", "Medium"),
-        ("When should I consult my doctor?", None),
-    ]
+    print("\n--- Turn 1: Can I exercise? ---")
+    result = service.ask("Can I exercise?", risk_level="Medium", session_id=session)
+    print(f"Answer: {result['answer']}")
 
-    for q, risk in test_cases:
-        print(f"\n--- Q: {q} (risk_level={risk}) ---")
-        result = service.ask(q, risk)
-        print(f"Status: {result['status']}")
-        print(f"Answer: {result['answer']}")
-        print(f"Recommend doctor: {result['recommend_doctor']}")
+    print("\n--- Turn 2: How long? (follow-up, should use context) ---")
+    result = service.ask("How long?", risk_level="Medium", session_id=session)
+    print(f"Answer: {result['answer']}")

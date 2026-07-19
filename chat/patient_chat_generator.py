@@ -2,11 +2,13 @@
 Patient Chat Generator
 Author: Akash
 Module 3 — Patient AI Assistant
+Module 6 — Context Awareness (conversation history support)
 
 Purpose:
     Generates simplified, jargon-free answers for patients.
     Unlike Doctor mode, avoids medical terminology entirely.
-    Can incorporate food/lifestyle recommendations when relevant.
+    Can incorporate food/lifestyle recommendations and recent
+    conversation history when relevant.
 """
 
 import os
@@ -22,7 +24,8 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 MAX_TOKENS = 500
 
 
-def build_patient_prompt(user_query: str, chunks: list, food_context: dict = None) -> str:
+def build_patient_prompt(user_query: str, chunks: list, food_context: dict = None,
+                          conversation_history: list = None) -> str:
     context_text = ""
     for i, chunk in enumerate(chunks[:4]):
         context_text += (
@@ -38,6 +41,12 @@ Avoid: {', '.join(food_context.get('avoid_foods', []))}
 Exercise: {food_context.get('exercise', '')}
 """
 
+    history_text = ""
+    if conversation_history:
+        history_text = "\nRECENT CONVERSATION (for context on follow-up questions):\n"
+        for turn in conversation_history[-2:]:
+            history_text += f"Patient asked: {turn['question']}\nYou answered: {turn['answer']}\n"
+
     prompt = f"""You are a friendly health assistant talking directly to a
 patient. You are NOT a doctor and must NEVER diagnose or predict disease.
 
@@ -46,9 +55,11 @@ RULES:
   "ejection fraction", "HFrEF" — explain things the way you would to a
   friend with no medical background).
 - Keep it warm, clear, and reassuring but honest.
+- If this is a follow-up question, use the recent conversation to understand
+  what the patient is really asking, and answer that specific thing directly.
 - Recommend seeing a doctor for anything about their personal symptoms or risk.
-
-PATIENT'S QUESTION:
+{history_text}
+PATIENT'S CURRENT QUESTION:
 {user_query}
 {food_text}
 MEDICAL GUIDELINES (for grounding your answer, don't quote directly):
@@ -56,7 +67,7 @@ MEDICAL GUIDELINES (for grounding your answer, don't quote directly):
 
 Generate a response in this EXACT JSON format (no markdown, no preamble):
 {{
-  "answer": "Simple, warm 2-4 sentence answer in plain language.",
+  "answer": "Simple, warm 2-4 sentence answer in plain language that directly addresses the current question.",
   "recommend_doctor": true or false
 }}"""
 
@@ -98,9 +109,10 @@ def parse_response(raw_text: str) -> dict:
         }
 
 
-def generate_patient_answer(user_query: str, chunks: list, food_context: dict = None) -> dict:
+def generate_patient_answer(user_query: str, chunks: list, food_context: dict = None,
+                             conversation_history: list = None) -> dict:
     print("Generating patient chatbot answer...")
-    prompt = build_patient_prompt(user_query, chunks, food_context)
+    prompt = build_patient_prompt(user_query, chunks, food_context, conversation_history)
     raw_response = call_groq_api(prompt)
     result = parse_response(raw_response)
     print("Answer generated successfully.")
