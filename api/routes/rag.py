@@ -2,6 +2,8 @@ from fastapi import APIRouter
 
 from api.schemas.rag_request import PublicChatRequest
 from chat.public_chat_service import PublicChatService
+from chat.suggested_questions import get_public_suggested_questions
+
 
 router = APIRouter(prefix="/rag", tags=["RAG - AI Assistant"])
 
@@ -30,3 +32,16 @@ def ask_public_assistant(chat_request: PublicChatRequest):
                 "Please try again or consult a healthcare professional."
             )
         }
+    
+
+
+@router.get("/public/suggested-questions")
+def suggested_questions():
+    """
+    Common questions shown on the public landing page.
+    Author: Akash
+    """
+    return {
+        "success": True,
+        **get_public_suggested_questions()
+    }
