@@ -16,20 +16,19 @@ function DiagnosePage() {
   const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
-    age: "",
-    gender: "",
-    height: "",
-    weight: "",
-    ap_hi: "",
-    ap_lo: "",
-    cholesterol: "",
-    gluc: "",
-    smoke: "",
-    alco: "",
-    active: "",
-    ecgFile: null,
-    echoFile: null,
-  });
+  age: "",
+  height: "",
+  weight: "",
+  ap_hi: "",
+  ap_lo: "",
+  cholesterol: "",
+  gluc: "",
+  smoke: "",
+  alco: "",
+  active: "",
+  ecgFile: null,
+  echoFile: null,
+});
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -66,10 +65,6 @@ const handleEchoFileChange = (e) => {
 
     if (!formData.age || formData.age < 1 || formData.age > 120) {
       newErrors.age = "Age must be between 1 and 120";
-    }
-
-    if (!formData.gender) {
-      newErrors.gender = "Please select gender";
     }
 
     if (!formData.height || formData.height < 100 || formData.height > 250) {
@@ -226,12 +221,16 @@ const handleSubmit = async () => {
     console.log("Uploaded ECG:", ecgPath);
     console.log("Uploaded Echo:", echoPath);
 
+    const storedGender = localStorage.getItem("patient_gender");
+    const genderValue = storedGender === "Male" ? 2 : 1;
+
     // Clinical data only
+    
     const clinicalData = {
   patient_id: localStorage.getItem("patient_id"),
 
   age: Number(formData.age),
-  gender: Number(formData.gender),
+  gender: genderValue,
   height: Number(formData.height),
   weight: Number(formData.weight),
   ap_hi: Number(formData.ap_hi),
@@ -246,11 +245,17 @@ const handleSubmit = async () => {
   echo_path: echoPath,
 };
     console.log(clinicalData);
-    const response = await api.post("/predict", clinicalData);
+   const response = await api.post("/predict", clinicalData);
 
 console.log(response.data);
 
-// Save prediction_id for Reports page
+// If backend returned validation errors
+if (response.data.success === false) {
+  setError(response.data.errors.join(", "));
+  return;
+}
+
+// Save prediction_id
 if (response.data.prediction_id) {
   localStorage.setItem(
     "prediction_id",

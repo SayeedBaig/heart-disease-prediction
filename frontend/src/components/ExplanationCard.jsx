@@ -1,73 +1,163 @@
+import {
+  BookOpen,
+  FileText,
+  Search,
+  Database,
+  CheckCircle2,
+} from "lucide-react";
+
 function ExplanationCard({ explanation }) {
   if (!explanation) return null;
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mt-8 shadow-sm">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mt-8 transition-all duration-300 hover:shadow-xl">
 
-      <h2 className="text-2xl font-bold text-blue-700 mb-6">
-        📚 Medical Explanation
-      </h2>
+      {/* Header */}
 
-      <p className="mb-4">
-        <strong>Status:</strong> {explanation.status}
-      </p>
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 flex items-center justify-center shadow-lg">
+          <BookOpen className="text-white" size={28} />
+        </div>
 
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">
-          Summary
-        </h3>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Medical Explanation
+          </h2>
 
-        <p>{explanation.explanation.summary}</p>
+          <p className="text-slate-500">
+            AI generated explanation with retrieved medical evidence
+          </p>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">
-          Detailed Explanation
-        </h3>
+      {/* Status */}
 
-        <p>{explanation.explanation.details}</p>
+      <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-2xl p-4 mb-8">
+        <CheckCircle2 className="text-green-600" size={22} />
+
+        <div>
+          <p className="text-sm text-slate-500">Status</p>
+          <p className="font-semibold text-green-700">
+            {explanation.status}
+          </p>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">
-          Query Used
-        </h3>
+      {/* Summary */}
 
-        <p className="italic text-gray-700">
+      <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <FileText className="text-blue-600" />
+          <h3 className="text-xl font-semibold">
+            Summary
+          </h3>
+        </div>
+
+        <p className="leading-8 text-slate-700">
+          {explanation.explanation.summary}
+        </p>
+      </div>
+
+      {/* Detailed Explanation */}
+
+      <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200 mb-6">
+        <div className="flex items-center gap-3 mb-3">
+          <BookOpen className="text-indigo-600" />
+          <h3 className="text-xl font-semibold">
+            Detailed Explanation
+          </h3>
+        </div>
+
+        <p className="leading-8 text-slate-700">
+          {explanation.explanation.details}
+        </p>
+      </div>
+
+      {/* Query */}
+
+      <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6 mb-8">
+        <div className="flex items-center gap-3 mb-3">
+          <Search className="text-blue-600" />
+          <h3 className="text-xl font-semibold">
+            Query Used
+          </h3>
+        </div>
+
+        <p className="italic text-slate-700">
           {explanation.query}
         </p>
       </div>
 
+      {/* References */}
+
       <div>
-        <h3 className="font-semibold text-lg mb-3">
-          Retrieved References
-        </h3>
 
-        <ul className="space-y-3">
+        <div className="flex items-center gap-3 mb-5">
+          <Database className="text-blue-600" />
+          <h3 className="text-2xl font-bold text-slate-900">
+            Retrieved References
+          </h3>
+        </div>
+
+        <div className="space-y-5">
+
           {explanation.chunks.map((chunk, index) => (
-            <li
+
+            <div
               key={index}
-              className="bg-white rounded-lg p-4 border"
+              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
             >
-              <p>
-                <strong>Source:</strong> {chunk.source}
-              </p>
 
-              <p>
-                <strong>Page:</strong> {chunk.page}
-              </p>
+              <div className="grid md:grid-cols-2 gap-4">
 
-              <p>
-                <strong>Category:</strong> {chunk.category}
-              </p>
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Source
+                  </p>
 
-              <p>
-                <strong>Similarity Score:</strong>{" "}
-                {chunk.score.toFixed(2)}
-              </p>
-            </li>
+                  <p className="font-semibold text-slate-800">
+                    {chunk.source}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Page
+                  </p>
+
+                  <p className="font-semibold text-slate-800">
+                    {chunk.page}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Category
+                  </p>
+
+                  <p className="font-semibold text-slate-800">
+                    {chunk.category}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-500">
+                    Similarity Score
+                  </p>
+
+                  <p className="font-semibold text-blue-600">
+                    {chunk.score.toFixed(2)}
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
           ))}
-        </ul>
+
+        </div>
+
       </div>
 
     </div>

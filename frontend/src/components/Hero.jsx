@@ -13,10 +13,10 @@ import AnimatedBackground from "./AnimatedBackground";
 
 function Hero() {
   return (
-   <section className="hero-background relative min-h-screen flex items-center overflow-hidden">
+   <section className="hero-background relative min-h-[92vh] pt-24 pb-16 flex items-center overflow-hidden">
       <AnimatedBackground />
       
-      <div className="relative z-10 max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-8 grid lg:grid-cols-[1.15fr_0.85fr] gap-16 items-center">
         {/* LEFT SECTION */}
 
         <motion.div
@@ -33,7 +33,8 @@ function Hero() {
 
           {/* Heading */}
 
-          <h1 className="text-5xl lg:text-6xl font-extrabold leading-snug text-slate-900 max-w-2xl">
+          <h1 className="text-5xl md:text-6xl xl:text-7xl
+tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
             Early Detection of
             <br />
             <span className="text-blue-600">
@@ -48,27 +49,49 @@ function Hero() {
           {/* Description */}
 
           <p className="mt-6 text-lg text-slate-600 leading-8 max-w-xl">
-            Analyze ECG, Echocardiography and Clinical Data using advanced
-            Artificial Intelligence to estimate cardiovascular risk with
-            explainable predictions and digital twin simulations.
+           Combine Clinical Data, ECG signals, and Echocardiography using advanced AI to deliver fast, accurate, and explainable cardiovascular risk predictions with digital twin insights.
           </p>
 
           {/* Buttons */}
 
           <div className="flex gap-5 mt-10 flex-wrap">
 
-            <Link
-  to="/register"
-  className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
->
-  Start Diagnosis
-</Link>
+            <div className="flex gap-5 mt-10 flex-wrap">
 
-            <button className="border border-slate-300 hover:border-blue-600 hover:text-blue-600 px-7 py-4 rounded-xl font-semibold transition-all duration-300">
-              Explore Features →
-            </button>
+  <Link
+    to="/doctor/register"
+    className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+  >
+    Register as Doctor
+  </Link>
 
+  <Link
+    to="/doctor/login"
+    className="border border-slate-300 hover:border-blue-600 hover:text-blue-600 px-7 py-4 rounded-xl font-semibold transition-all duration-300"
+  >
+    Doctor Login →
+  </Link>
+
+</div>
           </div>
+          <div className="flex flex-wrap gap-6 mt-8 text-sm text-slate-600">
+
+  <div className="flex items-center gap-2">
+    <ShieldCheck className="text-green-600" size={18}/>
+    Secure AI
+  </div>
+
+  <div className="flex items-center gap-2">
+    <Activity className="text-blue-600" size={18}/>
+    Real-time Analysis
+  </div>
+
+  <div className="flex items-center gap-2">
+    <HeartPulse className="text-red-500" size={18}/>
+    Explainable AI
+  </div>
+
+</div>
 
           {/* Feature List */}
 
@@ -98,36 +121,33 @@ function Hero() {
 
           {/* Statistics */}
 
-          <div className="grid grid-cols-3 gap-8 mt-14">
+<div className="grid grid-cols-3 gap-4 mt-12 max-w-xl">
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 hover:shadow-xl transition-all duration-300">
+    <h2 className="text-3xl font-bold text-blue-600">96%</h2>
+    <p className="text-slate-500 mt-2">
+      Prediction Confidence
+    </p>
+  </div>
 
-            <div>
-              <h2 className="text-4xl font-bold text-blue-600">
-                96%
-              </h2>
-              <p className="text-gray-500 mt-1">
-                Prediction Confidence
-              </p>
-            </div>
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 hover:shadow-xl transition-all duration-300">
+    <h2 className="text-3xl font-bold text-blue-600">
+      3 AI
+    </h2>
+    <p className="text-slate-500 mt-2">
+      Clinical • ECG • Echo
+    </p>
+  </div>
 
-            <div>
-              <h2 className="text-4xl font-bold text-blue-600">
-                3 AI
-              </h2>
-              <p className="text-gray-500 mt-1">
-                Clinical • ECG • Echo
-              </p>
-            </div>
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-3 hover:shadow-xl transition-all duration-300">
+    <h2 className="text-3xl font-bold text-blue-600">
+      Explainable
+    </h2>
+    <p className="text-slate-500 mt-2">
+      AI Powered Reports
+    </p>
+  </div>
 
-            <div>
-              <h2 className="text-4xl font-bold text-blue-600">
-                Explainable
-              </h2>
-              <p className="text-gray-500 mt-1">
-                AI Reports
-              </p>
-            </div>
-
-          </div>
+</div>
 
         </motion.div>
 
@@ -197,7 +217,7 @@ function Hero() {
           <motion.img
             src={heart}
             alt="Heart"
-            className="relative w-[450px] lg:w-[560px] z-10"
+            className="relative w-[420px] md:w-[500px] xl:w-[580px] z-10"
             animate={{
   y: [0, -6, 0],
   scale: [1, 1.03, 1, 1.05, 1],

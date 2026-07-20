@@ -1,19 +1,70 @@
-function RiskBadge({ level }) {
-  let color = "bg-gray-200 text-gray-800";
+import { ShieldCheck, AlertTriangle, ShieldAlert } from "lucide-react";
 
-  if (level === "Low") {
-    color = "bg-green-100 text-green-700";
-  } else if (level === "Medium") {
-    color = "bg-yellow-100 text-yellow-700";
-  } else if (level === "High") {
-    color = "bg-red-100 text-red-700";
+function RiskBadge({ level }) {
+  let styles = {
+    bg: "bg-gray-100",
+    text: "text-gray-700",
+    border: "border-gray-200",
+    icon: <ShieldCheck size={18} />,
+  };
+
+  switch (level) {
+    case "Low":
+      styles = {
+        bg: "bg-green-50",
+        text: "text-green-700",
+        border: "border-green-200",
+        icon: <ShieldCheck size={18} />,
+      };
+      break;
+
+    case "Medium":
+      styles = {
+        bg: "bg-yellow-50",
+        text: "text-yellow-700",
+        border: "border-yellow-200",
+        icon: <AlertTriangle size={18} />,
+      };
+      break;
+
+    case "High":
+      styles = {
+        bg: "bg-red-50",
+        text: "text-red-700",
+        border: "border-red-200",
+        icon: <ShieldAlert size={18} />,
+      };
+      break;
+
+    default:
+      break;
   }
 
   return (
     <span
-      className={`${color} px-3 py-1 rounded-full text-sm font-semibold`}
+      className={`
+        inline-flex
+        items-center
+        gap-2
+        ${styles.bg}
+        ${styles.text}
+        border
+        ${styles.border}
+        px-4
+        py-2
+        rounded-full
+        font-semibold
+        text-sm
+        shadow-sm
+        transition-all
+        duration-300
+        hover:shadow-md
+        hover:scale-105
+        cursor-default
+      `}
     >
-      {level}
+      {styles.icon}
+      {level} Risk
     </span>
   );
 }

@@ -1,327 +1,591 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 
 import Navbar from "../components/Navbar";
 import PageBackground from "../components/PageBackground";
 import api from "../services/api";
-import { motion } from "framer-motion";
+
 import {
+  TrendingUp,
+  Search,
   Activity,
-  HeartPulse,
-  Heart,
-  CalendarDays,
-  BadgeCheck,
 } from "lucide-react";
 
-function HistoryPage() {
-  const patientId = localStorage.getItem("selected_patient_id");
+export default function HistoryPage() {
+  const patientId = localStorage.getItem("patient_id");
 
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(patientId));
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [riskFilter, setRiskFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
+  // -------------------------------
+  // Helper Functions
+  // -------------------------------
+
+  const getRiskColor = (risk) => {
+    switch (risk?.toLowerCase()) {
+      case "low":
+        return "bg-green-100 text-green-700";
+
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+
+      case "high":
+        return "bg-red-100 text-red-700";
+
+      default:
+        return "bg-blue-100 text-blue-700";
+    }
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  // -------------------------------
+  // Fetch History
+  // -------------------------------
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      if (!patientId) {
-        setLoading(false);
-        return;
-      }
+  if (!patientId) return;
 
-      try {
-        const response = await api.get(
-  `/history/patient/${patientId}`
-);  
+  const fetchHistory = async () => {
+    try {
+      const res = await api.get(`/history/patient/${patientId}`);
 
-       setHistory(response.data || []);
-      } catch (err) {
-        console.error("Failed to load history:", err);
-      } finally {
-        setLoading(false);
-      }
+console.log("Patient ID:", patientId);
+console.log("History Response:", res.data);
+
+setHistory(res.data.predictions || []);
+    } catch (error) {
+      console.error("History Fetch Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchHistory();
+}, [patientId]);
+
+  // -------------------------------
+  // Statistics
+  // -------------------------------
+
+  const stats = useMemo(() => {
+    return {
+      total: history.length,
+
+      low: history.filter(
+        (item) => item.risk_level?.toLowerCase() === "low"
+      ).length,
+
+      medium: history.filter(
+        (item) => item.risk_level?.toLowerCase() === "medium"
+      ).length,
+
+      high: history.filter(
+        (item) => item.risk_level?.toLowerCase() === "high"
+      ).length,
+
+      average:
+        history.length > 0
+          ? (
+              history.reduce(
+                (sum, item) =>
+                  sum + Number(item.risk_percentage || 0),
+                0
+              ) / history.length
+            ).toFixed(1)
+          : "0",
     };
+  }, [history]);
 
-    fetchHistory();
-  }, [patientId]);
+  // -------------------------------
+  // Search + Filter + Sort
+  // -------------------------------
+
+  const filteredHistory = useMemo(() => {
+    let data = [...history];
+
+    // Search by Prediction ID OR Risk Level
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+
+      data = data.filter(
+        (item) =>
+          item.id.toString().includes(search) ||
+          item.risk_level?.toLowerCase().includes(search)
+      );
+    }
+
+    // Risk Filter
+
+    if (riskFilter !== "all") {
+      data = data.filter(
+        (item) =>
+          item.risk_level?.toLowerCase() ===
+          riskFilter.toLowerCase()
+      );
+    }
+
+    // Sorting
+
+    switch (sortBy) {
+      case "oldest":
+        data.sort(
+          (a, b) =>
+            new Date(a.created_at) -
+            new Date(b.created_at)
+        );
+        break;
+
+      case "highest":
+        data.sort(
+          (a, b) =>
+            Number(b.risk_percentage) -
+            Number(a.risk_percentage)
+        );
+        break;
+
+      case "lowest":
+        data.sort(
+          (a, b) =>
+            Number(a.risk_percentage) -
+            Number(b.risk_percentage)
+        );
+        break;
+
+      default:
+        data.sort(
+          (a, b) =>
+            new Date(b.created_at) -
+            new Date(a.created_at)
+        );
+    }
+
+    return data;
+  }, [history, searchTerm, riskFilter, sortBy]);
+
+  // -------------------------------
+  // Patient Not Found
+  // -------------------------------
+
+  if (!patientId) {
+    return (
+      <>
+        <Navbar />
+
+        <div className="relative min-h-screen">
+          <PageBackground />
+
+          <div className="relative z-10 flex justify-center items-center h-screen">
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-md"
+            >
+              <Activity
+                size={60}
+                className="mx-auto text-blue-600"
+              />
+
+              <h2 className="text-3xl font-bold mt-5">
+                Patient Not Found
+              </h2>
+
+              <p className="text-gray-500 mt-3">
+                Please register a patient before viewing
+                prediction history.
+              </p>
+
+            </motion.div>
+
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // -------------------------------
+  // Main UI
+  // -------------------------------
 
   return (
     <>
       <Navbar />
 
-      <div className="relative min-h-screen overflow-hidden p-10">
+      <div className="relative min-h-screen">
         <PageBackground />
 
-        <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="relative z-10 max-w-7xl mx-auto px-8 py-10">
 
-          {/* Heading */}
-
-          <div className="mb-10">
-            <h1 className="text-5xl font-bold text-slate-900">
+          <motion.div
+            initial={{ opacity: 0, y: -25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-5xl font-extrabold text-slate-900">
               Prediction History
             </h1>
 
-            <p className="text-lg text-gray-500 mt-3">
-              Review all previous AI-generated cardiovascular predictions.
+            <p className="text-lg text-slate-500 mt-3">
+              Review all previous AI-generated cardiovascular
+              predictions and monitor patient risk trends.
             </p>
-          </div>
 
-          {/* Loading */}
+          </motion.div>
 
           {loading ? (
-            <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
 
-              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto"></div>
+            <div className="flex justify-center items-center py-24">
 
-              <p className="mt-5 text-gray-600 text-lg">
-                Loading prediction history...
-              </p>
+              <div className="animate-spin rounded-full h-14 w-14 border-4 border-blue-600 border-t-transparent"></div>
 
             </div>
 
-          ) : history.length === 0 ? (
+          ) : (<div>
 
-            /* Empty State */
+  {/* ===========================
+      Statistics Cards
+  =========================== */}
 
-            <div className="bg-white rounded-3xl shadow-xl p-16 text-center">
+  <div className="grid md:grid-cols-5 gap-6 mt-10">
 
-              <div className="text-7xl">
-                📈
+    {/* Total Predictions */}
+
+    <motion.div
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="bg-white rounded-3xl shadow-lg p-6"
+    >
+      <p className="text-gray-500">
+        Total Predictions
+      </p>
+
+      <h2 className="text-4xl font-bold text-blue-700 mt-3">
+        {stats.total}
+      </h2>
+    </motion.div>
+
+    {/* Low Risk */}
+
+    <motion.div
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="bg-green-50 rounded-3xl shadow-lg p-6"
+    >
+      <p className="text-green-700">
+        Low Risk
+      </p>
+
+      <h2 className="text-4xl font-bold text-green-600 mt-3">
+        {stats.low}
+      </h2>
+    </motion.div>
+
+    {/* Medium Risk */}
+
+    <motion.div
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="bg-yellow-50 rounded-3xl shadow-lg p-6"
+    >
+      <p className="text-yellow-700">
+        Medium Risk
+      </p>
+
+      <h2 className="text-4xl font-bold text-yellow-600 mt-3">
+        {stats.medium}
+      </h2>
+    </motion.div>
+
+    {/* High Risk */}
+
+    <motion.div
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="bg-red-50 rounded-3xl shadow-lg p-6"
+    >
+      <p className="text-red-700">
+        High Risk
+      </p>
+
+      <h2 className="text-4xl font-bold text-red-600 mt-3">
+        {stats.high}
+      </h2>
+    </motion.div>
+
+    {/* Average Risk */}
+
+    <motion.div
+      whileHover={{ scale: 1.03, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="bg-indigo-50 rounded-3xl shadow-lg p-6"
+    >
+      <div className="flex items-center gap-2">
+
+        <TrendingUp
+          size={22}
+          className="text-indigo-700"
+        />
+
+        <p className="text-indigo-700">
+          Average Risk
+        </p>
+
+      </div>
+
+      <h2 className="text-4xl font-bold text-indigo-700 mt-3">
+        {stats.average}%
+      </h2>
+    </motion.div>
+
+  </div>
+
+  {/* ===========================
+      Search & Filter
+  =========================== */}
+
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.2 }}
+    className="bg-white rounded-3xl shadow-lg p-6 mt-8"
+  >
+
+    <div className="grid md:grid-cols-3 gap-4">
+
+      {/* Search */}
+
+      <div className="relative">
+
+        <Search
+          size={20}
+          className="absolute left-4 top-3.5 text-gray-400"
+        />
+
+        <input
+          type="text"
+          placeholder="Search Prediction ID or Risk..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+      </div>
+
+      {/* Risk Filter */}
+
+      <select
+        value={riskFilter}
+        onChange={(e) => setRiskFilter(e.target.value)}
+        className="border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+      >
+
+        <option value="all">
+          All Risk Levels
+        </option>
+
+        <option value="low">
+          Low Risk
+        </option>
+
+        <option value="medium">
+          Medium Risk
+        </option>
+
+        <option value="high">
+          High Risk
+        </option>
+
+      </select>
+
+      {/* Sort */}
+
+      <select
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+        className="border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
+      >
+
+        <option value="newest">
+          Newest First
+        </option>
+
+        <option value="oldest">
+          Oldest First
+        </option>
+
+        <option value="highest">
+          Highest Risk
+        </option>
+
+        <option value="lowest">
+          Lowest Risk
+        </option>
+
+      </select>
+
+    </div>
+
+  </motion.div>
+
+  {/* ===========================
+      Prediction List
+  =========================== */}
+
+  <div className="mt-8">
+
+    {filteredHistory.length === 0 ? (
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="bg-white rounded-3xl shadow-lg p-12 text-center"
+      >
+
+        <Activity
+          size={70}
+          className="mx-auto text-blue-500"
+        />
+
+        <h2 className="text-3xl font-bold mt-5">
+          No Predictions Found
+        </h2>
+
+        <p className="text-gray-500 mt-3">
+          No prediction records match your search or filters.
+        </p>
+
+      </motion.div>
+
+    ) : (
+
+      <div className="space-y-6">        {filteredHistory.map((item, index) => (
+
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.4,
+              delay: index * 0.08,
+            }}
+            whileHover={{
+              scale: 1.01,
+              y: -5,
+            }}
+            className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 transition-all"
+          >
+
+            {/* Header */}
+
+            <div className="flex justify-between items-start flex-wrap gap-4">
+
+              <div>
+
+                <h2 className="text-2xl font-bold text-slate-800">
+                  Prediction #{item.id}
+                </h2>
+
+                <p className="text-gray-500 mt-2">
+                  {formatDate(item.created_at)}
+                </p>
+
               </div>
 
-              <h2 className="text-3xl font-bold mt-6">
-                No Predictions Yet
-              </h2>
-
-              <p className="text-gray-500 mt-4 text-lg">
-                Your AI prediction history will appear here after completing
-                your first diagnosis.
-              </p>
-
-            </div>
-
-          ) : (
-
-            <div className="space-y-8">
-
-              {history.map((item) => {
-
-                const risk = item.risk_level?.toLowerCase();
-
-                return (
-
-                 <motion.div
-  key={item.prediction_id}
-  initial={{ opacity: 0, y: 25 }}
-  animate={{ opacity: 1, y: 0 }}
-  whileHover={{ y: -6 }}
-  transition={{ duration: 0.4 }}
-  className="
-    bg-white/90
-    backdrop-blur-md
-    rounded-3xl
-    shadow-[0_15px_40px_rgba(37,99,235,0.12)]
-    hover:shadow-[0_20px_50px_rgba(37,99,235,0.18)]
-    transition-all
-    duration-300
-    border
-    border-slate-100
-    p-8
-  "
->
-  {/* Header */}
-
-  <div className="flex justify-between items-start">
-
-    <div>
-
-      <span
-        className={`
-          inline-flex
-          items-center
-          px-5
-          py-2.5
-          rounded-full
-          text-base
-          font-bold
-          ${
-           risk === "low"
-? "bg-green-100 text-green-700 shadow-md shadow-green-200"
-              : risk === "medium"
-? "bg-yellow-100 text-yellow-700 shadow-md shadow-yellow-200"
-              : "bg-red-100 text-red-700 shadow-md shadow-red-200"
-          }
-        `}
-      >
-        {risk === "low"
-          ? "🟢 LOW RISK"
-          : risk === "medium"
-          ? "🟡 MEDIUM RISK"
-          : "🔴 HIGH RISK"}
-      </span>
-
-      <h2 className="text-6xl font-extrabold text-slate-900 mt-6">
-        {Number(item.risk_percentage).toFixed(1)}%
-      </h2>
-
-      <p className="text-gray-500 mt-2">
-        Overall Cardiovascular Risk
-      </p>
-
-      {/* Progress Bar */}
-
-      <div className="mt-6 w-72 h-3 bg-slate-200 rounded-full overflow-hidden">
-
-        <motion.div
-  initial={{ width: 0 }}
-  animate={{
-    width: `${Math.max(Number(item.risk_percentage), 30)}%`,
-  }}
-  transition={{
-    duration: 1,
-    ease: "easeOut",
-  }}
-  className={`
-    h-full rounded-full
-    ${
-      risk === "low"
-        ? "bg-green-500"
-        : risk === "medium"
-        ? "bg-yellow-500"
-        : "bg-red-500"
-    }
-  `}
-/>
-
-      </div>
-
-    </div>
-
-    <div className="text-right">
-
-      <p className="text-xs uppercase tracking-wider text-gray-400">
-  Prediction ID
-</p>
-
-<h3 className="text-3xl font-bold text-slate-800">
-  #{item.prediction_id ?? item.id}
-</h3>
-
-      <div className="flex justify-end items-center gap-2 mt-4 text-gray-500">
-
-        <CalendarDays size={16} />
-
-        <span>
-          {new Date(item.created_at).toLocaleDateString()}
-        </span>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <div className="border-t border-slate-200 my-8"></div>
-
-  {/* AI Modules */}
-
-  <div className="grid md:grid-cols-3 gap-5">
-
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="
-bg-blue-50
-rounded-2xl
-p-6
-transition-all
-duration-300
-hover:shadow-lg
-"
-    >
-
-      <Activity className="text-blue-600 mb-4" size={30} />
-
-      <p className="text-gray-500 text-sm">
-        Clinical AI
-      </p>
-
-      <h3 className="text-blue-700 text-3xl font-bold mt-3">
-        {item.clinical_level}
-      </h3>
-
-    </motion.div>
-
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="bg-red-50 rounded-2xl p-6"
-    >
-
-      <HeartPulse className="text-red-500 mb-4" size={30} />
-
-      <p className="text-gray-500 text-sm">
-        ECG Analysis
-      </p>
-
-      <h3 className="text-red-600 text-3xl font-bold mt-3">
-        {item.ecg_level}
-      </h3>
-
-    </motion.div>
-
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="bg-green-50 rounded-2xl p-6"
-    >
-
-      <Heart className="text-green-600 mb-4" size={30} />
-
-      <p className="text-gray-500 text-sm">
-        Echo Analysis
-      </p>
-
-      <h3 className="text-green-600 text-3xl font-bold mt-3">
-        {item.echo_level}
-      </h3>
-
-    </motion.div>
-
-  </div>
-
-  {/* Footer */}
-
-  <div className="flex justify-between items-center mt-10">
-
-    <div>
-
-      <p className="text-sm text-gray-400">
-        Generated on
-      </p>
-
-      <p className="font-medium text-gray-600">
-        {new Date(item.created_at).toLocaleString()}
-      </p>
-
-    </div>
-
-    <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-5 py-3 rounded-full font-semibold">
-
-      <BadgeCheck size={18} />
-
-      AI Verified Prediction
-
-    </div>
-
-  </div>
-
-</motion.div>
-
-                );
-              })}
+              <span
+                className={`px-4 py-2 rounded-full font-semibold ${getRiskColor(
+                  item.risk_level
+                )}`}
+              >
+                {item.risk_level}
+              </span>
 
             </div>
 
-          )}
+            {/* Risk Percentage */}
+
+            <div className="mt-8">
+
+              <div className="flex justify-between items-center">
+
+                <h3 className="text-lg font-semibold text-slate-700">
+                  Risk Percentage
+                </h3>
+
+                <span className="text-3xl font-bold text-blue-700">
+                  {Number(item.risk_percentage).toFixed(1)}%
+                </span>
+
+              </div>
+
+              {/* Progress Bar */}
+
+              <div className="w-full h-3 bg-gray-200 rounded-full mt-4 overflow-hidden">
+
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${Number(item.risk_percentage)}%`,
+                  }}
+                  transition={{
+                    duration: 1,
+                  }}
+                  className={`h-full rounded-full ${
+                    item.risk_level?.toLowerCase() === "high"
+                      ? "bg-red-500"
+                      : item.risk_level?.toLowerCase() === "medium"
+                      ? "bg-yellow-500"
+                      : "bg-green-500"
+                  }`}
+                />
+
+              </div>
+
+            </div>
+
+            {/* Optional Explanation */}
+
+            {item.explanation && (
+
+              <div className="mt-8">
+
+                <h4 className="font-semibold text-slate-700 mb-2">
+                  AI Explanation
+                </h4>
+
+                <p className="text-gray-600 leading-7">
+                  {item.explanation}
+                </p>
+
+              </div>
+
+            )}
+
+          </motion.div>
+
+        ))}
+
+      </div>
+
+    )}
+
+  </div>
+
+</div>
+
+)}
 
         </div>
       </div>
     </>
   );
 }
-
-export default HistoryPage;

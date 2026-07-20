@@ -15,34 +15,39 @@ function PatientReportCard({ report }) {
       <div className="flex gap-4 mb-6">
 
   <button
-    onClick={() => {
-      const patientId = localStorage.getItem("patient_id");
+  onClick={() => {
+    const predictionId = localStorage.getItem("prediction_id");
 
-      window.open(
-        `http://localhost:8000/reports/patient/pdf?patient_id=${patientId}`,
-        "_blank"
-      );
-    }}
-    className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
-  >
-    📥 Download Patient PDF
-  </button>
+    window.open(
+      `http://localhost:8000/reports/${predictionId}/patient/pdf`,
+      "_blank"
+    );
+  }}
+  className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
+>
+  📥 Download Patient PDF
+</button>
   <button
   onClick={async () => {
-    const patientId = localStorage.getItem("patient_id");
+    const predictionId = localStorage.getItem("prediction_id");
 
     try {
-      await fetch(
-        `http://localhost:8000/reports/patient/email?patient_id=${patientId}`,
+      const response = await fetch(
+        `http://localhost:8000/reports/${predictionId}/patient/email`,
         {
           method: "POST",
         }
       );
 
-      alert("Patient report emailed successfully!");
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      const data = await response.json();
+      alert(data.message || "Patient report emailed successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to send email.");
+      alert("Failed to send patient report email.");
     }
   }}
   className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold"

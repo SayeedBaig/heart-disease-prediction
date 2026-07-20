@@ -1,3 +1,10 @@
+import {
+  HeartPulse,
+  Activity,
+  Stethoscope,
+
+} from "lucide-react";
+
 import RiskBadge from "./RiskBadge";
 import ConfidenceBar from "./ConfidenceBar";
 import ExplanationCard from "./ExplanationCard";
@@ -8,116 +15,170 @@ function ResultCard({ result }) {
   const prediction = result.prediction;
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 bg-white shadow-lg rounded-xl p-6 md:p-8">
+    <div className="max-w-7xl mx-auto mt-10">
 
-      {/* Title */}
+      {/* ================= HEADER ================= */}
 
-      <h2 className="text-4xl font-bold text-blue-900 mb-8">
-        Heart Disease Prediction Report
-      </h2>
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 mb-10">
 
-      {/* ================= Final Prediction ================= */}
+        <div className="flex items-center gap-4 mb-8">
 
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg">
+            <HeartPulse className="text-white" size={34} />
+          </div>
 
-        <h3 className="text-2xl font-bold text-blue-800 mb-6">
-          🫀 Final Prediction
-        </h3>
+          <div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center">
+            <h2 className="text-4xl font-bold text-slate-900">
+              Heart Disease Prediction Report
+            </h2>
 
-          <div className="flex flex-col justify-center">
-            <p className="text-lg font-semibold mb-3">
-              Risk Level
+            <p className="text-slate-500 mt-2">
+              AI-powered cardiovascular risk assessment
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* Summary Cards */}
+
+        <div className="grid md:grid-cols-3 gap-6">
+
+          <div className="rounded-2xl bg-blue-50 border border-blue-200 p-6">
+
+            <p className="text-slate-500 mb-2">
+              Overall Risk
             </p>
 
             <RiskBadge level={prediction.fusion.final_level} />
+
           </div>
 
-          <div className="text-center mt-6 md:mt-0">
-            <p className="text-lg font-semibold">
+          <div className="rounded-2xl bg-green-50 border border-green-200 p-6">
+
+            <p className="text-slate-500 mb-2">
               Risk Percentage
             </p>
 
-            <p className="text-5xl font-extrabold text-blue-700">
+            <h3 className="text-4xl font-bold text-green-600">
               {prediction.fusion.risk_percentage}%
+            </h3>
+
+          </div>
+
+          <div className="rounded-2xl bg-purple-50 border border-purple-200 p-6">
+
+            <p className="text-slate-500 mb-2">
+              AI Modules
             </p>
+
+            <h3 className="text-2xl font-bold text-purple-700">
+              Clinical + ECG + Echo
+            </h3>
+
           </div>
 
         </div>
 
       </div>
 
-      {/* ================= Clinical ================= */}
+      {/* ================= AI MODULES ================= */}
 
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+      <div className="grid lg:grid-cols-3 gap-8 mb-10">
 
-        <h3 className="text-2xl font-bold text-gray-800 mb-4">
-          🩺 Clinical Analysis
-        </h3>
+        {/* Clinical */}
 
-        <p className="flex items-center gap-2 mb-4">
-          <strong>Risk:</strong>
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
+
+          <div className="flex items-center gap-3 mb-5">
+
+            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+              <Stethoscope className="text-blue-600" />
+            </div>
+
+            <h3 className="text-2xl font-bold">
+              Clinical
+            </h3>
+
+          </div>
+
           <RiskBadge level={prediction.clinical.level} />
-        </p>
 
-        <ConfidenceBar score={prediction.clinical.score} />
+          <ConfidenceBar score={prediction.clinical.score} />
 
-        <p className="mt-4 leading-8 text-gray-700">
-          {prediction.clinical.reason}
-        </p>
+          <p className="mt-5 leading-8 text-slate-700">
+            {prediction.clinical.reason}
+          </p>
 
-      </div>
+        </div>
 
-      {/* ================= ECG ================= */}
+        {/* ECG */}
 
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
 
-        <h3 className="text-2xl font-bold text-gray-800 mb-4">
-          📈 ECG Analysis
-        </h3>
+          <div className="flex items-center gap-3 mb-5">
 
-        <p className="flex items-center gap-2 mb-4">
-          <strong>Risk:</strong>
+            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+              <Activity className="text-red-600" />
+            </div>
+
+            <h3 className="text-2xl font-bold">
+              ECG
+            </h3>
+
+          </div>
+
           <RiskBadge level={prediction.ecg.level} />
-        </p>
 
-        <ConfidenceBar score={prediction.ecg.score} />
+          <ConfidenceBar score={prediction.ecg.score} />
 
-        <p className="mt-4 leading-8 text-gray-700">
-          {prediction.ecg.reason}
-        </p>
+          <p className="mt-5 leading-8 text-slate-700">
+            {prediction.ecg.reason}
+          </p>
 
-      </div>
+        </div>
 
-      {/* ================= Echo ================= */}
+        {/* Echo */}
 
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
 
-        <h3 className="text-2xl font-bold text-gray-800 mb-4">
-          🫁 Echo Analysis
-        </h3>
+          <div className="flex items-center gap-3 mb-5">
 
-        <p className="flex items-center gap-2 mb-4">
-          <strong>Risk:</strong>
+            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+              <HeartPulse className="text-green-600" />
+            </div>
+
+            <h3 className="text-2xl font-bold">
+              Echo
+            </h3>
+
+          </div>
+
           <RiskBadge level={prediction.echo.level} />
-        </p>
 
-        <ConfidenceBar score={prediction.echo.score} />
+          <ConfidenceBar score={prediction.echo.score} />
 
-        <p className="mt-4 leading-8 text-gray-700">
-          {prediction.echo.reason}
-        </p>
+          <p className="mt-5 leading-8 text-slate-700">
+            {prediction.echo.reason}
+          </p>
+
+        </div>
 
       </div>
+
+      {/* ================= AI RECOMMENDATION ================= */}
 
       <RecommendationCard prediction={prediction} />
 
-      
+      {/* ================= MEDICAL EXPLANATION ================= */}
 
       <ExplanationCard explanation={result.explanation} />
 
+      {/* ================= DIGITAL TWIN ================= */}
+
       <TwinSimulationCard digitalTwin={result.digital_twin} />
+
     </div>
   );
 }

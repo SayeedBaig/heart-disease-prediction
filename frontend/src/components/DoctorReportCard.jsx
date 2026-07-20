@@ -17,33 +17,39 @@ function DoctorReportCard({ report }) {
 
   <button
     onClick={() => {
-      const patientId = localStorage.getItem("patient_id");
+      const predictionId = localStorage.getItem("prediction_id");
 
-      window.open(
-        `http://localhost:8000/reports/doctor/pdf?patient_id=${patientId}`,
-        "_blank"
-      );
+window.open(
+  `http://localhost:8000/reports/${predictionId}/doctor/pdf`,
+  "_blank"
+);
     }}
     className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold"
   >
     📥 Download Doctor PDF
   </button>
-  <button
+  
+    <button
   onClick={async () => {
-    const patientId = localStorage.getItem("patient_id");
+    const predictionId = localStorage.getItem("prediction_id");
 
     try {
-      await fetch(
-        `http://localhost:8000/reports/doctor/email?patient_id=${patientId}`,
+      const response = await fetch(
+        `http://localhost:8000/reports/${predictionId}/doctor/email`,
         {
           method: "POST",
         }
       );
 
-      alert("Doctor report emailed successfully!");
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      const data = await response.json();
+      alert(data.message || "Doctor report emailed successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to send email.");
+      alert("Failed to send doctor report email.");
     }
   }}
   className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold"

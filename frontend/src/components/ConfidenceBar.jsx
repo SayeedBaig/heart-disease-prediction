@@ -1,18 +1,40 @@
 function ConfidenceBar({ score }) {
-  const percentage = (score * 100).toFixed(2);
+  const percentage = Math.round(score * 100);
+
+  let color = "bg-green-500";
+
+  if (percentage < 50) {
+    color = "bg-red-500";
+  } else if (percentage < 75) {
+    color = "bg-yellow-500";
+  }
 
   return (
-    <div className="mt-2">
-      <div className="flex justify-between text-sm font-medium mb-1">
-        <span>Confidence</span>
-        <span>{percentage}%</span>
+    <div className="mt-5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-semibold text-slate-700">
+          AI Confidence
+        </span>
+
+        <span className="text-sm font-bold text-blue-600">
+          {percentage}%
+        </span>
       </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-3">
+      {/* Progress Bar */}
+      <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
         <div
-          className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+          className={`${color} h-full rounded-full transition-all duration-700 ease-out`}
           style={{ width: `${percentage}%` }}
-        ></div>
+        />
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-between mt-2 text-xs text-slate-500">
+        <span>Low</span>
+        <span>Medium</span>
+        <span>High</span>
       </div>
     </div>
   );
