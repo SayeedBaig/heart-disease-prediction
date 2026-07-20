@@ -8,6 +8,7 @@ from api.schemas.response import PredictEndpointResponse
 from api.services.prediction_service import PredictionService
 from api.utils.validators import validate_patient_data
 from api.utils.exception_handler import handle_prediction_exception
+from api.models.diagnosis import DiagnosisStatus
 
 router = APIRouter()
 
@@ -60,6 +61,19 @@ def predict(
             echo_input=echo_path,
             patient_record=patient_record,
         )
+
+        result["diagnosis_id"] = None
+        if patient_record and patient_record.diagnoses:
+            pending_diagnoses = [
+                d for d in patient_record.diagnoses 
+                if d.status == DiagnosisStatus.PENDING
+            ]
+            if pending_diagnoses:
+                latest_diagnosis = sorted(pending_diagnoses, key=lambda d: d.created_at)[-1]
+                latest_diagnosis.prediction_id = result.get("prediction_id")
+                latest_diagnosis.status = DiagnosisStatus.COMPLETED
+                db.commit()
+                result["diagnosis_id"] = latest_diagnosis.diagnosis_id
 
         return result
 

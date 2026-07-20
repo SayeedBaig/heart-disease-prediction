@@ -26,8 +26,11 @@ class PredictResponse(BaseModel):
     rag: RagResult
 
 
+from uuid import UUID
+
 class PredictEndpointResponse(BaseModel):
     prediction: PredictResponse
     explanation: Dict[str, Any]
     digital_twin: Dict[str, Any]
-    prediction_id: Optional[str] = None
+    prediction_id: Optional[str] = None
+    diagnosis_id: Optional[UUID] = None
