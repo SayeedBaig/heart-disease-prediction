@@ -119,6 +119,62 @@ def parse_response(raw_text: str) -> dict:
         }
 
 
+# ── Chat Prompt Builder (Chatbot) ─────────────────────────────────────────────
+
+def build_chat_prompt(question: str, chunks: list) -> str:
+    """
+    Build a conversational Q&A prompt for the AI Health Assistant chatbot.
+
+    Unlike build_prompt() which produces a structured clinical report from
+    prediction fields, this function takes a free-text user question and
+    retrieved guideline chunks, then instructs the LLM to answer directly.
+
+    The prompt explicitly prohibits hallucination: if the retrieved context
+    does not contain sufficient information to answer the question, the LLM
+    is instructed to respond with a specific fallback sentence rather than
+    inventing medical advice.
+
+    Args:
+        question: The user's natural-language medical question.
+        chunks:   Retrieved FAISS chunks (list of dicts with 'text', 'source', 'page').
+
+    Returns:
+        A prompt string ready to be passed to call_groq_api().
+    """
+    context_text = ""
+    for i, chunk in enumerate(chunks[:4]):
+        context_text += (
+            f"\n[Reference {i + 1}] Source: {chunk['source']} "
+            f"(Page {chunk['page']})\n{chunk['text'][:300]}\n"
+        )
+
+    prompt = f"""You are CardioAI, a clinical decision support assistant specialising in \
+cardiovascular health.
+
+RETRIEVED MEDICAL GUIDELINES (your ONLY permitted knowledge source):
+{context_text}
+
+USER QUESTION:
+{question}
+
+STRICT RULES — you must follow these without exception:
+1. Answer ONLY using information that appears explicitly in the RETRIEVED MEDICAL GUIDELINES above.
+2. If the retrieved guidelines do not contain enough information to answer the question, \
+respond with exactly this sentence: \
+"I don't have enough information in the available guidelines to answer that question reliably. \
+Please consult a qualified healthcare professional."
+3. Do NOT add, infer, or extrapolate any medical facts beyond what is written in the guidelines.
+4. Do NOT produce advice that contradicts the guidelines.
+
+STYLE RULES:
+- Use plain, patient-friendly language (avoid unnecessary jargon).
+- Keep the answer under 200 words.
+- Respond with plain text only — no JSON, no markdown headers, no bullet prefixes."""
+
+    return prompt
+
+
+
 # ── Main Generator ────────────────────────────────────────────────────────────
 
 def generate_explanation(prediction: dict, chunks: list) -> dict:
