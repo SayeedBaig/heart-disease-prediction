@@ -40,3 +40,18 @@ class PatientUpdateRequest(BaseModel):
     full_name: str | None = Field(None, min_length=3, max_length=100)
     phone: str | None = Field(None, min_length=10, max_length=15)
     gender: str | None = Field(None, pattern="^(Male|Female|Other)$")
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class PatientProfileResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    patient_id: str
+    full_name: str
+    email: EmailStr
+    phone: str
+    gender: str
+    date_of_birth: date
