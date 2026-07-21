@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.database.base import Base
 from api.database.connection import engine
 from api.routes.health import router as health_router
-from api.routes.patient import router as patient_router
+from api.routes.patient import router as patient_router, singular_router as patient_singular_router
 from api.routes.predict import router as predict_router
 from api.routes.reports import router as reports_router
 from api.routes.upload import router as upload_router
@@ -78,6 +78,7 @@ app.include_router(predict_router)
 app.include_router(reports_router)
 app.include_router(upload_router)
 app.include_router(patient_router)
+app.include_router(patient_singular_router)
 app.include_router(doctor_router)
 app.include_router(appointment_router)
 app.include_router(diagnosis_router)

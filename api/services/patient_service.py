@@ -3,8 +3,8 @@ from typing import Any, Dict
 from sqlalchemy.orm import Session
 
 from api.repositories.patient_repository import PatientRepository
-from api.utils.auth import create_access_token, verify_password
-from api.utils.security import hash_password
+from api.utils.auth import create_access_token
+from api.utils.security import hash_password, verify_password
 
 
 class PatientService:
@@ -50,10 +50,10 @@ class PatientService:
         """Search patients by name, email, or public patient ID."""
         return self.patient_repo.search(query)
     def login(self, email: str, password: str):
-        """Authenticate a patient and return a JWT token."""
+        """Authenticate a patient and return a JWT token along with patient profile."""
         patient = self.patient_repo.get_by_email(email)
 
-        if not patient:
+        if not patient or not patient.password_hash:
             raise ValueError("Invalid email or password.")
 
         if not verify_password(password, patient.password_hash):
@@ -61,7 +61,7 @@ class PatientService:
 
         token = create_access_token(
             {
-                "sub": str(patient.id),
+                "sub": patient.patient_id,
                 "role": "patient",
             }
         )
@@ -69,6 +69,7 @@ class PatientService:
         return {
             "access_token": token,
             "token_type": "bearer",
+            "patient": patient,
         }
 
     # ------------------------------------------------------------------

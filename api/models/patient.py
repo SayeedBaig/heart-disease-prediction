@@ -75,3 +75,16 @@ class Patient(Base):
         back_populates="patient",
         cascade="all, delete-orphan"
     )
+
+    @property
+    def age(self) -> int:
+        """Calculate the age of the patient in years."""
+        today = date.today()
+        return (
+            today.year
+            - self.date_of_birth.year
+            - (
+                (today.month, today.day)
+                < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+        )

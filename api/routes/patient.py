@@ -11,6 +11,8 @@ from api.schemas.patient_response import (
     PatientResponse,
     PatientUpdateRequest,
     TokenResponse,
+    PatientLoginResponse,
+    PatientMeResponse,
 )
 from api.schemas.prediction_history_response import (
     PredictionHistoryItem,
@@ -19,7 +21,7 @@ from api.schemas.prediction_history_response import (
 from api.services.patient_registration_service import PatientRegistrationService
 from api.services.patient_service import PatientService
 from api.services.prediction_history_service import PredictionHistoryService
-from api.utils.auth import get_current_doctor
+from api.utils.auth import get_current_doctor, get_current_patient
 
 
 router = APIRouter(
@@ -62,7 +64,7 @@ def register_patient(
     "/login",
     summary="Patient Login",
     description="Authenticate a patient and return a JWT access token.",
-    response_model=TokenResponse,
+    response_model=PatientLoginResponse,
 )
 def login_patient(
     data: PatientLoginRequest,
@@ -77,6 +79,22 @@ def login_patient(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(exc),
         )
+
+
+# ------------------------------------------------------------------
+# Profile (Authenticated Patient)
+# ------------------------------------------------------------------
+
+@router.get(
+    "/me",
+    summary="Get authenticated patient profile",
+    description="Returns the profile of the currently logged-in patient.",
+    response_model=PatientMeResponse,
+)
+def get_me(
+    current_patient = Depends(get_current_patient),
+):
+    return current_patient
 
 
 # ------------------------------------------------------------------
@@ -207,7 +225,13 @@ def delete_patient(
 def get_prediction_history(
     patient_id: str,
     db: Session = Depends(get_db),
+    current_patient = Depends(get_current_patient),
 ):
+    if patient_id != current_patient.patient_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden",
+        )
     service = PredictionHistoryService(db)
 
     predictions = service.get_prediction_history(patient_id)
@@ -234,3 +258,20 @@ def get_prediction_history(
             for prediction in predictions
         ],
     )
+
+
+# Singular APIRouter for /patient/login compatibility
+singular_router = APIRouter(tags=["Patients"])
+
+
+@singular_router.post(
+    "/patient/login",
+    summary="Patient Login (Singular)",
+    description="Authenticate a patient and return a JWT access token.",
+    response_model=PatientLoginResponse,
+)
+def login_patient_singular(
+    data: PatientLoginRequest,
+    db: Session = Depends(get_db),
+):
+    return login_patient(data, db)

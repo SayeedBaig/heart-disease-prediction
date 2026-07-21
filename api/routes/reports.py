@@ -6,6 +6,7 @@ from api.database.session import get_db
 from api.reports.renderers.pdf_renderer import PdfRenderer
 from api.services.email_service import EmailService
 from api.services.report_service import ReportService
+from api.utils.auth import get_current_patient
 
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -33,8 +34,16 @@ def get_doctor_report(
 def get_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
+    current_patient = Depends(get_current_patient),
 ):
-    return ReportService(db).generate_patient_report(prediction_id)
+    report = ReportService(db).generate_patient_report(prediction_id)
+    patient = report.get("patient")
+    if not patient or patient.get("patient_id") != current_patient.patient_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden",
+        )
+    return report
 
 
 @router.get(
@@ -68,8 +77,15 @@ def download_doctor_report(
 def download_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
+    current_patient = Depends(get_current_patient),
 ):
     report = ReportService(db).generate_patient_report(prediction_id)
+    patient = report.get("patient")
+    if not patient or patient.get("patient_id") != current_patient.patient_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden",
+        )
     pdf = PdfRenderer().render(report)
 
     return StreamingResponse(
@@ -90,16 +106,16 @@ def download_patient_report(
 async def email_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
+    current_patient = Depends(get_current_patient),
 ):
     report = ReportService(db).generate_patient_report(prediction_id)
-    pdf_buffer = PdfRenderer().render(report)
-
     patient = report.get("patient")
-    if not patient:
+    if not patient or patient.get("patient_id") != current_patient.patient_id:
         raise HTTPException(
-            status_code=404,
-            detail="Patient information not found.",
+            status_code=403,
+            detail="Forbidden",
         )
+    pdf_buffer = PdfRenderer().render(report)
 
     await EmailService().send_report(
         recipient_email=patient["email"],

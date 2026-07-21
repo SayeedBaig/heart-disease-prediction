@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from api.repositories.patient_repository import PatientRepository
-from api.utils.auth import hash_password
+from api.utils.security import hash_password
 
 
 class PatientRegistrationService:

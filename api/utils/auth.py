@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from api.database.session import get_db
 from api.repositories.doctor_repository import DoctorRepository
+from api.repositories.patient_repository import PatientRepository
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/doctors/login")
+patient_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/patients/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -75,6 +77,12 @@ def get_current_doctor(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if payload.get("role") == "patient":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload.",
+        )
+
     doctor_id = payload.get("sub")
 
     if doctor_id is None:
@@ -93,3 +101,46 @@ def get_current_doctor(
         )
 
     return doctor
+
+
+def get_current_patient(
+    token: str = Depends(patient_oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """Validate the JWT and return the authenticated patient.
+
+    Used as a FastAPI dependency on protected endpoints.
+    """
+    payload = verify_access_token(token)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if payload.get("role") != "patient":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload.",
+        )
+
+    patient_id = payload.get("sub")
+
+    if patient_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload.",
+        )
+
+    patient_repo = PatientRepository(db)
+    patient = patient_repo.get_by_public_id(patient_id)
+
+    if patient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient not found.",
+        )
+
+    return patient

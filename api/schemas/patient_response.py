@@ -55,3 +55,31 @@ class PatientProfileResponse(BaseModel):
     phone: str
     gender: str
     date_of_birth: date
+
+
+class PatientLoginResponsePatient(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    patient_id: str
+    full_name: str
+    email: EmailStr
+
+
+class PatientLoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    patient: PatientLoginResponsePatient
+
+
+class PatientMeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    patient_id: str
+    full_name: str
+    email: EmailStr
+    phone: str
+    age: int
+    gender: str
+
