@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from api.repositories.patient_repository import PatientRepository
 from api.utils.auth import create_access_token, verify_password
+from api.utils.security import hash_password
 
 
 class PatientService:
@@ -97,6 +98,22 @@ class PatientService:
             self.db.rollback()
             raise
 
+        return patient
+
+    def set_password(self, patient_id: int, plain_password: str):
+        """Hash and set the patient's password."""
+        patient = self.patient_repo.get_by_id(patient_id)
+        if not patient:
+            raise ValueError("Patient not found.")
+
+        hashed = hash_password(plain_password)
+        try:
+            self.patient_repo.update_password(patient.id, hashed)
+            self.db.commit()
+            self.db.refresh(patient)
+        except Exception:
+            self.db.rollback()
+            raise
         return patient
 
     # ------------------------------------------------------------------

@@ -103,6 +103,14 @@ class PatientRepository:
 
         return patient
 
+    def update_password(self, patient_id: int, password_hash: str) -> Patient | None:
+        """Update the password hash for a patient."""
+        patient = self.get_by_id(patient_id)
+        if patient:
+            patient.password_hash = password_hash
+        return patient
+
+
     # ------------------------------------------------------------------
     # Delete
     # ------------------------------------------------------------------

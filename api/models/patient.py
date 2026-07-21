@@ -69,11 +69,6 @@ class Patient(Base):
         onupdate=datetime.utcnow
     )
 
-    password_hash: Mapped[str | None] = mapped_column(
-        String(255),
-        nullable=True
-    )
-
 
     predictions = relationship(
         "Prediction",
