@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from api.database.connection import get_db
+from api.database.session import get_db
 from api.repositories.dashboard_repository import DashboardRepository
 from api.schemas.dashboard import RecentActivityResponse
 from api.services.dashboard_service import DashboardService
