@@ -1,10 +1,10 @@
 from datetime import datetime, date
 from sqlalchemy.orm import relationship
-from sqlalchemy import Date, DateTime, Integer, String
+from sqlalchemy import Date, DateTime, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
+
 from api.database.base import Base
 
-from sqlalchemy import Boolean
 
 class Patient(Base):
     __tablename__ = "patients"
@@ -34,10 +34,9 @@ class Patient(Base):
     )
 
     password_hash: Mapped[str] = mapped_column(
-    String(255),
-    nullable=False
+        String(255),
+        nullable=False
     )
-
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,

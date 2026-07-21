@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from api.repositories.patient_repository import PatientRepository
+from api.utils.auth import hash_password
 
 
 class PatientRegistrationService:
@@ -25,6 +26,9 @@ class PatientRegistrationService:
             patient_number = 1
 
         patient_data["patient_id"] = f"PT{patient_number:06d}"
+        patient_data["password_hash"] = hash_password(
+        patient_data.pop("password")
+    )
 
         try:
             patient = self.patient_repository.create(patient_data)

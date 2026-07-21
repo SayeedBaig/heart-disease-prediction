@@ -2,11 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from api.database.session import get_db
-from api.schemas.patient_request import PatientRegisterRequest
+from api.schemas.patient_request import (
+    PatientRegisterRequest,
+    PatientLoginRequest,
+)
 from api.schemas.patient_response import (
     PatientRegisterResponse,
     PatientResponse,
     PatientUpdateRequest,
+    TokenResponse,
 )
 from api.schemas.prediction_history_response import (
     PredictionHistoryItem,
@@ -54,6 +58,25 @@ def register_patient(
         created_at=patient.created_at,
         message="Patient registered successfully.",
     )
+@router.post(
+    "/login",
+    summary="Patient Login",
+    description="Authenticate a patient and return a JWT access token.",
+    response_model=TokenResponse,
+)
+def login_patient(
+    data: PatientLoginRequest,
+    db: Session = Depends(get_db),
+):
+    service = PatientService(db)
+
+    try:
+        return service.login(data.email, data.password)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(exc),
+        )
 
 
 # ------------------------------------------------------------------

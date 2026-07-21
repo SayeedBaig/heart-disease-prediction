@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from api.database.session import get_db
@@ -17,6 +18,7 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/doctors/login")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # ------------------------------------------------------------------
@@ -43,7 +45,14 @@ def verify_access_token(token: str) -> dict | None:
         return payload
     except JWTError:
         return None
+def hash_password(password: str) -> str:
+    """Hash a plain-text password."""
+    return pwd_context.hash(password)
 
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a plain-text password against its hash."""
+    return pwd_context.verify(plain_password, hashed_password)
 
 # ------------------------------------------------------------------
 # FastAPI Auth Dependency
