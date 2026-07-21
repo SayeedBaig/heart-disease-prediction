@@ -19,6 +19,7 @@ from api.utils.logger import get_logger
 from api.routes.appointment import router as appointment_router
 from api.routes.diagnosis import router as diagnosis_router
 from api.routes.rag import router as rag_router
+from api.routes.dashboard import router as dashboard_router
 
 
 logger = get_logger(__name__)
@@ -83,6 +84,7 @@ app.include_router(diagnosis_router)
 app.include_router(history_router)
 app.include_router(doctor_note_router)
 app.include_router(rag_router)
+app.include_router(dashboard_router)
 
 @app.get("/")
 def root():
