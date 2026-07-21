@@ -92,6 +92,34 @@ const [doctor, patient] = await Promise.all([
   </p>
 </div>
 
+<div className="flex flex-wrap justify-center gap-4 mb-8">
+  <button
+    onClick={() => window.print()}
+    className="px-5 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition"
+  >
+    🖨 Print Report
+  </button>
+
+  <button
+    className="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
+  >
+    📄 Download PDF
+  </button>
+
+  <button
+    className="px-5 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
+  >
+    📧 Email Report
+  </button>
+
+  <button
+    onClick={() => window.location.href = "/diagnose"}
+    className="px-5 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition"
+  >
+    🔄 New Diagnosis
+  </button>
+</div>
+
           {/* Tabs */}
 
           <div className="flex justify-center gap-4 mb-8">

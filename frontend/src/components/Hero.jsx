@@ -59,18 +59,18 @@ tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
             <div className="flex gap-5 mt-10 flex-wrap">
 
   <Link
-    to="/doctor/register"
-    className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-  >
-    Register as Doctor
-  </Link>
+  to="/patient/login"
+  className="bg-green-600 hover:bg-green-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+>
+  Patient Portal
+</Link>
 
-  <Link
-    to="/doctor/login"
-    className="border border-slate-300 hover:border-blue-600 hover:text-blue-600 px-7 py-4 rounded-xl font-semibold transition-all duration-300"
-  >
-    Doctor Login →
-  </Link>
+<Link
+  to="/doctor/login"
+  className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+>
+  Doctor Portal
+</Link>
 
 </div>
           </div>

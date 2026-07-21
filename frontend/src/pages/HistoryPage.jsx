@@ -515,7 +515,7 @@ setHistory(res.data.predictions || []);
   <div className="bg-slate-50 rounded-2xl p-4">
     <p className="text-xs uppercase tracking-wide text-gray-500">Clinical</p>
     <h4 className="text-xl font-bold mt-2 text-slate-800">
-      {item.ecg_level || "N/A"}
+     {item.clinical_level || "N/A"}
     </h4>
   </div>
 
@@ -579,21 +579,40 @@ setHistory(res.data.predictions || []);
 
             {/* Optional Explanation */}
 
-            {item.explanation && (
+           {item.explanation && (
+  <div className="mt-8">
 
-              <div className="mt-8">
+    <h4 className="font-semibold text-slate-700 mb-2">
+      AI Explanation
+    </h4>
 
-                <h4 className="font-semibold text-slate-700 mb-2">
-                  AI Explanation
-                </h4>
+    <p className="text-gray-600 leading-7">
+      {item.explanation}
+    </p>
 
-                <p className="text-gray-600 leading-7">
-                  {item.explanation}
-                </p>
+    {/* Action Buttons */}
 
-              </div>
+    <div className="mt-8 flex flex-wrap gap-4">
 
-            )}
+      <button className="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+        View Report
+      </button>
+
+      <button className="px-5 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700">
+        Download PDF
+      </button>
+
+      <button
+        onClick={() => window.print()}
+        className="px-5 py-3 bg-slate-700 text-white rounded-xl hover:bg-slate-800"
+      >
+        Print
+      </button>
+
+    </div>
+
+  </div>
+)}
 
           </motion.div>
 

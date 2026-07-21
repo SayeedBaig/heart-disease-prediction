@@ -22,6 +22,7 @@ function DoctorDashboard() {
   const navigate = useNavigate();
 
   const [patientCount, setPatientCount] = useState(0);
+  const [activities, setActivities] = useState([]);
   useEffect(() => {
   const fetchPatients = async () => {
     try {
@@ -36,6 +37,19 @@ function DoctorDashboard() {
   };
 
   fetchPatients();
+}, []);
+useEffect(() => {
+  const fetchRecentActivities = async () => {
+    try {
+      const response = await api.get("/dashboard/recent-activity");
+
+      setActivities(response.data.activities);
+    } catch (error) {
+      console.error("Failed to fetch recent activity:", error);
+    }
+  };
+
+  fetchRecentActivities();
 }, []);
 
   return (
@@ -176,7 +190,7 @@ function DoctorDashboard() {
           {/* Recent Activity */}
 
           <section className="mt-12">
-                        <RecentActivity />
+                        <RecentActivity activities={activities} />
 
           </section>
 

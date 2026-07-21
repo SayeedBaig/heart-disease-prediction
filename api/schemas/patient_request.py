@@ -9,3 +9,7 @@ class PatientRegisterRequest(BaseModel):
     phone: str = Field(..., min_length=10, max_length=15)
     gender: str = Field(..., pattern="^(Male|Female|Other)$")
     date_of_birth: date
+
+class PatientLoginRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=6)

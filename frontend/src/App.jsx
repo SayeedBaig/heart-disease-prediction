@@ -14,7 +14,13 @@ import ResultsPage from "./pages/ResultsPage";
 import Reports from "./pages/Reports";
 import HistoryPage from "./pages/HistoryPage";
 import Appointments from "./pages/Appointments";
-
+import PatientLogin from "./pages/PatientLogin";
+import PatientDashboard from "./pages/PatientDashboard";
+import PatientAppointments from "./pages/PatientAppointments";
+import PatientReports from "./pages/PatientReports";
+import HealthInsights from "./pages/HealthInsights";
+import PatientAssistant from "./pages/PatientAssistant";
+import PatientProfile from "./pages/PatientProfile";
 function App() {
   return (
     <Routes>
@@ -41,9 +47,24 @@ function App() {
 
 <Route path="/doctor-notes" element={<DoctorNotes />} />
 
+
 <Route path="/appointment-management" element={<AppointmentManagement />}/>
 
 <Route path="/ai-health-assistant" element={<AIHealthAssistant />}/>
+
+<Route path="/patient/login" element={<PatientLogin />} />
+
+<Route path="/patient/dashboard" element={<PatientDashboard />} />
+
+<Route path="/patient/appointments" element={<PatientAppointments />} />
+
+<Route path="/patient/reports" element={<PatientReports />} />
+
+<Route path="/patient/insights" element={<HealthInsights />} />
+
+<Route path="/patient/assistant" element={<PatientAssistant />} />
+
+<Route path="/patient/profile" element={<PatientProfile />} />
 
 </Routes>
   );

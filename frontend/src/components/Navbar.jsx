@@ -100,23 +100,22 @@ function Navbar() {
 
         <div className="flex items-center gap-4">
 
-          <Link
-            to="/doctor/login"
-            className="flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
-          >
-            <Stethoscope size={18} />
-            Doctor Portal
-          </Link>
+  <Link
+    to="/patient/login"
+    className="rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+  >
+    Patient Portal
+  </Link>
 
-          <Link
-            to="/doctor/register"
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-          >
-            Register as Doctor
-          </Link>
+  <Link
+    to="/doctor/login"
+    className="flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
+  >
+    <Stethoscope size={18} />
+    Doctor Portal
+  </Link>
 
-        </div>
-
+</div>
       </div>
 
     </header>

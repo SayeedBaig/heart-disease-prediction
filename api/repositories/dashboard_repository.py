@@ -4,6 +4,7 @@ from api.models.prediction import Prediction
 from api.models.report import Report
 from api.models.appointment import Appointment
 from api.models.doctor_note import DoctorNote
+from api.models.diagnosis import Diagnosis
 
 class DashboardRepository:
     def __init__(self, db: Session):
@@ -23,5 +24,5 @@ class DashboardRepository:
 
     def get_latest_doctor_notes(self, limit: int = 20):
         return self.db.query(DoctorNote).options(
-            joinedload(DoctorNote.diagnosis).joinedload("patient")
+            joinedload(DoctorNote.diagnosis).joinedload(Diagnosis.patient)
         ).order_by(DoctorNote.created_at.desc()).limit(limit).all()

@@ -13,6 +13,10 @@ function AIHealthAssistant() {
   // Chat messages
   const [messages, setMessages] = useState([]);
 
+  const result = JSON.parse(
+  localStorage.getItem("prediction_result") || "{}"
+);
+
   // Suggested prompts
   const suggestions = [
     "Explain ECG Findings",
@@ -36,9 +40,15 @@ function AIHealthAssistant() {
   setMessage("");
 
   try {
-    const response = await api.post("/rag/doctor/ask", {
-      question: currentQuestion,
-    });
+    const response = await api.post("/rag/ask", {
+  question: currentQuestion,
+  context: {
+    risk_level: result?.fusion?.final_level || "",
+    risk_percentage: result?.fusion?.risk_percentage || 0,
+    ecg_class: result?.ecg?.level || "",
+    ef_value: 0,
+  },
+});
 
     const aiMessage = {
   id: Date.now() + 1,
@@ -91,7 +101,7 @@ function AIHealthAssistant() {
         <div className="mb-6">
 
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/doctor/dashboard")}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-4"
           >
             <ArrowLeft size={18} />
@@ -99,14 +109,23 @@ function AIHealthAssistant() {
           </button>
 
           <h1 className="text-4xl font-bold text-gray-800">
-            AI Health Assistant
-          </h1>
+  AI Health Assistant
+</h1>
 
-          <p className="text-gray-600 mt-2 text-lg">
-            Ask AI to explain heart disease predictions,
-            ECG findings, clinical risk,
-            and medical guidelines.
-          </p>
+<p className="text-gray-600 mt-2 text-lg">
+  Ask AI to explain heart disease predictions,
+  ECG findings, clinical risk,
+  and medical guidelines.
+</p>
+
+<div className="mt-4">
+  <button
+    onClick={() => setMessages([])}
+    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+  >
+    🗑 Clear Chat
+  </button>
+</div>
 
         </div>
 
@@ -238,9 +257,14 @@ function AIHealthAssistant() {
             />
 
             <button
-              onClick={handleSend}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl flex items-center gap-2 transition"
-            >
+  onClick={handleSend}
+  disabled={!message.trim()}
+  className={`px-6 rounded-xl flex items-center gap-2 transition text-white ${
+    message.trim()
+      ? "bg-blue-600 hover:bg-blue-700"
+      : "bg-gray-400 cursor-not-allowed"
+  }`}
+>
               <Send size={18} />
               Send
             </button>

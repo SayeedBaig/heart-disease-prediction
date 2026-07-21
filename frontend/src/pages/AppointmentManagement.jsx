@@ -174,8 +174,23 @@ const formatTime = (time) => {
       <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
         <h1 className="text-3xl font-bold text-slate-800 mb-8">
-          Appointment Management
-        </h1>
+  Appointment Management
+</h1>
+
+<div className="flex justify-end mb-6 gap-3">
+  <button
+    onClick={() => window.location.reload()}
+    className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+  >
+    🔄 Refresh
+  </button>
+
+  <button
+    className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700"
+  >
+    📥 Export CSV
+  </button>
+</div>
 
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
 

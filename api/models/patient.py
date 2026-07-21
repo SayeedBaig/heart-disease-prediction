@@ -4,7 +4,7 @@ from sqlalchemy import Date, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from api.database.base import Base
 
-
+from sqlalchemy import Boolean
 
 class Patient(Base):
     __tablename__ = "patients"
@@ -31,6 +31,17 @@ class Patient(Base):
         String(150),
         unique=True,
         nullable=False
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+    String(255),
+    nullable=False
+    )
+
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True
     )
 
     phone: Mapped[str] = mapped_column(

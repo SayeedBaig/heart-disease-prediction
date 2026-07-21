@@ -262,6 +262,10 @@ if (response.data.prediction_id) {
     response.data.prediction_id
   );
 }
+localStorage.setItem(
+  "prediction_result",
+  JSON.stringify(response.data)
+);
 
 setResult(response.data);
 

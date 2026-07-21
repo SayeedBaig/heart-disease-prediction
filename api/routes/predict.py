@@ -52,8 +52,16 @@ def predict(
                 "success": False,
                 "errors": errors
             }
+        print("Patient ID received:", patient_id)
+        print("Patient Record:", patient_record)
+        print("Diagnoses:", patient_record.diagnoses)
+        print("Diagnosis Count:", len(patient_record.diagnoses))
+
+        for d in patient_record.diagnoses:
+            print("Diagnosis:", d.diagnosis_id, d.status)
 
         prediction_service = PredictionService(db)
+        
 
         result = prediction_service.predict(
             clinical_data=patient,
