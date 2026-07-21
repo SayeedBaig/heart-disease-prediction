@@ -4,7 +4,9 @@ import LandingPage from "./pages/LandingPage";
 import DoctorLogin from "./pages/DoctorLogin";
 import DoctorRegister from "./pages/DoctorRegister";
 import DoctorDashboard from "./pages/DoctorDashboard";
-
+import DoctorNotes from "./pages/DoctorNotes";
+import AppointmentManagement from "./pages/AppointmentManagement";
+import AIHealthAssistant from "./pages/AIHealthAssistant";
 import PatientRegister from "./pages/PatientRegister";
 
 import DiagnosePage from "./pages/DiagnosePage";
@@ -36,6 +38,12 @@ function App() {
 <Route path="/history" element={<HistoryPage />} />
 
 <Route path="/appointments" element={<Appointments />} />
+
+<Route path="/doctor-notes" element={<DoctorNotes />} />
+
+<Route path="/appointment-management" element={<AppointmentManagement />}/>
+
+<Route path="/ai-health-assistant" element={<AIHealthAssistant />}/>
 
 </Routes>
   );

@@ -35,8 +35,7 @@ const [doctor, patient] = await Promise.all([
         setDoctorReport(doctor.data);
         setPatientReport(patient.data);
 
-        console.log("Doctor Report:", doctor.data);
-        console.log("Patient Report:", patient.data);
+        
       } catch (err) {
         console.error(err);
         setError("Unable to load reports. Please try again.");
@@ -83,9 +82,15 @@ const [doctor, patient] = await Promise.all([
       <div className="min-h-screen bg-gray-100 py-10">
         <div className="max-w-7xl mx-auto px-6">
 
-          <h1 className="text-5xl font-bold text-blue-800 mb-10 text-center">
-            Reports
-          </h1>
+          <div className="text-center mb-10">
+  <h1 className="text-5xl font-extrabold text-slate-900">
+    AI Diagnosis Reports
+  </h1>
+
+  <p className="mt-3 text-lg text-slate-500">
+    View and manage detailed reports generated from the AI prediction system.
+  </p>
+</div>
 
           {/* Tabs */}
 

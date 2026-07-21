@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 import Sidebar from "../components/dashboard/Sidebar";
 import Header from "../components/dashboard/Header";
@@ -13,10 +15,28 @@ import {
   Brain,
   UserPlus,
   ClipboardList,
+  CalendarDays,
 } from "lucide-react";
 
 function DoctorDashboard() {
   const navigate = useNavigate();
+
+  const [patientCount, setPatientCount] = useState(0);
+  useEffect(() => {
+  const fetchPatients = async () => {
+    try {
+      const response = await api.get("/patients");
+
+      console.log(response.data);
+
+      setPatientCount(response.data.length);
+    } catch (error) {
+      console.error("Failed to fetch patients:", error);
+    }
+  };
+
+  fetchPatients();
+}, []);
 
   return (
     <div className="flex min-h-screen bg-slate-100">
@@ -49,7 +69,7 @@ function DoctorDashboard() {
 
               <StatCard
                 title="Registered Patients"
-                value="128"
+                value={patientCount}
                 subtitle="Total Patients"
                 icon={Users}
                 color="blue"
@@ -57,7 +77,7 @@ function DoctorDashboard() {
 
               <StatCard
                 title="Today's Diagnoses"
-                value="24"
+                value="0"
                 subtitle="Completed Today"
                 icon={HeartPulse}
                 color="red"
@@ -65,19 +85,19 @@ function DoctorDashboard() {
 
               <StatCard
                 title="Reports Generated"
-                value="61"
+                value="0"
                 subtitle="Available Reports"
                 icon={FileText}
                 color="green"
               />
 
               <StatCard
-                title="AI Confidence"
-                value="96.8%"
-                subtitle="Prediction Accuracy"
-                icon={Brain}
-                color="purple"
-              />
+  title="Pending Appointments"
+  value="0"
+  subtitle="Waiting Approval"
+  icon={CalendarDays}
+  color="purple"
+/>
 
             </div>
 
@@ -99,7 +119,7 @@ function DoctorDashboard() {
 
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
               <QuickActionCard
   title="Register Patient"
@@ -116,6 +136,13 @@ function DoctorDashboard() {
                 color="red"
                 onClick={() => navigate("/diagnose")}
               />
+               <QuickActionCard
+  title="Appointment Management"
+  description="Manage, approve and track patient appointments."
+  icon={CalendarDays}
+  color="purple"
+  onClick={() => navigate("/appointment-management")}
+/>
 
               <QuickActionCard
                 title="Patient History"
@@ -129,9 +156,18 @@ function DoctorDashboard() {
                 title="Reports"
                 description="Download and manage generated reports."
                 icon={FileText}
-                color="purple"
+                color="green"
                 onClick={() => navigate("/reports")}
               />
+              {/* NEW: AI Health Assistant */}
+<QuickActionCard
+  title="AI Health Assistant"
+  description="Ask AI for clinical insights, explain patient reports, and answer cardiovascular questions."
+  icon={Brain}
+  color="blue"
+  onClick={() => navigate("/ai-health-assistant")}
+/>
+             
 
             </div>
 

@@ -5,6 +5,7 @@ import {
   HeartPulse,
   ClipboardList,
   FileText,
+  Brain,
   CalendarDays,
 } from "lucide-react";
 
@@ -35,10 +36,16 @@ const menuItems = [
     icon: FileText,
   },
   {
-    name: "Appointments",
-    path: "/appointments",
+    name: "Appointment Management",
+    path: "/appointment-management",
     icon: CalendarDays,
   },
+  {
+    name:"AI Health Assisant",
+    path: "/ai-health-assistant",
+    icon:Brain,
+  }
+  
 ];
 
 export default function Sidebar() {

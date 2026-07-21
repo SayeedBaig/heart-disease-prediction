@@ -57,10 +57,8 @@ export default function HistoryPage() {
 
   const fetchHistory = async () => {
     try {
-      const res = await api.get(`/history/patient/${patientId}`);
+      const res = await api.get(`/patients/${patientId}/predictions`);
 
-console.log("Patient ID:", patientId);
-console.log("History Response:", res.data);
 
 setHistory(res.data.predictions || []);
     } catch (error) {
@@ -119,7 +117,7 @@ setHistory(res.data.predictions || []);
 
       data = data.filter(
         (item) =>
-          item.id.toString().includes(search) ||
+          item.prediction_id.toString().includes(search) ||
           item.risk_level?.toLowerCase().includes(search)
       );
     }
@@ -468,10 +466,10 @@ setHistory(res.data.predictions || []);
 
     ) : (
 
-      <div className="space-y-6">        {filteredHistory.map((item, index) => (
+      <div className="space-y-6">    {filteredHistory.map((item, index) => (
 
           <motion.div
-            key={item.id}
+            key={item.prediction_id}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -492,7 +490,7 @@ setHistory(res.data.predictions || []);
               <div>
 
                 <h2 className="text-2xl font-bold text-slate-800">
-                  Prediction #{item.id}
+                 Prediction #{item.prediction_id}
                 </h2>
 
                 <p className="text-gray-500 mt-2">
@@ -510,6 +508,32 @@ setHistory(res.data.predictions || []);
               </span>
 
             </div>
+             {/* Analysis Summary */}
+
+<div className="grid md:grid-cols-3 gap-4 mt-8">
+
+  <div className="bg-slate-50 rounded-2xl p-4">
+    <p className="text-xs uppercase tracking-wide text-gray-500">Clinical</p>
+    <h4 className="text-xl font-bold mt-2 text-slate-800">
+      {item.ecg_level || "N/A"}
+    </h4>
+  </div>
+
+  <div className="bg-slate-50 rounded-2xl p-4">
+    <p className="text-xs uppercase tracking-wide text-gray-500">ECG</p>
+    <h4 className="text-xl font-bold mt-2 text-slate-800">
+      {item.ecg_level || "N/A"}
+    </h4>
+  </div>
+
+  <div className="bg-slate-50 rounded-2xl p-4">
+    <p className="text-xs uppercase tracking-wide text-gray-500">Echo</p>
+    <h4 className="text-xl font-bold mt-2 text-slate-800">
+      {item.echo_level || "N/A"}
+    </h4>
+  </div>
+
+</div>
 
             {/* Risk Percentage */}
 
@@ -526,6 +550,7 @@ setHistory(res.data.predictions || []);
                 </span>
 
               </div>
+             
 
               {/* Progress Bar */}
 

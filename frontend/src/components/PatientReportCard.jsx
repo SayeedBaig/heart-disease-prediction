@@ -1,36 +1,24 @@
 function PatientReportCard({ report }) {
   if (!report) {
     return (
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <p>Loading Patient Report...</p>
+      <div className="bg-white rounded-3xl shadow-xl p-8">
+        <p className="text-center text-xl font-semibold text-green-600 animate-pulse">
+          Loading Patient Report...
+        </p>
       </div>
     );
   }
 
-  return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-2xl font-bold text-green-700 mb-4">
-        🩺 Patient Report
-      </h2>
-      <div className="flex gap-4 mb-6">
+  const predictionId = localStorage.getItem("prediction_id");
 
-  <button
-  onClick={() => {
-    const predictionId = localStorage.getItem("prediction_id");
-
+  const handleDownloadPDF = () => {
     window.open(
       `http://localhost:8000/reports/${predictionId}/patient/pdf`,
       "_blank"
     );
-  }}
-  className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold"
->
-  📥 Download Patient PDF
-</button>
-  <button
-  onClick={async () => {
-    const predictionId = localStorage.getItem("prediction_id");
+  };
 
+  const handleEmailReport = async () => {
     try {
       const response = await fetch(
         `http://localhost:8000/reports/${predictionId}/patient/email`,
@@ -44,61 +32,180 @@ function PatientReportCard({ report }) {
       }
 
       const data = await response.json();
+
       alert(data.message || "Patient report emailed successfully!");
     } catch (err) {
       console.error(err);
       alert("Failed to send patient report email.");
     }
-  }}
-  className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-semibold"
->
-  📧 Email Patient Report
-</button>
+  };
 
-</div>
+  return (
+    <div className="bg-white rounded-3xl shadow-xl p-8">
 
-      <p>
-        <strong>Risk Level:</strong> {report.risk_level}
-      </p>
+      {/* Header */}
 
-      <p>
-        <strong>Risk Percentage:</strong>{" "}
-        {report.risk_percentage}%
-      </p>
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
 
-      <hr className="my-4" />
+        <div>
 
-      <h3 className="text-xl font-semibold">
-        Summary
-      </h3>
+          <h2 className="text-4xl font-bold text-green-700">
+            👤 Patient Report
+          </h2>
 
-      <p className="mt-2">
-        {report.summary}
-      </p>
+          <p className="text-gray-500 mt-2">
+            A simple explanation of your heart health assessment.
+          </p>
 
-      <hr className="my-4" />
+        </div>
 
-      <h3 className="text-xl font-semibold">
-        Lifestyle Recommendations
-      </h3>
+        <div className="flex flex-col sm:flex-row gap-4">
 
-      <ul className="list-disc ml-6 mt-2">
-        {report.lifestyle_recommendations?.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300 hover:scale-105"
+          >
+            📥 Download PDF
+          </button>
 
-      <hr className="my-4" />
+          <button
+            onClick={handleEmailReport}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300 hover:scale-105"
+          >
+            📧 Email Report
+          </button>
 
-      <h3 className="text-xl font-semibold">
-        Follow-up Advice
-      </h3>
+        </div>
 
-      <ul className="list-disc ml-6 mt-2">
-        {report.follow_up_advice?.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+      </div>
+
+      {/* Heart Health Summary */}
+
+      <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-3xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 p-8 mb-10">
+
+        <h2 className="text-3xl font-bold mb-8">
+          ❤️ Your Heart Health
+        </h2>
+
+        <div className="grid md:grid-cols-2 gap-8">
+
+          <div>
+
+            <p className="uppercase text-green-100 tracking-wide">
+              Risk Level
+            </p>
+
+            <h2 className="text-5xl font-extrabold mt-3">
+            {report.risk_level || "N/A"}
+            </h2>
+
+          </div>
+
+          <div>
+
+            <p className="uppercase text-green-100 tracking-wide">
+              Risk Percentage
+            </p>
+
+            <h2 className="text-5xl font-extrabold mt-3">
+             {report.risk_percentage ?? "N/A"}%
+            </h2>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+           {/* ================= Summary ================= */}
+
+      <div className="bg-white rounded-3xl shadow-lg p-8 mb-8">
+
+        <h2 className="text-3xl font-bold text-slate-800 mb-6">
+          📋 What We Found
+        </h2>
+
+        <div className="bg-slate-50 rounded-2xl border shadow-md p-6">
+
+          <p className="text-lg leading-9 text-gray-700">
+         {report.summary || "No summary available."}
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* ================= Lifestyle ================= */}
+
+      <div className="bg-green-50 rounded-3xl shadow-lg p-8 mb-8">
+
+        <h2 className="text-3xl font-bold text-green-700 mb-6">
+          🌱 Healthy Lifestyle Tips
+        </h2>
+
+        <div className="grid md:grid-cols-2 gap-5">
+
+          {report.lifestyle_recommendations?.length > 0 ? (
+
+            report.lifestyle_recommendations.map((item, index) => (
+
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-md border-l-4 border-green-500 p-5 hover:shadow-xl transition-all"
+              >
+                ✅ {item}
+              </div>
+
+            ))
+
+          ) : (
+
+            <div className="bg-white rounded-xl p-5">
+            No lifestyle recommendations are available at this time.
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+      {/* ================= Follow-up ================= */}
+
+      <div className="bg-blue-50 rounded-3xl shadow-lg p-8 mb-8">
+
+        <h2 className="text-3xl font-bold text-blue-700 mb-6">
+          🩺 Follow-up Advice
+        </h2>
+
+        <div className="space-y-4">
+
+          {report.follow_up_advice?.length > 0 ? (
+
+            report.follow_up_advice.map((item, index) => (
+
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-5 hover:shadow-xl transition-all"
+              >
+                📌 {item}
+              </div>
+
+            ))
+
+          ) : (
+
+            <div className="bg-white rounded-xl p-5">
+              No follow-up advice is available at this time.
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
     </div>
   );
 }
