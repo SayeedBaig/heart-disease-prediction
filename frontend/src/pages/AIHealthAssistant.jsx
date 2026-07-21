@@ -1,3 +1,5 @@
+import api from "../services/api";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bot, Send } from "lucide-react";
@@ -19,19 +21,44 @@ function AIHealthAssistant() {
     "ACC/AHA Guidelines",
   ];
 
-  // Send message
-  const handleSend = () => {
-    if (!message.trim()) return;
+  const handleSend = async () => {
+  if (!message.trim()) return;
 
-    const newMessage = {
-      id: Date.now(),
-      sender: "user",
-      text: message,
-    };
+  const userMessage = {
+  id: Date.now(),
+  sender: "user",
+  text: message,
+};
 
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
+  setMessages((prev) => [...prev, userMessage]);
 
+  const currentQuestion = message;
+  setMessage("");
+
+  try {
+    const response = await api.post("/rag/doctor/ask", {
+      question: currentQuestion,
+    });
+
+    const aiMessage = {
+  id: Date.now() + 1,
+  sender: "ai",
+  text: response.data.answer,
+};
+
+    setMessages((prev) => [...prev, aiMessage]);
+  } catch (error) {
+    const errorMessage = {
+  id: Date.now() + 1,
+  sender: "ai",
+  text: "Sorry, I couldn't connect to the AI Assistant. Please try again.",
+};
+
+    setMessages((prev) => [...prev, errorMessage]);
+
+    console.error(error);
+  }
+};
     /*
       TODO (Backend Integration)
 
@@ -49,7 +76,6 @@ function AIHealthAssistant() {
           }
       ]);
     */
-  };
 
   // Click on suggested question
   const handleSuggestionClick = (question) => {
