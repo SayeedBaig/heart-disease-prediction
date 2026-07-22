@@ -3,6 +3,7 @@ import {
   Mail,
   Phone,
   CalendarDays,
+  Lock,
 } from "lucide-react";
 
 function PatientForm({
@@ -139,6 +140,52 @@ function PatientForm({
         </div>
 
         {/* Gender */}
+
+        <div>
+          <label className="block mb-2 font-medium text-slate-700">
+            Temporary Password
+          </label>
+
+          <div className="relative">
+            <Lock
+              size={18}
+              className="absolute left-3 top-3.5 text-slate-400"
+            />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="At least 6 characters"
+              minLength="6"
+              required
+              className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium text-slate-700">
+            Confirm Password
+          </label>
+
+          <div className="relative">
+            <Lock
+              size={18}
+              className="absolute left-3 top-3.5 text-slate-400"
+            />
+            <input
+              type="password"
+              name="confirm_password"
+              value={formData.confirm_password}
+              onChange={handleChange}
+              placeholder="Confirm temporary password"
+              minLength="6"
+              required
+              className="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
 
         <div>
 

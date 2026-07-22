@@ -29,6 +29,7 @@ function DoctorRegister() {
     hospital: "",
     email: "",
     password: "",
+    confirm_password: "",
   });
 
   const handleChange = (e) => {
@@ -47,8 +48,16 @@ function DoctorRegister() {
     setError("");
     setSuccess("");
 
+    if (formData.password !== formData.confirm_password) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await api.post("/doctors/register", formData);
+      const doctorData = { ...formData };
+      delete doctorData.confirm_password;
+      const response = await api.post("/doctors/register", doctorData);
 
       setSuccess(response.data.message);
 
@@ -248,6 +257,21 @@ function DoctorRegister() {
           </div>
 
           {/* Error */}
+
+          <div>
+            <label className="block mb-2 font-medium text-slate-700">
+              Confirm Password
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="confirm_password"
+              value={formData.confirm_password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Confirm password"
+            />
+          </div>
 
           {error && (
             <div className="bg-red-100 border border-red-300 text-red-700 rounded-xl p-3">

@@ -58,21 +58,14 @@ tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
 
             <div className="flex gap-5 mt-10 flex-wrap">
 
-  <Link
-  to="/patient/login"
-  className="bg-green-600 hover:bg-green-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
->
-  Patient Portal
-</Link>
+              <Link
+                to="/get-started"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              >
+                Get Started
+              </Link>
 
-<Link
-  to="/doctor/login"
-  className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
->
-  Doctor Portal
-</Link>
-
-</div>
+            </div>
           </div>
           <div className="flex flex-wrap gap-6 mt-8 text-sm text-slate-600">
 

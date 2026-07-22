@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarDays,
@@ -10,6 +11,13 @@ import {
 
 function PatientDashboard() {
   const navigate = useNavigate();
+  useEffect(() => {
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    navigate("/patient/login", { replace: true });
+  }
+}, [navigate]);
 
   const patient =
     JSON.parse(localStorage.getItem("patient")) || {};
@@ -63,7 +71,7 @@ function PatientDashboard() {
       <div className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl text-white p-8 mb-8 shadow-lg">
 
         <h1 className="text-4xl font-bold">
-          Welcome, {patient.full_name || "Patient"} 👋
+          Welcome, {patient.full_name || "Patient"}
         </h1>
 
         <p className="mt-3 text-lg text-blue-100">
@@ -158,10 +166,10 @@ function PatientDashboard() {
         </div>
 
         <ul className="space-y-3 text-slate-600">
-          <li>✅ AI Heart Disease Prediction Completed</li>
-          <li>📄 Latest Medical Report Generated</li>
-          <li>❤️ Health Insights Updated</li>
-          <li>🤖 AI Assistant Available for Questions</li>
+          <li>AI Heart Disease Prediction Completed</li>
+          <li>Latest Medical Report Generated</li>
+          <li>Health Insights Updated</li>
+          <li>AI Assistant Available for Questions</li>
         </ul>
 
       </div>

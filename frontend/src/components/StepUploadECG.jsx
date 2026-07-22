@@ -10,7 +10,6 @@ function StepUploadECG({
       <div className="text-center mb-10">
 
         <div className="text-6xl mb-4">
-          ❤️
         </div>
 
         <h2 className="text-4xl font-bold text-blue-900">
@@ -35,7 +34,7 @@ function StepUploadECG({
         {formData.ecgFile && (
           <div className="mt-5 p-4 rounded-lg bg-green-50 border border-green-300">
             <p className="text-green-700 font-semibold">
-              ✅ {formData.ecgFile.name}
+              {formData.ecgFile.name}
             </p>
           </div>
         )}
@@ -52,14 +51,14 @@ function StepUploadECG({
           onClick={prevStep}
           className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl transition"
         >
-          ← Back
+          Back
         </button>
 
         <button
           onClick={nextStep}
           className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-xl transition"
         >
-          Continue →
+          Continue
         </button>
 
       </div>

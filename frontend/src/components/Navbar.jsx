@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Activity, Stethoscope } from "lucide-react";
+import { Activity } from "lucide-react";
 
 function Navbar() {
   const location = useLocation();
@@ -57,7 +57,7 @@ function Navbar() {
             </h1>
 
             <p className="text-xs text-slate-500">
-              AI Heart Disease Prediction Platform
+              Cardiovascular assessment workspace
             </p>
           </div>
         </Link>
@@ -84,7 +84,7 @@ function Navbar() {
             onClick={() => scrollToSection("features")}
             className="relative font-semibold text-slate-700 hover:text-blue-600 transition"
           >
-            Features
+            Capabilities
           </button>
 
           <button
@@ -96,26 +96,6 @@ function Navbar() {
 
         </nav>
 
-        {/* Right Side */}
-
-        <div className="flex items-center gap-4">
-
-  <Link
-    to="/patient/login"
-    className="rounded-xl bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-  >
-    Patient Portal
-  </Link>
-
-  <Link
-    to="/doctor/login"
-    className="flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-2.5 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50"
-  >
-    <Stethoscope size={18} />
-    Doctor Portal
-  </Link>
-
-</div>
       </div>
 
     </header>

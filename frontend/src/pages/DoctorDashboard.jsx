@@ -148,7 +148,7 @@ useEffect(() => {
                 description="Start AI-powered heart disease prediction."
                 icon={HeartPulse}
                 color="red"
-                onClick={() => navigate("/diagnose")}
+                onClick={() => navigate("/appointment-management")}
               />
                <QuickActionCard
   title="Appointment Management"

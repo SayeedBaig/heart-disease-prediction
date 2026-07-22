@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function AppointmentManagement() {
+  const navigate = useNavigate();
  const [appointments, setAppointments] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState("");
 const [selectedAppointment, setSelectedAppointment] = useState(null);
 const [search, setSearch] = useState("");
 const [statusFilter, setStatusFilter] = useState("All");
-  useEffect(() => {
-    const fetchAppointments = async () => {
+  const fetchAppointments = async () => {
+      setError("");
       try {
         const response = await api.get("/appointments");
         console.log(response.data);
@@ -31,7 +33,25 @@ const [statusFilter, setStatusFilter] = useState("All");
       }
     };
 
-    fetchAppointments();
+  useEffect(() => {
+    const loadAppointments = async () => {
+      try {
+        const response = await api.get("/appointments");
+        setAppointments(response.data);
+      } catch (err) {
+        if (err.response) {
+          setError(
+            `Error ${err.response.status}: ${JSON.stringify(err.response.data)}`
+          );
+        } else {
+          setError(err.message);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAppointments();
   }, []);
 
   
@@ -101,29 +121,6 @@ if (!confirmReject) return;
   }
 };
 
-const handleComplete = async (appointmentId) => {
-  const confirmComplete = window.confirm(
-  "Mark this appointment as completed?"
-);
-
-if (!confirmComplete) return;
-  try {
-    await api.put(`/appointments/${appointmentId}/complete`);
-
-    setAppointments((prev) =>
-      prev.map((appointment) =>
-        appointment.appointment_id === appointmentId
-          ? { ...appointment, status: "Completed" }
-          : appointment
-      )
-    );
-
-    alert("Appointment completed successfully!");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to complete appointment.");
-  }
-};
 const filteredAppointments = appointments
   .filter((appointment) => {
     const matchesSearch =
@@ -179,7 +176,7 @@ const formatTime = (time) => {
 
 <div className="flex justify-end mb-6 gap-3">
   <button
-    onClick={() => window.location.reload()}
+    onClick={fetchAppointments}
     className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
   >
     🔄 Refresh
@@ -256,17 +253,21 @@ const formatTime = (time) => {
     className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
 
-  <select
-    value={statusFilter}
-    onChange={(e) => setStatusFilter(e.target.value)}
-    className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-  >
-    <option value="All">All Status</option>
-    <option value="Pending">Pending</option>
-    <option value="Approved">Approved</option>
-    <option value="Rejected">Rejected</option>
-    <option value="Completed">Completed</option>
-  </select>
+  <div className="flex flex-wrap gap-2">
+    {["All", "Pending", "Approved", "Completed", "Rejected"].map((status) => (
+      <button
+        key={status}
+        onClick={() => setStatusFilter(status)}
+        className={`rounded-lg px-4 py-2 font-medium transition ${
+          statusFilter === status
+            ? "bg-blue-600 text-white"
+            : "border bg-white text-slate-700 hover:bg-blue-50"
+        }`}
+      >
+        {status}
+      </button>
+    ))}
+  </div>
 
 </div>
 
@@ -382,14 +383,22 @@ const formatTime = (time) => {
       </>
     )}
 
-    {appointment.status === "Approved" && (
-      <button
-        onClick={() => handleComplete(appointment.appointment_id)}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition"
-      >
-        Complete
-      </button>
-    )}
+   {appointment.status === "Approved" && (
+  <button
+    onClick={() => {
+      localStorage.setItem("active_appointment_id", appointment.appointment_id);
+      navigate("/diagnose", {
+        state: {
+          appointmentId: appointment.appointment_id,
+          patientId: appointment.patient_id,
+        },
+      });
+    }}
+    className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded transition"
+  >
+    Diagnose
+  </button>
+)}
 
     {(appointment.status === "Rejected" ||
       appointment.status === "Completed") && (

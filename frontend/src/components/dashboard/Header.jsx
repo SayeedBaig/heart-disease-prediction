@@ -23,7 +23,7 @@ function Header() {
         <div>
 
           <h1 className="text-3xl font-bold text-slate-800">
-            {greeting}, Dr. {doctor?.full_name?.split(" ")[0] || "Doctor"} 👋
+            {greeting}, Dr. {doctor?.full_name?.split(" ")[0] || "Doctor"}
           </h1>
 
           <p className="text-slate-500 mt-2">

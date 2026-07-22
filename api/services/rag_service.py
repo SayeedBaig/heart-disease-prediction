@@ -3,8 +3,6 @@ from typing import Optional
 
 from rag.generator.generator import build_chat_prompt, call_groq_api, GROQ_MODEL
 from rag.pipeline.rag_pipeline import RAGPipeline
-from rag.retriever.retriever import RAGRetriever
-
 from api.utils.logger import get_logger
 
 
@@ -21,12 +19,16 @@ class RAGService:
 
     def __init__(self):
         self.logger = get_logger(__name__)
+        self.pipeline = None
+        self.retriever = None
+
+    def _get_pipeline(self) -> RAGPipeline:
         if RAGService._shared_pipeline is None:
             RAGService._shared_pipeline = RAGPipeline()
+
         self.pipeline = RAGService._shared_pipeline
-        # Reuse the retriever that is already initialised inside the pipeline
-        # so the FAISS index is only loaded once per process.
         self.retriever = self.pipeline.retriever
+        return self.pipeline
 
     def get_explanation(self, prediction_result: dict) -> dict:
         """
@@ -46,7 +48,7 @@ class RAGService:
 
             self.logger.info("Running RAG pipeline")
 
-            return self.pipeline.run(rag_input)
+            return self._get_pipeline().run(rag_input)
 
         except Exception as e:
             self.logger.exception("RAG pipeline failed")
@@ -97,7 +99,7 @@ class RAGService:
                     query += " reduced ejection fraction"
 
             # ── Step 2: Retrieve relevant guideline chunks ─────────────────
-            chunks = self.retriever.retrieve(query, top_k=4)
+            chunks = self._get_pipeline().retriever.retrieve(query, top_k=4)
             self.logger.info("RAG chatbot: retrieved %d chunks", len(chunks))
 
             # ── Step 3 & 4: Build prompt and call LLM ─────────────────────
@@ -138,6 +140,15 @@ class RAGService:
         Used by GET /rag/health.
         """
         try:
+            if self.retriever is None:
+                return {
+                    "status": "unavailable",
+                    "vector_store_loaded": False,
+                    "chunks_indexed": 0,
+                    "llm_model": GROQ_MODEL,
+                    "groq_api_configured": bool(os.environ.get("GROQ_API_KEY", "")),
+                }
+
             chunks_indexed = len(self.retriever.chunks)
             vector_store_loaded = chunks_indexed > 0
         except Exception:
@@ -152,4 +163,4 @@ class RAGService:
             "chunks_indexed": chunks_indexed,
             "llm_model": GROQ_MODEL,
             "groq_api_configured": groq_api_configured,
-        }
+        }

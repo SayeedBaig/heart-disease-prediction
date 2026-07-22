@@ -21,11 +21,15 @@ import PatientReports from "./pages/PatientReports";
 import HealthInsights from "./pages/HealthInsights";
 import PatientAssistant from "./pages/PatientAssistant";
 import PatientProfile from "./pages/PatientProfile";
+import PatientSignup from "./pages/PatientSignup";
+import RoleSelection from "./pages/RoleSelection";
 function App() {
   return (
     <Routes>
 
 <Route path="/" element={<LandingPage />} />
+
+<Route path="/get-started" element={<RoleSelection />} />
 
 <Route path="/doctor/login" element={<DoctorLogin />} />
 
@@ -65,6 +69,11 @@ function App() {
 <Route path="/patient/assistant" element={<PatientAssistant />} />
 
 <Route path="/patient/profile" element={<PatientProfile />} />
+
+<Route
+  path="/patient/signup"
+  element={<PatientSignup />}
+/>
 
 </Routes>
   );

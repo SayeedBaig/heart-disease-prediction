@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 import uuid
 import random
 from api.main import app
+from api.utils.auth import create_access_token
 
 client = TestClient(app)
 
@@ -43,12 +44,22 @@ def test_invalid_jwt():
     response = client.get("/patients/", headers={"Authorization": "Bearer invalid_token_123"})
     assert response.status_code == 401
 
+
+def test_invalid_doctor_subject_is_rejected_before_database_query():
+    token = create_access_token({"sub": "16", "role": "doctor"})
+    response = client.get(
+        "/doctors/me",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 401
+
 def test_patient_crud(headers):
     # Create patient
     email = f"patient_{uuid.uuid4().hex[:6]}@example.com"
     payload = {
         "full_name": "John Doe",
         "email": email,
+        "password": "testpassword123",
         "phone": "555-0000-000",
         "gender": "Male",
         "date_of_birth": "1980-01-01"
@@ -58,6 +69,18 @@ def test_patient_crud(headers):
     create_res = client.post("/patients/register", json=payload)
     assert create_res.status_code == 200
     patient_id = create_res.json()["id"]
+
+    login_res = client.post(
+        "/patients/login",
+        json={"email": email, "password": payload["password"]},
+    )
+    assert login_res.status_code == 200
+    profile_res = client.get(
+        "/patients/me",
+        headers={"Authorization": f"Bearer {login_res.json()['access_token']}"},
+    )
+    assert profile_res.status_code == 200
+    assert profile_res.json()["patient_id"] == create_res.json()["patient_id"]
     
     # 2. GET
     get_res = client.get(f"/patients/{patient_id}", headers=headers)
@@ -82,6 +105,7 @@ def test_full_workflow(headers, doctor_id):
     payload = {
         "full_name": "Jane Doe",
         "email": email,
+        "password": "testpassword123",
         "phone": "555-1111-111",
         "gender": "Female",
         "date_of_birth": "1990-01-01"
@@ -132,6 +156,12 @@ def test_full_workflow(headers, doctor_id):
     pred_res = client.post("/prediction", json={"diagnosis_id": diagnosis_id}, headers=headers)
     assert pred_res.status_code == 200
     prediction_id = pred_res.json()["prediction_id"]
+
+    completed_appointment = client.get(
+        f"/appointments/{appointment_id}", headers=headers
+    )
+    assert completed_appointment.status_code == 200
+    assert completed_appointment.json()["status"] == "Completed"
     
     # E. Add Doctor Notes
     note_res = client.post("/notes/", json={

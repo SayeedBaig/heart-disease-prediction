@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from api.database.session import get_db
 from api.repositories.doctor_repository import DoctorRepository
+from api.repositories.patient_repository import PatientRepository
 
 load_dotenv()
 
@@ -77,10 +79,18 @@ def get_current_doctor(
 
     doctor_id = payload.get("sub")
 
-    if doctor_id is None:
+    if payload.get("role") != "doctor" or doctor_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token payload.",
+        )
+
+    try:
+        doctor_id = UUID(doctor_id)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid doctor token.",
         )
 
     doctor_repo = DoctorRepository(db)
@@ -93,3 +103,36 @@ def get_current_doctor(
         )
 
     return doctor
+
+
+def get_current_patient(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """Validate a patient JWT and return the authenticated patient."""
+    payload = verify_access_token(token)
+
+    if payload is None or payload.get("role") != "patient":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired patient token.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        patient_id = int(payload["sub"])
+    except (KeyError, TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid patient token.",
+        )
+
+    patient = PatientRepository(db).get_by_id(patient_id)
+
+    if patient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient not found.",
+        )
+
+    return patient

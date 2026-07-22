@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import ProgressBar from "../components/ProgressBar";
 import StepUploadECG from "../components/StepUploadECG";
@@ -13,6 +13,10 @@ import ResultCard from "../components/ResultCard";
 
 function DiagnosePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const appointmentId =
+    location.state?.appointmentId || localStorage.getItem("active_appointment_id");
   const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
@@ -33,7 +37,7 @@ function DiagnosePage() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState(null);
+  const [result] = useState(null);
 
   // ---------------- Handle Input ----------------
 
@@ -206,10 +210,13 @@ const handleSubmit = async () => {
     return;
   }
 
+  if (!appointmentId) {
+    setError("Select an approved appointment before starting a diagnosis.");
+    return;
+  }
+
   setLoading(true);
   setError("");
-  setResult(null);
-
   try {
 
     // Upload ECG
@@ -226,48 +233,49 @@ const handleSubmit = async () => {
 
     // Clinical data only
     
-    const clinicalData = {
-  patient_id: localStorage.getItem("patient_id"),
+    const diagnosisPayload = {
+  appointment_id: appointmentId,
 
-  age: Number(formData.age),
-  gender: genderValue,
-  height: Number(formData.height),
-  weight: Number(formData.weight),
-  ap_hi: Number(formData.ap_hi),
-  ap_lo: Number(formData.ap_lo),
-  cholesterol: Number(formData.cholesterol),
-  gluc: Number(formData.gluc),
-  smoke: Number(formData.smoke),
-  alco: Number(formData.alco),
-  active: Number(formData.active),
+  clinical_data: {
+    gender: genderValue,
+    age: Number(formData.age),
+    height: Number(formData.height),
+    weight: Number(formData.weight),
+    ap_hi: Number(formData.ap_hi),
+    ap_lo: Number(formData.ap_lo),
+    cholesterol: Number(formData.cholesterol),
+    gluc: Number(formData.gluc),
+    smoke: Number(formData.smoke),
+    alco: Number(formData.alco),
+    active: Number(formData.active),
+  },
 
   ecg_path: ecgPath,
   echo_path: echoPath,
 };
-    console.log(clinicalData);
-   const response = await api.post("/predict", clinicalData);
+    const diagnosisResponse = await api.post("/diagnosis", diagnosisPayload);
+    const diagnosisId = diagnosisResponse.data.diagnosis_id;
+    localStorage.setItem("active_diagnosis_id", diagnosisId);
 
-console.log(response.data);
+    const predictionResponse = await api.post("/prediction", {
+      diagnosis_id: diagnosisId,
+    });
+    const predictionResult = predictionResponse.data.raw_result || predictionResponse.data;
+    const predictionId =
+      predictionResult.prediction_id || predictionResponse.data.prediction_id;
 
-// If backend returned validation errors
-if (response.data.success === false) {
-  setError(response.data.errors.join(", "));
-  return;
-}
+    if (predictionId) {
+      localStorage.setItem("prediction_id", String(predictionId));
+    }
+    localStorage.setItem(
+      "latest_prediction_result",
+      JSON.stringify(predictionResult)
+    );
+    localStorage.removeItem("active_appointment_id");
 
-// Save prediction_id
-if (response.data.prediction_id) {
-  localStorage.setItem(
-    "prediction_id",
-    response.data.prediction_id
-  );
-}
-localStorage.setItem(
-  "prediction_result",
-  JSON.stringify(response.data)
-);
-
-setResult(response.data);
+    navigate("/results", {
+      state: { result: predictionResult, predictionId, appointmentId },
+    });
 
   } catch (err) {
 

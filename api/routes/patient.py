@@ -8,6 +8,7 @@ from api.schemas.patient_request import (
 )
 from api.schemas.patient_response import (
     PatientRegisterResponse,
+    PatientProfileResponse,
     PatientResponse,
     PatientUpdateRequest,
     TokenResponse,
@@ -19,7 +20,7 @@ from api.schemas.prediction_history_response import (
 from api.services.patient_registration_service import PatientRegistrationService
 from api.services.patient_service import PatientService
 from api.services.prediction_history_service import PredictionHistoryService
-from api.utils.auth import get_current_doctor
+from api.utils.auth import get_current_doctor, get_current_patient
 
 
 router = APIRouter(
@@ -77,6 +78,18 @@ def login_patient(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(exc),
         )
+
+
+@router.get(
+    "/me",
+    summary="Get current patient profile",
+    description="Returns the profile of the authenticated patient.",
+    response_model=PatientProfileResponse,
+)
+def get_my_profile(
+    current_patient=Depends(get_current_patient),
+):
+    return PatientProfileResponse.model_validate(current_patient)
 
 
 # ------------------------------------------------------------------

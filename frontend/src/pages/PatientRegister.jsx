@@ -14,6 +14,8 @@ function PatientRegister() {
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
+    password: "",
+    confirm_password: "",
     phone: "",
     gender: "",
     date_of_birth: "",
@@ -29,10 +31,19 @@ function PatientRegister() {
     try {
       setLoading(true);
 
-      const data = await registerPatient(formData);
+      if (formData.password !== formData.confirm_password) {
+        throw new Error("Passwords do not match.");
+      }
+
+      const patientData = { ...formData };
+      delete patientData.confirm_password;
+      const data = await registerPatient(patientData);
 
       // Save patient details
       localStorage.setItem("patient_id", data.patient_id);
+      localStorage.setItem("selected_patient_id", String(data.id));
+      localStorage.setItem("selected_patient_code", data.patient_id);
+      localStorage.setItem("selected_patient_name", data.full_name);
       localStorage.setItem("patient_name", data.full_name);
       localStorage.setItem("patient_email", data.email);
       localStorage.setItem("patient_gender", formData.gender);
@@ -59,6 +70,8 @@ function PatientRegister() {
     setFormData({
       full_name: "",
       email: "",
+      password: "",
+      confirm_password: "",
       phone: "",
       gender: "",
       date_of_birth: "",
@@ -67,8 +80,7 @@ function PatientRegister() {
     // Close modal
     setSuccessData(null);
 
-    // Navigate to Diagnosis
-    navigate("/diagnose");
+    navigate("/appointment-management");
   };
 
   return (

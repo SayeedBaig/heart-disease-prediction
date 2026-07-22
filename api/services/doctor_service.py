@@ -50,7 +50,11 @@ class DoctorService:
             raise ValueError("Invalid email or password.")
 
         token = create_access_token(
-            data={"sub": str(doctor.doctor_id), "email": doctor.email}
+            data={
+                "sub": str(doctor.doctor_id),
+                "email": doctor.email,
+                "role": "doctor",
+            }
         )
 
         return {"access_token": token, "doctor": doctor}

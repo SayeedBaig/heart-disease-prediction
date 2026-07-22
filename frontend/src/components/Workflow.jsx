@@ -11,33 +11,33 @@ import {
 const steps = [
   {
     icon: UserPlus,
-    title: "Register",
-    description: "Create your patient profile.",
+    title: "Register patient",
+    description: "Create a patient record and capture the information needed for assessment.",
   },
   {
     icon: Activity,
-    title: "Upload ECG",
-    description: "Upload ECG image or signal.",
+    title: "Add ECG recording",
+    description: "Upload an ECG image or signal file for waveform analysis.",
   },
   {
     icon: HeartPulse,
-    title: "Upload Echo",
-    description: "Upload Echocardiography image.",
+    title: "Add echocardiography",
+    description: "Include an echo study when imaging is available.",
   },
   {
     icon: ClipboardList,
-    title: "Clinical Data",
-    description: "Enter patient health details.",
+    title: "Enter clinical data",
+    description: "Record vital signs, laboratory indicators, and lifestyle factors.",
   },
   {
     icon: BrainCircuit,
-    title: "AI Prediction",
-    description: "AI combines ECG, Echo and Clinical data.",
+    title: "Generate assessment",
+    description: "Combine available inputs into a consolidated cardiovascular risk result.",
   },
   {
     icon: FileText,
-    title: "Reports",
-    description: "Download patient & doctor reports.",
+    title: "Review and report",
+    description: "Examine findings, save assessment history, and generate reports.",
   },
 ];
 
@@ -51,13 +51,12 @@ function Workflow() {
         <div className="text-center mb-20">
 
           <h2 className="text-4xl font-bold text-slate-900">
-            How CardioAI Works
+            From patient record to clinical report
           </h2>
 
           <p className="mt-4 text-gray-600 max-w-3xl mx-auto leading-7">
-            Our AI platform follows a simple multi-modal workflow to analyse
-            ECG, Echocardiography and Clinical information before generating
-            explainable prediction reports.
+            A practical workflow for documenting cardiovascular assessments and
+            reviewing results in one place.
           </p>
 
         </div>

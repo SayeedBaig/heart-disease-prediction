@@ -38,7 +38,7 @@ function FeatureCard({ icon: Icon, title, description }) {
 
       <div className="flex items-center gap-2 text-blue-600 font-semibold cursor-pointer">
 
-        Learn More
+        View details
 
         <ArrowRight
           size={18}

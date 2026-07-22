@@ -22,7 +22,7 @@ const menuItems = [
   },
   {
     name: "Diagnose Patient",
-    path: "/diagnose",
+    path: "/appointment-management",
     icon: HeartPulse,
   },
   {

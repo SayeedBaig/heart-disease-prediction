@@ -2,6 +2,7 @@ from datetime import date
 from uuid import UUID
 from sqlalchemy.orm import Session
 
+from api.models.appointment import AppointmentStatus
 from api.models.diagnosis import DiagnosisStatus
 from api.repositories.diagnosis_repository import DiagnosisRepository
 from api.repositories.appointment_repository import AppointmentRepository
@@ -112,6 +113,11 @@ class DiagnosisService:
             latest_prediction = recent_preds[0]
             
             self.diagnosis_repo.set_prediction(diagnosis, latest_prediction.id)
+            appointment = self.appointment_repo.get_by_id(diagnosis.appointment_id)
+            if appointment and appointment.status != AppointmentStatus.COMPLETED:
+                self.appointment_repo.update_status(
+                    appointment, AppointmentStatus.COMPLETED
+                )
             self.db.commit()
             self.db.refresh(diagnosis)
             
