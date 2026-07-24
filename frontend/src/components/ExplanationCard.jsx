@@ -10,7 +10,7 @@ function ExplanationCard({ explanation }) {
   if (!explanation) return null;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mt-8 transition-all duration-300 hover:shadow-xl">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mt-8 transition-all duration-300">
 
       {/* Header */}
 
@@ -105,7 +105,7 @@ function ExplanationCard({ explanation }) {
 
             <div
               key={index}
-              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300"
+              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm transition-all duration-300"
             >
 
               <div className="grid md:grid-cols-2 gap-4">

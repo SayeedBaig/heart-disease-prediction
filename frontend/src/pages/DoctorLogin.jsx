@@ -169,7 +169,7 @@ function DoctorLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 rounded-xl font-semibold text-lg hover:shadow-lg transition duration-300 disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 rounded-xl font-semibold text-lg transition duration-300 disabled:opacity-60"
           >
             {loading ? "Signing In..." : "Sign In"}
           </button>

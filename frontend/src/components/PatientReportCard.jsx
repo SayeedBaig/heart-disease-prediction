@@ -63,14 +63,14 @@ function PatientReportCard({ report }) {
 
           <button
             onClick={handleDownloadPDF}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300 hover:scale-105"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300"
           >
             📥 Download PDF
           </button>
 
           <button
             onClick={handleEmailReport}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300 hover:scale-105"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300"
           >
             📧 Email Report
           </button>
@@ -81,7 +81,7 @@ function PatientReportCard({ report }) {
 
       {/* Heart Health Summary */}
 
-      <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-3xl text-white shadow-lg hover:shadow-2xl transition-all duration-300 p-8 mb-10">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-3xl text-white shadow-lg transition-all duration-300 p-8 mb-10">
 
         <h2 className="text-3xl font-bold mb-8">
           ❤️ Your Heart Health
@@ -152,7 +152,7 @@ function PatientReportCard({ report }) {
 
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-md border-l-4 border-green-500 p-5 hover:shadow-xl transition-all"
+                className="bg-white rounded-2xl shadow-md border-l-4 border-green-500 p-5 transition-all"
               >
                 ✅ {item}
               </div>
@@ -187,7 +187,7 @@ function PatientReportCard({ report }) {
 
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-5 hover:shadow-xl transition-all"
+                className="bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-5 transition-all"
               >
                 📌 {item}
               </div>

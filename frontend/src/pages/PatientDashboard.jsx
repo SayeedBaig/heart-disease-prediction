@@ -133,7 +133,7 @@ function PatientDashboard() {
             <div
               key={card.title}
               onClick={() => navigate(card.route)}
-              className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl hover:-translate-y-1 transition cursor-pointer"
+              className="bg-white rounded-2xl shadow-md p-6 transition cursor-pointer"
             >
               <div
                 className={`w-14 h-14 ${card.color} rounded-xl flex items-center justify-center mb-5`}

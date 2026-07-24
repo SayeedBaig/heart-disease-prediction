@@ -13,7 +13,7 @@ function StatCard({
   };
 
   return (
-    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-slate-200 transition-all duration-300">
 
       <div className="flex items-center justify-between">
 

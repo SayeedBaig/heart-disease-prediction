@@ -19,6 +19,15 @@ class AppointmentCreate(BaseModel):
     reason: str | None = Field(None, max_length=2000)
 
 
+class PatientAppointmentCreate(BaseModel):
+    """Used when a patient books — patient_id is injected from their JWT."""
+    doctor_id: UUID
+    preferred_date: date
+    preferred_time: time
+    symptoms: str | None = Field(None, max_length=2000)
+    reason: str | None = Field(None, max_length=2000)
+
+
 class AppointmentUpdate(BaseModel):
     status: AppointmentStatus
 
@@ -41,3 +50,10 @@ class AppointmentResponse(BaseModel):
     reason: str | None
     status: AppointmentStatus
     created_at: datetime
+
+
+class AppointmentRichResponse(AppointmentResponse):
+    """Appointment with embedded patient info for the doctor portal."""
+    patient_name: str = ""
+    patient_email: str = ""
+    patient_pid: str = ""   # human-readable e.g. PT-001

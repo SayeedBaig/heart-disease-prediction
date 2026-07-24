@@ -4,7 +4,7 @@ function RecommendationCard({ prediction }) {
   if (!prediction) return null;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mb-8 transition-all duration-300 hover:shadow-xl">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mb-8 transition-all duration-300">
 
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">

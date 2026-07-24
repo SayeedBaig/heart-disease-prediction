@@ -4,7 +4,7 @@ function TwinSimulationCard({ digitalTwin }) {
   if (!digitalTwin) return null;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mt-8 transition-all duration-300 hover:shadow-xl">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-8 mt-8 transition-all duration-300">
 
       {/* Header */}
 
@@ -56,7 +56,7 @@ function TwinSimulationCard({ digitalTwin }) {
 
           <div
             key={index}
-            className="bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            className="bg-slate-50 border border-slate-200 rounded-2xl p-6 transition-all duration-300"
           >
 
             <div className="flex items-center gap-3 mb-5">

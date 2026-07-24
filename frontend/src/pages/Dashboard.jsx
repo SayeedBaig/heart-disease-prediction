@@ -95,10 +95,7 @@ function Dashboard() {
               shadow-lg
               p-7
               transition-all
-              duration-300
-              hover:-translate-y-3
-              hover:scale-[1.02]
-              hover:shadow-2xl"
+              duration-300"
             >
 
               <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-5">
@@ -129,10 +126,7 @@ function Dashboard() {
               shadow-lg
               p-7
               transition-all
-              duration-300
-              hover:-translate-y-3
-              hover:scale-[1.02]
-              hover:shadow-2xl"
+              duration-300"
             >
 
               <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mb-5">
@@ -165,10 +159,7 @@ function Dashboard() {
               shadow-lg
               p-7
               transition-all
-              duration-300
-              hover:-translate-y-3
-              hover:scale-[1.02]
-              hover:shadow-2xl"
+              duration-300"
             >
 
               <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mb-5">
@@ -223,9 +214,7 @@ function Dashboard() {
                 p-6
                 text-white
                 transition-all
-                duration-300
-                hover:-translate-y-2
-                hover:shadow-2xl"
+                duration-300"
               >
 
                 <HeartPulse size={36} />
@@ -251,9 +240,7 @@ function Dashboard() {
                 rounded-2xl
                 p-6
                 transition-all
-                duration-300
-                hover:-translate-y-2
-                hover:shadow-xl"
+                duration-300"
               >
 
                 <FileText
@@ -282,9 +269,7 @@ function Dashboard() {
                 rounded-2xl
                 p-6
                 transition-all
-                duration-300
-                hover:-translate-y-2
-                hover:shadow-xl"
+                duration-300"
               >
 
                 <History

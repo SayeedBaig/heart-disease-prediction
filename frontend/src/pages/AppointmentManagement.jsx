@@ -191,7 +191,7 @@ const formatTime = (time) => {
 
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
 
-  <div className="bg-blue-600 text-white rounded-xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+  <div className="bg-blue-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300 cursor-pointer">
     <h3 className="text-lg font-semibold">
       Total Appointments
     </h3>
@@ -201,7 +201,7 @@ const formatTime = (time) => {
     </p>
   </div>
 
-  <div className="bg-blue-600 text-white rounded-xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+  <div className="bg-blue-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300 cursor-pointer">
     <h3 className="text-lg font-semibold">
       Pending
     </h3>
@@ -211,7 +211,7 @@ const formatTime = (time) => {
     </p>
   </div>
 
-  <div className="bg-green-600 text-white rounded-xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+  <div className="bg-green-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300 cursor-pointer">
     <h3 className="text-lg font-semibold">
       Approved
     </h3>
@@ -221,7 +221,7 @@ const formatTime = (time) => {
     </p>
   </div>
 
-  <div className="bg-red-600 text-white rounded-xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+  <div className="bg-red-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300 cursor-pointer">
   <h3 className="text-lg font-semibold">
     Rejected
   </h3>
@@ -231,7 +231,7 @@ const formatTime = (time) => {
   </p>
 </div>
 
-  <div className="bg-indigo-600 text-white rounded-xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+  <div className="bg-indigo-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300 cursor-pointer">
     <h3 className="text-lg font-semibold">
       Completed
     </h3>

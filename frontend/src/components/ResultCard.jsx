@@ -89,7 +89,7 @@ function ResultCard({ result }) {
 
         {/* Clinical */}
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 transition">
 
           <div className="flex items-center gap-3 mb-5">
 
@@ -115,7 +115,7 @@ function ResultCard({ result }) {
 
         {/* ECG */}
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 transition">
 
           <div className="flex items-center gap-3 mb-5">
 
@@ -141,7 +141,7 @@ function ResultCard({ result }) {
 
         {/* Echo */}
 
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 hover:shadow-xl transition">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-lg p-6 transition">
 
           <div className="flex items-center gap-3 mb-5">
 

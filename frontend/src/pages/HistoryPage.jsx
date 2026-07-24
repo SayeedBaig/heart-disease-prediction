@@ -259,7 +259,6 @@ setHistory(res.data.predictions || []);
     {/* Total Predictions */}
 
     <motion.div
-      whileHover={{ scale: 1.03, y: -5 }}
       transition={{ duration: 0.2 }}
       className="bg-white rounded-3xl shadow-lg p-6"
     >
@@ -275,7 +274,6 @@ setHistory(res.data.predictions || []);
     {/* Low Risk */}
 
     <motion.div
-      whileHover={{ scale: 1.03, y: -5 }}
       transition={{ duration: 0.2 }}
       className="bg-green-50 rounded-3xl shadow-lg p-6"
     >
@@ -291,7 +289,6 @@ setHistory(res.data.predictions || []);
     {/* Medium Risk */}
 
     <motion.div
-      whileHover={{ scale: 1.03, y: -5 }}
       transition={{ duration: 0.2 }}
       className="bg-yellow-50 rounded-3xl shadow-lg p-6"
     >
@@ -307,7 +304,6 @@ setHistory(res.data.predictions || []);
     {/* High Risk */}
 
     <motion.div
-      whileHover={{ scale: 1.03, y: -5 }}
       transition={{ duration: 0.2 }}
       className="bg-red-50 rounded-3xl shadow-lg p-6"
     >
@@ -323,7 +319,6 @@ setHistory(res.data.predictions || []);
     {/* Average Risk */}
 
     <motion.div
-      whileHover={{ scale: 1.03, y: -5 }}
       transition={{ duration: 0.2 }}
       className="bg-indigo-50 rounded-3xl shadow-lg p-6"
     >
@@ -475,10 +470,6 @@ setHistory(res.data.predictions || []);
             transition={{
               duration: 0.4,
               delay: index * 0.08,
-            }}
-            whileHover={{
-              scale: 1.01,
-              y: -5,
             }}
             className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8 transition-all"
           >

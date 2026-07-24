@@ -18,7 +18,7 @@ function RoleSelection() {
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <button
             onClick={() => navigate("/doctor/login")}
-            className="rounded-2xl border border-blue-200 bg-blue-50 p-8 text-left transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg"
+            className="rounded-2xl border border-blue-200 bg-blue-50 p-8 text-left transition hover:border-blue-500"
           >
             <Stethoscope className="text-blue-600" size={40} />
             <h2 className="mt-5 text-2xl font-bold text-slate-900">Doctor Portal</h2>
@@ -29,7 +29,7 @@ function RoleSelection() {
 
           <button
             onClick={() => navigate("/patient/login")}
-            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-left transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg"
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-left transition hover:border-emerald-500"
           >
             <UserRound className="text-emerald-600" size={40} />
             <h2 className="mt-5 text-2xl font-bold text-slate-900">Patient Portal</h2>

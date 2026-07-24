@@ -58,8 +58,6 @@ function RiskBadge({ level }) {
         shadow-sm
         transition-all
         duration-300
-        hover:shadow-md
-        hover:scale-105
         cursor-default
       `}
     >

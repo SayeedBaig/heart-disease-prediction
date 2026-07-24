@@ -4,12 +4,8 @@ import { ArrowRight } from "lucide-react";
 function FeatureCard({ icon: Icon, title, description }) {
   return (
     <motion.div
-      whileHover={{
-        y: -10,
-        scale: 1.02,
-      }}
       transition={{ duration: 0.25 }}
-      className="group bg-white rounded-3xl border border-gray-100 shadow-lg hover:shadow-2xl p-8 transition-all duration-300"
+      className="group bg-white rounded-3xl border border-gray-100 shadow-lg p-8 transition-all duration-300"
     >
       {/* Icon */}
 

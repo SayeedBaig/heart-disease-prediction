@@ -50,20 +50,20 @@ function ResultsPage() {
          <div className="grid md:grid-cols-3 gap-6 mt-12">
             <Link
               to="/reports"
-             className="bg-blue-600 hover:bg-blue-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+             className="bg-blue-600 hover:bg-blue-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg transition-all duration-300">
               View Reports
             </Link>
 
             <Link
               to="/appointment-management"
-              className="bg-green-600 hover:bg-green-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-green-600 hover:bg-green-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg transition-all duration-300"
             >
               New Diagnosis
             </Link>
 
             <Link
               to="/"
-              className="border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-center py-4 rounded-2xl font-semibold shadow-md hover:shadow-lg transition-all duration-300"    >
+              className="border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-center py-4 rounded-2xl font-semibold shadow-md transition-all duration-300"    >
               Back Home
             </Link>
 

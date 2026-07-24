@@ -60,7 +60,7 @@ tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
 
               <Link
                 to="/get-started"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300"
               >
                 Get Started
               </Link>
@@ -115,14 +115,14 @@ tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
           {/* Statistics */}
 
 <div className="grid grid-cols-3 gap-4 mt-12 max-w-xl">
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 hover:shadow-xl transition-all duration-300">
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 transition-all duration-300">
     <h2 className="text-3xl font-bold text-blue-600">96%</h2>
     <p className="text-slate-500 mt-2">
       Prediction Confidence
     </p>
   </div>
 
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 hover:shadow-xl transition-all duration-300">
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 transition-all duration-300">
     <h2 className="text-3xl font-bold text-blue-600">
       3 AI
     </h2>
@@ -131,7 +131,7 @@ tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
     </p>
   </div>
 
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-3 hover:shadow-xl transition-all duration-300">
+  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-3 transition-all duration-300">
     <h2 className="text-3xl font-bold text-blue-600">
       Explainable
     </h2>

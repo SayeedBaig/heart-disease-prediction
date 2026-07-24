@@ -138,7 +138,7 @@ function DoctorReportCard({ report }) {
 
           {/* Clinical */}
 
-          <div className="bg-white border rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+          <div className="bg-white border rounded-2xl shadow-lg p-8 transition-all duration-300">
             <div className="flex justify-between items-center mb-4">
 
               <h3 className="text-xl font-bold text-blue-700">
@@ -179,7 +179,7 @@ function DoctorReportCard({ report }) {
 
           {/* ECG */}
 
-          <div className="bg-white border rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+          <div className="bg-white border rounded-2xl shadow-lg p-8 transition-all duration-300">
 
             <div className="flex justify-between items-center mb-4">
 
@@ -221,7 +221,7 @@ function DoctorReportCard({ report }) {
 
           {/* Echo */}
 
-          <div className="bg-white border rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+          <div className="bg-white border rounded-2xl shadow-lg p-8 transition-all duration-300">
             <div className="flex justify-between items-center mb-4">
 
               <h3 className="text-xl font-bold text-purple-700">

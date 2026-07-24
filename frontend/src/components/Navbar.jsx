@@ -44,7 +44,7 @@ function Navbar() {
           to="/"
           className="flex items-center gap-3 group"
         >
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg transition group-hover:scale-105">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg transition">
             <Activity
               size={22}
               className="text-white"

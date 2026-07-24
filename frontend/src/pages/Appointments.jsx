@@ -298,7 +298,7 @@ function Appointments() {
                 className={`flex-1 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 ${
                   loading
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
                 }`}
               >
                 {loading ? "Booking Appointment..." : "📅 Book Appointment"}

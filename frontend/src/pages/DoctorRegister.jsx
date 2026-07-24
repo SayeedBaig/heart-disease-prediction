@@ -292,7 +292,7 @@ function DoctorRegister() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 rounded-xl font-semibold text-lg hover:shadow-lg transition duration-300 disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 rounded-xl font-semibold text-lg transition duration-300 disabled:opacity-60"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>

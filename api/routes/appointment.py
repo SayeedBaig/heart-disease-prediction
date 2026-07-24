@@ -4,10 +4,12 @@ from sqlalchemy.orm import Session
 from api.database.session import get_db
 from api.schemas.appointment import (
     AppointmentCreate,
+    AppointmentRichResponse,
     AppointmentResponse,
+    PatientAppointmentCreate,
 )
 from api.services.appointment_service import AppointmentService
-from api.utils.auth import get_current_doctor
+from api.utils.auth import get_current_doctor, get_current_patient
 
 
 router = APIRouter(
@@ -17,7 +19,7 @@ router = APIRouter(
 
 
 # ------------------------------------------------------------------
-# Create
+# Create (doctor-side admin, existing)
 # ------------------------------------------------------------------
 
 @router.post(
@@ -41,6 +43,85 @@ def create_appointment(
         raise HTTPException(status_code=400, detail=str(exc))
 
     return AppointmentResponse.model_validate(appointment)
+
+
+# ------------------------------------------------------------------
+# Create — Patient self-booking (patient JWT)
+# ------------------------------------------------------------------
+
+@router.post(
+    "/book",
+    summary="Patient books an appointment",
+    description="Authenticated patient creates an appointment with a chosen doctor.",
+    response_model=AppointmentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def book_appointment_as_patient(
+    data: PatientAppointmentCreate,
+    current_patient=Depends(get_current_patient),
+    db: Session = Depends(get_db),
+):
+    service = AppointmentService(db)
+    payload = data.model_dump()
+    payload["patient_id"] = current_patient.id
+
+    try:
+        appointment = service.create_appointment(payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    return AppointmentResponse.model_validate(appointment)
+
+
+# ------------------------------------------------------------------
+# Doctor — My pending / approved appointments (rich with patient info)
+# ------------------------------------------------------------------
+
+def _enrich(appointments) -> list[dict]:
+    """Attach patient name/email/pid to each appointment dict."""
+    out = []
+    for a in appointments:
+        d = AppointmentResponse.model_validate(a).model_dump()
+        if a.patient:
+            d["patient_name"]  = a.patient.full_name
+            d["patient_email"] = a.patient.email
+            d["patient_pid"]   = a.patient.patient_id
+        else:
+            d["patient_name"] = d["patient_email"] = d["patient_pid"] = ""
+        out.append(d)
+    return out
+
+
+@router.get(
+    "/my/pending",
+    summary="Doctor’s pending appointments",
+    description="Returns all Pending appointments for the authenticated doctor, including patient details.",
+    response_model=list[AppointmentRichResponse],
+)
+def get_my_pending_appointments(
+    current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = AppointmentService(db)
+    all_appts = service.get_doctor_appointments(str(current_doctor.doctor_id))
+    pending = [a for a in all_appts if a.status.value == "Pending"]
+    return _enrich(pending)
+
+
+@router.get(
+    "/my/approved",
+    summary="Doctor’s approved appointments",
+    description="Returns all Approved appointments for the authenticated doctor, including patient details.",
+    response_model=list[AppointmentRichResponse],
+)
+def get_my_approved_appointments(
+    current_doctor=Depends(get_current_doctor),
+    db: Session = Depends(get_db),
+):
+    service = AppointmentService(db)
+    all_appts = service.get_doctor_appointments(str(current_doctor.doctor_id))
+    approved = [a for a in all_appts if a.status.value == "Approved"]
+    return _enrich(approved)
 
 
 # ------------------------------------------------------------------

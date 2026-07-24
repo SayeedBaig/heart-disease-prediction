@@ -17,7 +17,7 @@ function QuickActionCard({
   return (
     <div
       onClick={onClick}
-      className="group cursor-pointer bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="group cursor-pointer bg-white rounded-2xl p-6 border border-slate-200 shadow-sm transition-all duration-300"
     >
       <div
         className={`w-14 h-14 rounded-xl bg-gradient-to-br ${colors[color]} flex items-center justify-center shadow-md`}

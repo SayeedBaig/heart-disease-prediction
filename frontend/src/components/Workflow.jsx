@@ -77,14 +77,10 @@ function Workflow() {
 
                 <motion.div
                   key={index}
-                  whileHover={{
-                    y: -8,
-                    scale: 1.03,
-                  }}
                   transition={{
                     duration: 0.25,
                   }}
-                  className="relative bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center hover:shadow-2xl"
+                  className="relative bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center"
                 >
 
                   {/* Step Number */}
