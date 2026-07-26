@@ -1,23 +1,16 @@
 import api from "../services/api";
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Bot, Send } from "lucide-react";
+import { Bot, Send, Trash2, Sparkles } from "lucide-react";
+import Navbar from "../components/Navbar";
 
 function AIHealthAssistant() {
-  const navigate = useNavigate();
-
-  // Input field
   const [message, setMessage] = useState("");
-
-  // Chat messages
   const [messages, setMessages] = useState([]);
 
   const result = JSON.parse(
-  localStorage.getItem("prediction_result") || "{}"
-);
+    localStorage.getItem("prediction_result") || "{}"
+  );
 
-  // Suggested prompts
   const suggestions = [
     "Explain ECG Findings",
     "Summarize Patient Risk",
@@ -26,255 +19,179 @@ function AIHealthAssistant() {
   ];
 
   const handleSend = async () => {
-  if (!message.trim()) return;
+    if (!message.trim()) return;
 
-  const userMessage = {
-  id: Date.now(),
-  sender: "user",
-  text: message,
-};
+    const userMessage = {
+      id: Date.now(),
+      sender: "user",
+      text: message,
+    };
 
-  setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
+    const currentQuestion = message;
+    setMessage("");
 
-  const currentQuestion = message;
-  setMessage("");
-
-  try {
-    const response = await api.post("/rag/ask", {
-  question: currentQuestion,
-  context: {
-    risk_level: result?.fusion?.final_level || "",
-    risk_percentage: result?.fusion?.risk_percentage || 0,
-    ecg_class: result?.ecg?.level || "",
-    ef_value: 0,
-  },
-});
-
-    const aiMessage = {
-  id: Date.now() + 1,
-  sender: "ai",
-  text: response.data.answer,
-};
-
-    setMessages((prev) => [...prev, aiMessage]);
-  } catch (error) {
-    const errorMessage = {
-  id: Date.now() + 1,
-  sender: "ai",
-  text: "Sorry, I couldn't connect to the AI Assistant. Please try again.",
-};
-
-    setMessages((prev) => [...prev, errorMessage]);
-
-    console.error(error);
-  }
-};
-    /*
-      TODO (Backend Integration)
-
-      const response = await api.post("/assistant", {
-          question: message,
-          prediction_id: ...,
+    try {
+      const response = await api.post("/rag/ask", {
+        question: currentQuestion,
+        context: {
+          risk_level: result?.fusion?.final_level || "",
+          risk_percentage: result?.fusion?.risk_percentage || 0,
+          ecg_class: result?.ecg?.level || "",
+          ef_value: 0,
+        },
       });
 
-      setMessages(prev => [
-          ...prev,
-          {
-              id: Date.now()+1,
-              sender:"ai",
-              text: response.data.answer
-          }
-      ]);
-    */
+      const aiMessage = {
+        id: Date.now() + 1,
+        sender: "ai",
+        text: response.data.answer,
+      };
 
-  // Click on suggested question
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error(error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        sender: "ai",
+        text: "Sorry, I couldn't connect to the AI Assistant. Please check backend connection.",
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+  };
+
   const handleSuggestionClick = (question) => {
     setMessage(question);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="cardio-shell">
+      <Navbar breadcrumb="AI Health Assistant" />
 
-        {/* ================= HEADER ================= */}
-
-        <div className="mb-6">
+      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-6 border-b border-[var(--border-color)] gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} className="text-[var(--accent-melanzane)]" />
+              <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
+                Clinical Intelligence RAG Assistant
+              </span>
+            </div>
+            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
+              AI Health Assistant
+            </h1>
+            <p className="body-regular text-xs mt-1">
+              Ask questions about prediction results, ECG waves, clinical risk, and ACC/AHA guidelines.
+            </p>
+          </div>
 
           <button
-            onClick={() => navigate("/doctor/dashboard")}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-4"
+            onClick={() => setMessages([])}
+            className="btn-secondary text-xs py-2 px-3 rounded-xl flex items-center gap-1.5 hover:text-red-500 hover:border-red-200 transition-all shrink-0"
           >
-            <ArrowLeft size={18} />
-            Back to Dashboard
+            <Trash2 size={14} />
+            <span>Clear Chat</span>
           </button>
-
-          <h1 className="text-4xl font-bold text-gray-800">
-  AI Health Assistant
-</h1>
-
-<p className="text-gray-600 mt-2 text-lg">
-  Ask AI to explain heart disease predictions,
-  ECG findings, clinical risk,
-  and medical guidelines.
-</p>
-
-<div className="mt-4">
-  <button
-    onClick={() => setMessages([])}
-    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-  >
-    🗑 Clear Chat
-  </button>
-</div>
-
         </div>
 
         {/* Suggested Questions */}
-
-        <div className="bg-white rounded-xl shadow-md p-5 mb-6">
-
-          <h2 className="text-lg font-semibold mb-4">
-            Suggested Questions
+        <div className="cardio-card p-5 mb-6">
+          <h2 className="caption-small font-bold text-[var(--text-primary)] uppercase tracking-wider mb-3">
+            Suggested Prompts
           </h2>
-
-          <div className="flex flex-wrap gap-3">
-
+          <div className="flex flex-wrap gap-2.5">
             {suggestions.map((item, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(item)}
-                className="px-4 py-2 rounded-full border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                className="py-1.5 px-3.5 rounded-xl border border-[var(--accent-melanzane-border)] bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] text-xs font-semibold hover:bg-[var(--accent-melanzane-border)] transition-all"
               >
                 {item}
               </button>
             ))}
-
           </div>
-
         </div>
-                {/* ================= CHAT AREA ================= */}
 
-        <div className="bg-white rounded-xl shadow-md h-[430px] flex flex-col mb-6">
-
-          <div className="flex-1 overflow-y-auto p-6">
-
+        {/* Chat Container */}
+        <div className="cardio-card p-0 h-[450px] flex flex-col mb-6 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.length === 0 ? (
-
-              <div className="h-full flex flex-col items-center justify-center text-center">
-
-                <div className="bg-blue-100 p-5 rounded-full mb-5">
-                  <Bot className="text-blue-600" size={42} />
+              <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mb-4">
+                  <Bot size={36} />
                 </div>
-
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  CardioAI Health Assistant
+                <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">
+                  CardioAI Multimodal Intelligence Assistant
                 </h2>
-
-                <p className="text-gray-500 max-w-lg mb-8">
-                  Ask questions about prediction results, ECG findings,
-                  cardiovascular risk, lifestyle recommendations,
-                  or clinical guidelines.
+                <p className="caption-small max-w-md mb-6">
+                  Query clinical parameters, ECG classifications, echocardiography EF metrics, or ACC/AHA guidelines.
                 </p>
-
-                <div className="grid grid-cols-2 gap-3 text-left">
-
-                  <div className="bg-gray-50 rounded-lg px-4 py-3 border">
-                    ❤️ Explain Prediction
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-md w-full">
+                  <div className="cardio-card p-3 text-xs font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <span>❤️</span> Explain Risk Assessment
                   </div>
-
-                  <div className="bg-gray-50 rounded-lg px-4 py-3 border">
-                    📈 Explain ECG Findings
+                  <div className="cardio-card p-3 text-xs font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <span>📈</span> Explain ECG Waveform
                   </div>
-
-                  <div className="bg-gray-50 rounded-lg px-4 py-3 border">
-                    🥗 Lifestyle Advice
+                  <div className="cardio-card p-3 text-xs font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <span>🥗</span> Lifestyle Interventions
                   </div>
-
-                  <div className="bg-gray-50 rounded-lg px-4 py-3 border">
-                    📚 Medical Guidelines
+                  <div className="cardio-card p-3 text-xs font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <span>📚</span> ACC/AHA Guidelines
                   </div>
-
                 </div>
-
               </div>
-
             ) : (
-
-              <div className="space-y-5">
-
-                {messages.map((msg) => (
-
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${
+                    msg.sender === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
                   <div
-                    key={msg.id}
-                    className={`flex ${
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                       msg.sender === "user"
-                        ? "justify-end"
-                        : "justify-start"
+                        ? "bg-[var(--accent-melanzane)] text-white rounded-br-none"
+                        : "bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-bl-none"
                     }`}
                   >
-
-                    <div
-                      className={`max-w-[75%] rounded-2xl px-5 py-3 shadow-sm ${
-                        msg.sender === "user"
-                          ? "bg-blue-600 text-white rounded-br-md"
-                          : "bg-gray-100 text-gray-800 rounded-bl-md"
-                      }`}
-                    >
-
-                      <p className="text-sm leading-7">
-                        {msg.text}
-                      </p>
-
-                    </div>
-
+                    {msg.text}
                   </div>
-
-                ))}
-
-              </div>
-
+                </div>
+              ))
             )}
-
           </div>
 
-        </div>
-                {/* ================= INPUT AREA ================= */}
-
-        <div className="bg-white rounded-xl shadow-md p-4">
-          <div className="flex gap-3">
-
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSend();
-                }
-              }}
-              placeholder="Ask about prediction results, ECG findings, or medical guidelines..."
-              className="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-            <button
-  onClick={handleSend}
-  disabled={!message.trim()}
-  className={`px-6 rounded-xl flex items-center gap-2 transition text-white ${
-    message.trim()
-      ? "bg-blue-600 hover:bg-blue-700"
-      : "bg-gray-400 cursor-not-allowed"
-  }`}
->
-              <Send size={18} />
-              Send
-            </button>
-
+          {/* Input Bar */}
+          <div className="p-4 border-t border-[var(--border-color)] bg-[var(--card-bg)]">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSend();
+                }}
+                placeholder="Ask about prediction results, ECG findings, or guidelines..."
+                className="cardio-input text-xs flex-1"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!message.trim()}
+                className="btn-primary text-xs py-2.5 px-5 rounded-xl disabled:opacity-50 flex items-center gap-2"
+              >
+                <Send size={15} />
+                <span>Send</span>
+              </button>
+            </div>
           </div>
         </div>
-
-      </div>
+      </main>
     </div>
   );
 }
 
-export default AIHealthAssistant;
+export default AIHealthAssistant;

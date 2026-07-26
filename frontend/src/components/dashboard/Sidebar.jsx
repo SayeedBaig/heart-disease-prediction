@@ -39,13 +39,7 @@ const menuItems = [
     name: "Appointment Management",
     path: "/appointment-management",
     icon: CalendarDays,
-  },
-  {
-    name:"AI Health Assisant",
-    path: "/ai-health-assistant",
-    icon:Brain,
   }
-  
 ];
 
 export default function Sidebar() {

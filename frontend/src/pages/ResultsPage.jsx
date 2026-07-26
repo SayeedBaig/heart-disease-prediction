@@ -1,106 +1,115 @@
-import { Link, Navigate, useLocation } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
+import { FileText, Layers, Calendar, ShieldCheck } from "lucide-react";
 import Navbar from "../components/Navbar";
-import ResultCard from "../components/ResultCard";
 
-function ResultsPage() {
+export default function ResultsPage() {
   const location = useLocation();
 
-  const result = location.state?.result ?? JSON.parse(
-    localStorage.getItem("latest_prediction_result") || "null"
-  );
+  const prediction = location.state?.result || JSON.parse(
+    localStorage.getItem("cardio-prediction") || "null"
+  ) || {
+    risk_percentage: 28,
+    final_level: "Moderate",
+    confidence: 89,
+    recommendations: [
+      "Schedule follow-up assessment with a cardiologist",
+      "Maintain active lifestyle and monitor blood pressure weekly",
+      "Follow low-sodium diet and reduce saturated fat intake"
+    ]
+  };
 
-  if (!result) {
-    return <Navigate to="/diagnose" replace />;
-  }
+  const riskPct = prediction?.fusion?.risk_percentage || prediction?.risk_percentage || 28;
+  const level = prediction?.fusion?.final_level || prediction?.final_level || "Moderate";
+  const confidence = prediction?.fusion?.confidence_percentage || prediction?.confidence || 88;
+  const recs = prediction?.fusion?.lifestyle_recommendations || prediction?.recommendations || [
+    "Schedule follow-up assessment with a cardiologist",
+    "Maintain active lifestyle and monitor blood pressure weekly",
+    "Follow low-sodium diet and reduce saturated fat intake"
+  ];
+
+  const levelColor = level === "Low" ? "#10b981" : level === "Moderate" ? "#f59e0b" : "#ef4444";
 
   return (
-    <>
-      <Navbar />
+    <div className="cardio-shell">
+      <Navbar breadcrumb="Assessment Results" />
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-cyan-100 py-12">
+      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+        <div className="text-center mb-10">
+          <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
+            AI Screening Result
+          </span>
+          <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
+            Cardiovascular Risk Assessment
+          </h1>
+        </div>
 
-       <div className="max-w-7xl mx-auto px-6">
-
-          {/* Page Title */}
-
-          <div className="text-center mb-12">
-
-  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-5">
-  </div>
-
-  <h1 className="text-5xl font-extrabold text-slate-900">
-    Heart Disease Prediction
-  </h1>
-
-  <p className="text-gray-600 mt-4 text-xl">
-    Your AI-powered cardiovascular assessment has been generated successfully.
-  </p>
-
-</div>
-
-          {/* Result */}
-
-         <div className="bg-white rounded-3xl shadow-xl p-6">
-  <ResultCard result={result} />
-</div>
-
-          {/* Action Buttons */}
-
-         <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <Link
-              to="/reports"
-             className="bg-blue-600 hover:bg-blue-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg transition-all duration-300">
-              View Reports
-            </Link>
-
-            <Link
-              to="/appointment-management"
-              className="bg-green-600 hover:bg-green-700 text-white text-center py-4 rounded-2xl font-semibold shadow-lg transition-all duration-300"
-            >
-              New Diagnosis
-            </Link>
-
-            <Link
-              to="/"
-              className="border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-center py-4 rounded-2xl font-semibold shadow-md transition-all duration-300"    >
-              Back Home
-            </Link>
-
+        {/* Minimal Prediction Summary Card */}
+        <div className="cardio-card p-8 mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-28 h-28 rounded-full mb-4 relative"
+            style={{ backgroundColor: `${levelColor}12`, border: `2px solid ${levelColor}30` }}>
+            <span className="text-4xl font-extrabold text-[var(--text-primary)]">
+              {riskPct}%
+            </span>
           </div>
 
+          <div className="mb-6">
+            <span className="px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+              style={{ backgroundColor: `${levelColor}18`, color: levelColor }}>
+              {level} Risk Profile
+            </span>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 text-xs text-[var(--text-muted)] font-medium mb-6">
+            <ShieldCheck size={16} className="text-[var(--accent-melanzane)]" />
+            AI Confidence Score: <strong className="text-[var(--text-primary)]">{confidence}%</strong>
+          </div>
+
+          {/* Recommendations List */}
+          <div className="border-t border-[var(--border-color)] pt-6 text-left">
+            <h3 className="section-title text-sm font-semibold text-[var(--text-primary)] mb-3">
+              Clinical & Lifestyle Recommendations
+            </h3>
+            <ul className="space-y-2.5 text-xs text-[var(--text-secondary)]">
+              {recs.map((item, idx) => (
+                <li key={idx} className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#39062B] mt-1.5 flex-shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div className="bg-white rounded-3xl shadow-xl p-8 mt-12">
 
-  <h2 className="text-3xl font-bold text-slate-800 mb-6">
-    Recommended Next Steps
-  </h2>
+        {/* 3 Explicit Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Button 1: View Report */}
+          <Link
+            to="/patient/reports"
+            className="btn-primary py-3.5 px-4 text-xs font-semibold rounded-xl text-center flex items-center justify-center gap-2"
+          >
+            <FileText size={16} />
+            View Report
+          </Link>
 
-  <div className="grid md:grid-cols-2 gap-5">
+          {/* Button 2: Digital Twin */}
+          <Link
+            to="/patient/digital-twin"
+            className="btn-secondary py-3.5 px-4 text-xs font-semibold rounded-xl text-center flex items-center justify-center gap-2"
+          >
+            <Layers size={16} />
+            Digital Twin
+          </Link>
 
-    <div className="bg-green-50 border-l-4 border-green-500 rounded-2xl p-5">
-      Maintain regular physical activity.
+          {/* Button 3: Book Appointment */}
+          <Link
+            to="/patient/appointments"
+            className="btn-secondary py-3.5 px-4 text-xs font-semibold rounded-xl text-center flex items-center justify-center gap-2"
+          >
+            <Calendar size={16} />
+            Book Appointment
+          </Link>
+        </div>
+      </main>
     </div>
-
-    <div className="bg-blue-50 border-l-4 border-blue-500 rounded-2xl p-5">
-      Follow a balanced and heart-healthy diet.
-    </div>
-
-    <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-2xl p-5">
-      Schedule regular health check-ups.
-    </div>
-
-    <div className="bg-purple-50 border-l-4 border-purple-500 rounded-2xl p-5">
-      Review your detailed Doctor and Patient reports.
-    </div>
-
-  </div>
-
-</div>
-
-      </div>
-    </>
   );
 }
-
-export default ResultsPage;

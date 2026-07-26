@@ -32,6 +32,10 @@ class PdfRenderer:
 
         # ── Header ──────────────────────────────────────────────────────
         elements.extend(fmt.format_header(report_type.title()))
+        elements.extend(fmt.section(
+            "Academic Use Only",
+            "This system is developed solely for academic and research purposes. It is not intended for real-world medical diagnosis or treatment. Always consult a qualified healthcare professional before making medical decisions.",
+        ))
 
         # ── Patient information ──────────────────────────────────────────
         elements.extend(fmt.format_patient_info(report_data.get("patient")))

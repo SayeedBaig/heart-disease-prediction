@@ -11,123 +11,87 @@ import {
 const steps = [
   {
     icon: UserPlus,
-    title: "Register patient",
-    description: "Create a patient record and capture the information needed for assessment.",
-  },
-  {
-    icon: Activity,
-    title: "Add ECG recording",
-    description: "Upload an ECG image or signal file for waveform analysis.",
-  },
-  {
-    icon: HeartPulse,
-    title: "Add echocardiography",
-    description: "Include an echo study when imaging is available.",
+    title: "1. Patient Intake",
+    description: "Capture core demographic vitals and medical background.",
   },
   {
     icon: ClipboardList,
-    title: "Enter clinical data",
-    description: "Record vital signs, laboratory indicators, and lifestyle factors.",
+    title: "2. Clinical Vitals",
+    description: "Input blood pressure, cholesterol, and fasting glucose metrics.",
+  },
+  {
+    icon: Activity,
+    title: "3. ECG Signal",
+    description: "Upload ECG waveforms for automated deep learning wave analysis.",
+  },
+  {
+    icon: HeartPulse,
+    title: "4. Echo Imaging",
+    description: "Incorporate echocardiogram ejection signals and wall motion scans.",
   },
   {
     icon: BrainCircuit,
-    title: "Generate assessment",
-    description: "Combine available inputs into a consolidated cardiovascular risk result.",
+    title: "5. Multimodal Fusion",
+    description: "AI engines fuse all available diagnostic streams in seconds.",
   },
   {
     icon: FileText,
-    title: "Review and report",
-    description: "Examine findings, save assessment history, and generate reports.",
+    title: "6. Clinical Report",
+    description: "Generate print-ready diagnostic summaries & consultation charts.",
   },
 ];
 
 function Workflow() {
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-
+    <section className="py-20 md:py-24 bg-[var(--bg-secondary)] border-y border-[var(--border-color)]">
+      <div className="cardio-container max-w-7xl mx-auto">
         {/* Heading */}
-
-        <div className="text-center mb-20">
-
-          <h2 className="text-4xl font-bold text-slate-900">
-            From patient record to clinical report
+        <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+          <span className="caption-small uppercase tracking-widest text-[var(--accent-melanzane)] font-bold">
+            End-to-End Clinical Flow
+          </span>
+          <h2 className="h2-semibold text-[var(--text-primary)] mt-2 text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">
+            From Patient Intake to Clinical Report
           </h2>
-
-          <p className="mt-4 text-gray-600 max-w-3xl mx-auto leading-7">
-            A practical workflow for documenting cardiovascular assessments and
-            reviewing results in one place.
+          <p className="body-regular mt-3 text-sm md:text-base text-[var(--text-secondary)] leading-relaxed">
+            A practical, streamlined workflow for evaluating cardiovascular risk factors and generating explainable insights.
           </p>
-
         </div>
 
-        <div className="relative">
+        {/* Workflow Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
 
-          {/* Connector Line */}
-
-          <div className="hidden lg:block absolute top-12 left-0 w-full h-0.5 bg-blue-100 rounded-full"></div>
-
-          <div className="grid lg:grid-cols-6 md:grid-cols-3 sm:grid-cols-2 gap-8 relative">
-
-            {steps.map((step, index) => {
-
-              const Icon = step.icon;
-
-              return (
-
-                <motion.div
-                  key={index}
-                  transition={{
-                    duration: 0.25,
-                  }}
-                  className="relative bg-white rounded-2xl shadow-lg border border-gray-100 p-5 text-center"
-                >
-
-                  {/* Step Number */}
-
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
-
-                    {String(index + 1).padStart(2, "0")}
-
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                className="cardio-card p-6 md:p-7 flex flex-col items-start rounded-2xl group hover:border-[var(--accent-melanzane-border)] transition-all duration-300 shadow-sm hover:shadow-md"
+              >
+                <div className="flex items-center justify-between w-full mb-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center transition-transform group-hover:scale-105">
+                    <Icon size={24} />
                   </div>
+                  <span className="w-7 h-7 rounded-full bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] font-extrabold text-xs flex items-center justify-center border border-[var(--accent-melanzane-border)]">
+                    {index + 1}
+                  </span>
+                </div>
 
-                  {/* Icon */}
+                <h3 className="text-base md:text-lg font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--accent-melanzane)] transition-colors">
+                  {step.title}
+                </h3>
 
-                  <div className="w-16 h-16 mx-auto mt-4 rounded-xl bg-blue-50 flex items-center justify-center">
-
-                    <Icon
-                      size={32}
-                      className="text-blue-600"
-                    />
-
-                  </div>
-
-                  {/* Title */}
-
-                  <h3 className="mt-5 text-lg font-bold text-slate-900">
-
-                    {step.title}
-
-                  </h3>
-
-                  {/* Description */}
-
-                  <p className="mt-3 text-sm text-gray-500 leading-6">
-
-                    {step.description}
-
-                  </p>
-
-                </motion.div>
-
-              );
-
-            })}
-
-          </div>
-
+                <p className="body-regular text-xs md:text-sm leading-relaxed text-[var(--text-secondary)]">
+                  {step.description}
+                </p>
+              </motion.div>
+            );
+          })}
         </div>
-
       </div>
     </section>
   );

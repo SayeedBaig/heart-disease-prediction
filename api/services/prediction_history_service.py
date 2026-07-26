@@ -11,6 +11,6 @@ class PredictionHistoryService:
         patient = self.patient_repository.get_by_public_id(patient_id)
 
         if not patient:
-            return None
+            return []
 
         return self.prediction_repository.get_by_patient_id(patient.id)

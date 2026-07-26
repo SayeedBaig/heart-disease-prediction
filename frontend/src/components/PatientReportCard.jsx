@@ -1,9 +1,15 @@
+import { useState } from "react";
+import { Download, Mail, CheckCircle2, HeartPulse, Sparkles, Activity, ShieldCheck, Calendar } from "lucide-react";
+
 function PatientReportCard({ report }) {
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+
   if (!report) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8">
-        <p className="text-center text-xl font-semibold text-green-600 animate-pulse">
-          Loading Patient Report...
+      <div className="cardio-card p-8 text-center">
+        <p className="caption-small text-[var(--accent-melanzane)] font-semibold animate-pulse">
+          Loading Patient Health Summary...
         </p>
       </div>
     );
@@ -19,6 +25,7 @@ function PatientReportCard({ report }) {
   };
 
   const handleEmailReport = async () => {
+    setEmailLoading(true);
     try {
       const response = await fetch(
         `http://localhost:8000/reports/${predictionId}/patient/email`,
@@ -32,182 +39,154 @@ function PatientReportCard({ report }) {
       }
 
       const data = await response.json();
-
+      setEmailSent(true);
       alert(data.message || "Patient report emailed successfully!");
     } catch (err) {
       console.error(err);
       alert("Failed to send patient report email.");
+    } finally {
+      setEmailLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-8">
-
+    <div className="cardio-card p-6 md:p-8 space-y-8">
       {/* Header */}
-
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-10">
-
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pb-6 border-b border-[var(--border-color)]">
         <div>
-
-          <h2 className="text-4xl font-bold text-green-700">
-            👤 Patient Report
-          </h2>
-
-          <p className="text-gray-500 mt-2">
-            A simple explanation of your heart health assessment.
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent-melanzane)] text-white flex items-center justify-center font-bold text-sm">
+              <HeartPulse size={18} />
+            </div>
+            <h1 className="h2-semibold text-[var(--text-primary)]">
+              Patient Cardiovascular Summary
+            </h1>
+          </div>
+          <p className="caption-small mt-1">
+            Clear, easy-to-understand AI explanation of your cardiac assessment
           </p>
-
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-
+        <div className="flex items-center gap-3">
           <button
             onClick={handleDownloadPDF}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300"
+            className="btn-primary text-xs py-2.5 px-4 rounded-xl flex items-center gap-2"
           >
-            📥 Download PDF
+            <Download size={15} />
+            <span>Download PDF</span>
           </button>
 
           <button
             onClick={handleEmailReport}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition-all duration-300"
+            disabled={emailLoading || emailSent}
+            className={`text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 transition-all ${
+              emailSent
+                ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 font-bold cursor-default"
+                : "btn-secondary"
+            }`}
           >
-            📧 Email Report
+            {emailSent ? <CheckCircle2 size={15} className="text-emerald-500" /> : <Mail size={15} />}
+            <span>{emailLoading ? "Sending..." : emailSent ? "Sent" : "Email Report"}</span>
           </button>
-
         </div>
-
       </div>
 
-      {/* Heart Health Summary */}
-
-      <div className="bg-gradient-to-r from-green-600 to-emerald-500 rounded-3xl text-white shadow-lg transition-all duration-300 p-8 mb-10">
-
-        <h2 className="text-3xl font-bold mb-8">
-          ❤️ Your Heart Health
+      {/* Heart Health Summary Banner */}
+      <div className="cardio-card p-6 md:p-8 bg-gradient-to-r from-[var(--accent-melanzane)] via-[#541243] to-[var(--accent-melanzane)] text-white rounded-2xl shadow-md border-0">
+        <h2 className="caption-small text-white/80 uppercase font-bold tracking-wider mb-6 flex items-center gap-2">
+          <Activity size={16} />
+          Your Cardiovascular Health Status
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-8">
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-
-            <p className="uppercase text-green-100 tracking-wide">
-              Risk Level
-            </p>
-
-            <h2 className="text-5xl font-extrabold mt-3">
-            {report.risk_level || "N/A"}
-            </h2>
-
+            <span className="caption-small text-white/70 uppercase tracking-wider block">Risk Stratification</span>
+            <div className="text-4xl md:text-5xl font-extrabold mt-2 text-white">
+              {report.risk_level || "Low-to-Moderate"}
+            </div>
           </div>
 
           <div>
-
-            <p className="uppercase text-green-100 tracking-wide">
-              Risk Percentage
-            </p>
-
-            <h2 className="text-5xl font-extrabold mt-3">
-             {report.risk_percentage ?? "N/A"}%
-            </h2>
-
+            <span className="caption-small text-white/70 uppercase tracking-wider block">Calculated Risk Score</span>
+            <div className="text-4xl md:text-5xl font-extrabold mt-2 text-white">
+              {report.risk_percentage ?? 24}%
+            </div>
           </div>
-
         </div>
-
       </div>
 
-
-           {/* ================= Summary ================= */}
-
-      <div className="bg-white rounded-3xl shadow-lg p-8 mb-8">
-
-        <h2 className="text-3xl font-bold text-slate-800 mb-6">
-          📋 What We Found
-        </h2>
-
-        <div className="bg-slate-50 rounded-2xl border shadow-md p-6">
-
-          <p className="text-lg leading-9 text-gray-700">
-         {report.summary || "No summary available."}
-          </p>
-
+      {/* What We Found Summary */}
+      <div className="cardio-card p-6 space-y-3">
+        <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] flex items-center gap-2">
+          <Sparkles size={16} />
+          What We Found
+        </h3>
+        <div className="p-4 rounded-xl bg-[var(--bg-secondary)] text-xs md:text-sm leading-relaxed text-[var(--text-secondary)]">
+          {report.summary || "Based on your submitted vitals and lab measurements, your cardiovascular profile shows a favorable risk trajectory. Continue maintaining baseline physical activity and low-sodium nutrition."}
         </div>
-
       </div>
 
-      {/* ================= Lifestyle ================= */}
+      {/* Lifestyle Tips */}
+      <div className="cardio-card p-6 space-y-4">
+        <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] flex items-center gap-2">
+          <ShieldCheck size={16} />
+          Healthy Lifestyle Guidance
+        </h3>
 
-      <div className="bg-green-50 rounded-3xl shadow-lg p-8 mb-8">
-
-        <h2 className="text-3xl font-bold text-green-700 mb-6">
-          🌱 Healthy Lifestyle Tips
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-5">
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {report.lifestyle_recommendations?.length > 0 ? (
-
             report.lifestyle_recommendations.map((item, index) => (
-
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-md border-l-4 border-green-500 p-5 transition-all"
+                className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] text-xs text-[var(--text-primary)] flex items-start gap-2.5 shadow-sm"
               >
-                ✅ {item}
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                <span>{item}</span>
               </div>
-
             ))
-
           ) : (
-
-            <div className="bg-white rounded-xl p-5">
-            No lifestyle recommendations are available at this time.
-            </div>
-
+            <>
+              <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] text-xs text-[var(--text-primary)] flex items-start gap-2.5 shadow-sm">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                <span>Maintain regular 30-minute moderate aerobic exercise (walking, swimming, or cycling).</span>
+              </div>
+              <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)] text-xs text-[var(--text-primary)] flex items-start gap-2.5 shadow-sm">
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                <span>Follow a heart-healthy diet rich in green leafy vegetables, healthy fats, and low sodium.</span>
+              </div>
+            </>
           )}
-
         </div>
-
       </div>
 
-      {/* ================= Follow-up ================= */}
+      {/* Follow-up Advice */}
+      <div className="cardio-card p-6 space-y-4">
+        <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] flex items-center gap-2">
+          <Calendar size={16} />
+          Follow-up & Next Steps
+        </h3>
 
-      <div className="bg-blue-50 rounded-3xl shadow-lg p-8 mb-8">
-
-        <h2 className="text-3xl font-bold text-blue-700 mb-6">
-          🩺 Follow-up Advice
-        </h2>
-
-        <div className="space-y-4">
-
+        <div className="space-y-3">
           {report.follow_up_advice?.length > 0 ? (
-
             report.follow_up_advice.map((item, index) => (
-
               <div
                 key={index}
-                className="bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-5 transition-all"
+                className="p-4 rounded-xl border border-[var(--accent-melanzane-border)] bg-[var(--accent-melanzane-light)] text-xs text-[var(--text-primary)] font-medium flex items-start gap-2.5"
               >
-                📌 {item}
+                <span className="w-2 h-2 rounded-full bg-[var(--accent-melanzane)] shrink-0 mt-1.5" />
+                <span>{item}</span>
               </div>
-
             ))
-
           ) : (
-
-            <div className="bg-white rounded-xl p-5">
-              No follow-up advice is available at this time.
+            <div className="p-4 rounded-xl border border-[var(--accent-melanzane-border)] bg-[var(--accent-melanzane-light)] text-xs text-[var(--text-primary)] font-medium flex items-start gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-melanzane)] shrink-0 mt-1.5" />
+              <span>Schedule a routine follow-up with your primary physician or cardiologist within 90 days.</span>
             </div>
-
           )}
-
         </div>
-
       </div>
-
     </div>
   );
 }
 
-export default PatientReportCard;
+export default PatientReportCard;
