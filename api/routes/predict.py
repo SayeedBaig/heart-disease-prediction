@@ -1,19 +1,47 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
+from api.database.session import get_db
+from api.repositories.patient_repository import PatientRepository
 from api.schemas.request import ClinicalInput
+from api.schemas.response import PredictEndpointResponse
 from api.services.prediction_service import PredictionService
+from api.utils.authorization import get_current_actor, resolve_patient
 from api.utils.validators import validate_patient_data
 from api.utils.exception_handler import handle_prediction_exception
+from api.models.diagnosis import DiagnosisStatus
 
 router = APIRouter()
 
-prediction_service = PredictionService()
 
-
-@router.post("/predict")
-def predict(clinical_data: ClinicalInput):
+@router.post(
+    "/predict",
+    summary="Predict heart disease risk",
+    description=(
+        "Runs the complete CardioAI prediction pipeline using "
+        "clinical data, ECG, and Echocardiography inputs."
+    ),
+    response_description="Prediction completed successfully.",
+    responses={200: {"model": PredictEndpointResponse}},
+)
+def predict(
+    clinical_data: ClinicalInput,
+    db: Session = Depends(get_db),
+    actor=Depends(get_current_actor),
+):
     try:
         patient = clinical_data.model_dump()
+        ecg_path = patient.pop("ecg_path", None)
+        echo_path = patient.pop("echo_path", None)
+        patient_id = patient.pop("patient_id", None)
+
+        if not patient_id:
+            raise HTTPException(status_code=422, detail="A registered patient ID is required.")
+
+        patient_record = resolve_patient(patient_id, db)
+        role, account = actor
+        if role == "patient" and account.id != patient_record.id:
+            raise HTTPException(status_code=403, detail="You can only create predictions for your own record.")
 
         errors = validate_patient_data(patient)
 
@@ -22,14 +50,38 @@ def predict(clinical_data: ClinicalInput):
                 "success": False,
                 "errors": errors
             }
+        prediction_service = PredictionService(db)
+        
 
         result = prediction_service.predict(
             clinical_data=patient,
-            ecg_input="sample_ecg.csv",
-            echo_input="",
+            ecg_input=ecg_path,
+            echo_input=echo_path,
+            patient_record=patient_record,
         )
 
+        result["diagnosis_id"] = None
+        if patient_record:
+            try:
+                diagnoses = patient_record.diagnoses or []
+                pending_diagnoses = [
+                    d for d in diagnoses
+                    if d.status == DiagnosisStatus.PENDING
+                ]
+                if pending_diagnoses:
+                    latest_diagnosis = sorted(pending_diagnoses, key=lambda d: d.created_at)[-1]
+                    latest_diagnosis.prediction_id = result.get("prediction_id")
+                    latest_diagnosis.status = DiagnosisStatus.COMPLETED
+                    db.commit()
+                    result["diagnosis_id"] = latest_diagnosis.diagnosis_id
+            except Exception:
+                # diagnoses relationship may not be loaded; continue without it
+                pass
+
         return result
+
+    except HTTPException:
+        raise
 
     except Exception as e:
         handle_prediction_exception(e)

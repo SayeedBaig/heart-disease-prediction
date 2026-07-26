@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class AgentResult(BaseModel):
@@ -24,3 +24,13 @@ class PredictResponse(BaseModel):
     echo: AgentResult
     fusion: FusionResult
     rag: RagResult
+
+
+from uuid import UUID
+
+class PredictEndpointResponse(BaseModel):
+    prediction: PredictResponse
+    explanation: Dict[str, Any]
+    digital_twin: Dict[str, Any]
+    prediction_id: Optional[str] = None
+    diagnosis_id: Optional[UUID] = None

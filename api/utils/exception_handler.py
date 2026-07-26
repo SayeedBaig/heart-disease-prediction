@@ -1,13 +1,18 @@
 from fastapi import HTTPException
 
+from api.utils.logger import get_logger
 
-def handle_prediction_exception(exception: Exception):
+logger = get_logger(__name__)
+
+
+def handle_prediction_exception(exception: Exception) -> None:
     """
-    Convert backend exceptions into
-    standardized HTTP responses.
+    Log the real exception internally and raise a safe HTTP 500
+    that never exposes internal details to API clients.
     """
+    logger.exception("Prediction pipeline error: %s", exception)
 
     raise HTTPException(
         status_code=500,
-        detail=str(exception),
+        detail="An internal error occurred. Please try again.",
     )
