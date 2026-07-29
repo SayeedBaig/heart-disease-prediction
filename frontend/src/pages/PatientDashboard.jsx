@@ -9,7 +9,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function PatientDashboard({ onNavigate, onLogout }) {
   const navigate = useNavigate();
@@ -35,8 +34,7 @@ export default function PatientDashboard({ onNavigate, onLogout }) {
   };
 
   return (
-    <>
-      <div className="cardio-shell overflow-x-hidden">
+    <div className="cardio-shell overflow-x-hidden">
       <Navbar />
 
       <main className="cardio-container py-8 md:py-10 w-full flex-1 max-w-[1400px] mx-auto space-y-12">
@@ -212,8 +210,6 @@ export default function PatientDashboard({ onNavigate, onLogout }) {
         </section>
       </main>
     </div>
-    <ChatbotWidget mode="patient" />
-    </>
   );
 }
 

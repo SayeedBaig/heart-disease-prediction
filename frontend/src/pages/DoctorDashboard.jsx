@@ -11,7 +11,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import ChatbotWidget from "../components/ChatbotWidget";
 
 export default function DoctorDashboard({ doctor, onNavigate, onLogout }) {
   const navigate = useNavigate();
@@ -40,8 +39,7 @@ export default function DoctorDashboard({ doctor, onNavigate, onLogout }) {
   const specialization = currentDoctor.specialization || "Cardiology";
 
   return (
-    <>
-      <div className="cardio-shell overflow-x-hidden">
+    <div className="cardio-shell overflow-x-hidden">
       <Navbar />
 
       <main className="cardio-container py-8 md:py-10 w-full flex-1 max-w-[1400px] mx-auto space-y-12">
@@ -179,8 +177,6 @@ export default function DoctorDashboard({ doctor, onNavigate, onLogout }) {
         */}
       </main>
     </div>
-    <ChatbotWidget mode="doctor" />
-    </>
   );
 }
 
