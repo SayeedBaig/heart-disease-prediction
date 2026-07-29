@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../components/Navbar";
 import api from "../services/api";
 
 function DoctorNotes() {
@@ -48,130 +49,123 @@ function DoctorNotes() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-10">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <div className="cardio-shell">
+      <Navbar breadcrumb="Clinical Observations" />
 
-        <h1 className="text-3xl font-bold text-slate-800">
-          Doctor Notes
-        </h1>
-
-        <p className="text-slate-500 mt-2 mb-8">
-          Add clinical observations and recommendations.
-        </p>
-
-        <div className="space-y-6">
-
-          {/* Diagnosis ID */}
-
-          <div>
-            <label className="block font-medium mb-2">
-              Diagnosis ID
-            </label>
-
-            <input
-              type="text"
-              value={diagnosisId}
-              onChange={(e) => setDiagnosisId(e.target.value)}
-              className="w-full border rounded-xl p-3"
-              placeholder="Enter Diagnosis ID"
-            />
+      <main className="cardio-container py-8 flex-1 w-full max-w-4xl">
+        <div className="cardio-card p-8">
+          <div className="border-b border-[var(--border-color)] pb-4 mb-6">
+            <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
+              Clinician Portal
+            </span>
+            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
+              Doctor Clinical Notes
+            </h1>
+            <p className="body-regular text-xs mt-1">
+              Add observations, prescriptions, and follow-up guidance to patient records.
+            </p>
           </div>
 
-          {/* Notes */}
-
-          <div>
-            <label className="block font-medium mb-2">
-              Clinical Notes
-            </label>
-
-            <textarea
-              rows="4"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full border rounded-xl p-3"
-              placeholder="Enter doctor observations"
-            />
-          </div>
-
-          {/* Prescription */}
-
-          <div>
-            <label className="block font-medium mb-2">
-              Prescription
-            </label>
-
-            <textarea
-              rows="3"
-              value={prescription}
-              onChange={(e) => setPrescription(e.target.value)}
-              className="w-full border rounded-xl p-3"
-              placeholder="Enter prescription"
-            />
-          </div>
-
-          {/* Advice */}
-
-          <div>
-            <label className="block font-medium mb-2">
-              Advice
-            </label>
-
-            <textarea
-              rows="3"
-              value={advice}
-              onChange={(e) => setAdvice(e.target.value)}
-              className="w-full border rounded-xl p-3"
-              placeholder="Lifestyle and medical advice"
-            />
-          </div>
-
-          {/* Follow Up */}
-
-          <div>
-            <label className="block font-medium mb-2">
-              Follow Up
-            </label>
-
-            <input
-              type="text"
-              value={followUp}
-              onChange={(e) => setFollowUp(e.target.value)}
-              className="w-full border rounded-xl p-3"
-              placeholder="Example: Review after 30 days"
-            />
-          </div>
-
-          {/* Error Message */}
-
-          {error && (
-            <div className="bg-red-100 border border-red-300 text-red-700 rounded-xl p-3">
-              {error}
+          <div className="space-y-5">
+            {/* Diagnosis ID */}
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
+                Diagnosis ID *
+              </label>
+              <input
+                type="text"
+                value={diagnosisId}
+                onChange={(e) => setDiagnosisId(e.target.value)}
+                className="cardio-input text-xs"
+                placeholder="Enter Diagnosis ID (e.g. DIAG-9021)"
+              />
             </div>
-          )}
 
-          {/* Success Message */}
-
-          {success && (
-            <div className="bg-green-100 border border-green-300 text-green-700 rounded-xl p-3">
-              {success}
+            {/* Notes */}
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
+                Clinical Observations
+              </label>
+              <textarea
+                rows="4"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="cardio-input text-xs"
+                placeholder="Enter detailed physician findings..."
+              />
             </div>
-          )}
 
-          {/* Save Button */}
+            {/* Prescription */}
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
+                Prescription & Medication Plan
+              </label>
+              <textarea
+                rows="3"
+                value={prescription}
+                onChange={(e) => setPrescription(e.target.value)}
+                className="cardio-input text-xs"
+                placeholder="Enter prescribed medications and dosage..."
+              />
+            </div>
 
-          <button
-            onClick={handleSaveNotes}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-60"
-          >
-            {loading ? "Saving..." : "Save Notes"}
-          </button>
+            {/* Advice */}
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
+                Lifestyle & Dietary Advice
+              </label>
+              <textarea
+                rows="3"
+                value={advice}
+                onChange={(e) => setAdvice(e.target.value)}
+                className="cardio-input text-xs"
+                placeholder="Lifestyle, dietary, and exercise recommendations..."
+              />
+            </div>
 
+            {/* Follow Up */}
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
+                Follow-Up Schedule
+              </label>
+              <input
+                type="text"
+                value={followUp}
+                onChange={(e) => setFollowUp(e.target.value)}
+                className="cardio-input text-xs"
+                placeholder="e.g. Re-evaluate blood pressure in 30 days"
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
+                {error}
+              </div>
+            )}
+
+            {/* Success Message */}
+            {success && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold">
+                {success}
+              </div>
+            )}
+
+            {/* Save Button */}
+            <div className="pt-2">
+              <button
+                onClick={handleSaveNotes}
+                disabled={loading}
+                className="btn-primary w-full py-3 text-xs font-semibold rounded-xl"
+              >
+                {loading ? "Saving Notes..." : "Save Doctor Notes"}
+              </button>
+            </div>
+          </div>
         </div>
-
-      </div>
+      </main>
     </div>
   );
 }
 
-export default DoctorNotes;
+export default DoctorNotes;

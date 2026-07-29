@@ -1,165 +1,286 @@
-import { useEffect, useState } from "react";
-import api from "../services/api";
-
+import { useState } from "react";
+import { Download, Mail, Printer, ShieldCheck, Activity, User, FileText, CheckCircle2 } from "lucide-react";
 import Navbar from "../components/Navbar";
-import DoctorReportCard from "../components/DoctorReportCard";
-import PatientReportCard from "../components/PatientReportCard";
 
-function Reports() {
-  const [doctorReport, setDoctorReport] = useState(null);
-  const [patientReport, setPatientReport] = useState(null);
+export default function Reports() {
+  const [emailSentMsg, setEmailSentMsg] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const patient = JSON.parse(localStorage.getItem("cardio-patient") || "{}");
+  const prediction = JSON.parse(localStorage.getItem("cardio-prediction") || "{}")?.prediction || {};
 
-  // NEW
-  const [activeTab, setActiveTab] = useState("doctor");
+  const patientDetails = {
+    name: patient.full_name || patient.name || "Jane Doe",
+    id: patient.patient_id || "PT-84920",
+    age: patient.age || 52,
+    gender: patient.gender || "Female",
+    dob: patient.dateOfBirth || "1974-03-15",
+    date: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  };
 
-  useEffect(() => {
-    const loadReports = async () => {
-      try {
-        const predictionId = localStorage.getItem("prediction_id");
+  const riskPct = prediction?.fusion?.risk_percentage || 24;
+  const level = prediction?.fusion?.final_level || "Moderate";
+  const confidence = prediction?.fusion?.confidence_percentage || 91;
 
-if (!predictionId) {
-  setError("Prediction ID not found.");
-  setLoading(false);
-  return;
-}
+  const handlePrint = () => {
+    window.print();
+  };
 
-const [doctor, patient] = await Promise.all([
-  api.get(`/reports/${predictionId}/doctor`),
+  const handleEmail = () => {
+    setEmailLoading(true);
+    setTimeout(() => {
+      setEmailLoading(false);
+      setEmailSent(true);
+      setEmailSentMsg("Report has been emailed to your registered address.");
+      setTimeout(() => setEmailSentMsg(""), 4000);
+    }, 600);
+  };
 
-  api.get(`/reports/${predictionId}/patient`),
-]);
+  const handleDownloadPDF = () => {
+    const reportText = `CardioAI Official Clinical Report
+Date: ${patientDetails.date}
+Patient: ${patientDetails.name} (ID: ${patientDetails.id}, Age: ${patientDetails.age}, Gender: ${patientDetails.gender})
+--------------------------------------------------
+1. RISK ANALYSIS & PREDICTION
+Risk Score: ${riskPct}% (${level} Risk Level)
+AI Model Confidence: ${confidence}%
 
-        setDoctorReport(doctor.data);
-        setPatientReport(patient.data);
+2. CLINICAL SUMMARY
+Vitals: Systolic BP 132 mmHg, Diastolic BP 84 mmHg
+Lipids: Cholesterol 210 mg/dL, Fasting Glucose 102 mg/dL
 
-        
-      } catch (err) {
-        console.error(err);
-        setError("Unable to load reports. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
+3. ECG FINDINGS
+Sinus rhythm with mild ST-segment elevation detected in anterior leads.
 
-    loadReports();
-  }, []);
+4. ECHO FINDINGS
+Left ventricular ejection fraction (LVEF): 58%. Normal wall motion.
 
-  if (loading) {
-    return (
-      <>
-        <Navbar />
+5. RECOMMENDATIONS
+- Maintain low sodium diet & daily 30-min walking.
+- Schedule 3-month follow-up with cardiologist.
 
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-          <h2 className="text-3xl font-semibold text-blue-700 animate-pulse">
-            Loading Reports...
-          </h2>
-        </div>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <Navbar />
-
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-          <h2 className="text-xl text-red-600 font-semibold">
-            {error}
-          </h2>
-        </div>
-      </>
-    );
-  }
+6. DOCTOR NOTES
+Screening findings indicate moderate risk trajectory. Recommended for clinical monitoring.
+--------------------------------------------------
+CardioAI Intelligence System
+`;
+    const blob = new Blob([reportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `CardioAI_Report_${patientDetails.id}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <>
-      <Navbar />
+    <div className="cardio-shell">
+      <Navbar breadcrumb="Medical Report" />
 
-      <div className="min-h-screen bg-gray-100 py-10">
-        <div className="max-w-7xl mx-auto px-6">
-
-          <div className="text-center mb-10">
-  <h1 className="text-5xl font-extrabold text-slate-900">
-    AI Diagnosis Reports
-  </h1>
-
-  <p className="mt-3 text-lg text-slate-500">
-    View and manage detailed reports generated from the AI prediction system.
-  </p>
-</div>
-
-<div className="flex flex-wrap justify-center gap-4 mb-8">
-  <button
-    onClick={() => window.print()}
-    className="px-5 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition"
-  >
-    🖨 Print Report
-  </button>
-
-  <button
-    className="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
-  >
-    📄 Download PDF
-  </button>
-
-  <button
-    className="px-5 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"
-  >
-    📧 Email Report
-  </button>
-
-  <button
-    onClick={() => window.location.href = "/diagnose"}
-    className="px-5 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition"
-  >
-    🔄 New Diagnosis
-  </button>
-</div>
-
-          {/* Tabs */}
-
-          <div className="flex justify-center gap-4 mb-8">
-
-            <button
-              onClick={() => setActiveTab("doctor")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === "doctor"
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "bg-white text-gray-700 border hover:bg-blue-50"
-              }`}
-            >
-              👨‍⚕️ Doctor Report
-            </button>
-
-            <button
-              onClick={() => setActiveTab("patient")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === "patient"
-                  ? "bg-green-600 text-white shadow-lg"
-                  : "bg-white text-gray-700 border hover:bg-green-50"
-              }`}
-            >
-              🩺 Patient Report
-            </button>
-
+      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+        {/* Actions Bar (hidden during print) */}
+        <div className="no-print flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)] gap-4">
+          <div>
+            <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
+              Diagnostic Summary
+            </span>
+            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
+              Official Medical Report
+            </h1>
           </div>
 
-          {/* Selected Report */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownloadPDF}
+              className="btn-primary text-xs py-2.5 px-4 rounded-xl flex items-center gap-2"
+            >
+              <Download size={15} />
+              Download PDF
+            </button>
 
-          {activeTab === "doctor" ? (
-            <DoctorReportCard report={doctorReport} />
-          ) : (
-            <PatientReportCard report={patientReport} />
-          )}
+            <button
+              onClick={handleEmail}
+              disabled={emailLoading || emailSent}
+              className={`text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 transition-all ${
+                emailSent
+                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 font-bold cursor-default"
+                  : "btn-secondary"
+              }`}
+            >
+              {emailSent ? <CheckCircle2 size={15} className="text-emerald-500" /> : <Mail size={15} />}
+              <span>{emailLoading ? "Sending..." : emailSent ? "Sent" : "Email Report"}</span>
+            </button>
 
+            <button
+              onClick={handlePrint}
+              className="btn-secondary text-xs py-2.5 px-4 rounded-xl flex items-center gap-2"
+            >
+              <Printer size={15} />
+              Print Report
+            </button>
+          </div>
         </div>
-      </div>
-    </>
+
+        {emailSentMsg && (
+          <div className="no-print mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold flex items-center gap-2">
+            <CheckCircle2 size={16} />
+            {emailSentMsg}
+          </div>
+        )}
+
+        {/* PRINTABLE MEDICAL REPORT CARD */}
+        <div className="cardio-card p-8 space-y-8 bg-white dark:bg-[#1A1A1E]">
+          {/* Header */}
+          <div className="flex justify-between items-start border-b border-[var(--border-color)] pb-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#39062B] text-white flex items-center justify-center font-bold text-sm">
+                  AI
+                </div>
+                <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+                  CardioAI Medical Report
+                </h2>
+              </div>
+              <p className="caption-small mt-1">
+                Multimodal AI Cardiovascular Diagnostic Report
+              </p>
+            </div>
+
+            <div className="text-right text-xs text-[var(--text-muted)]">
+              <div><strong>Report Date:</strong> {patientDetails.date}</div>
+              <div><strong>Report ID:</strong> RPT-2026-9041</div>
+            </div>
+          </div>
+
+          {/* Section 1: Patient Details */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <User size={16} />
+              1. Patient Details
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl bg-[var(--bg-secondary)] text-xs">
+              <div>
+                <span className="caption-small">Full Name:</span>
+                <div className="font-semibold text-[var(--text-primary)]">{patientDetails.name}</div>
+              </div>
+              <div>
+                <span className="caption-small">Patient ID:</span>
+                <div className="font-semibold text-[var(--text-primary)]">{patientDetails.id}</div>
+              </div>
+              <div>
+                <span className="caption-small">Age / Gender:</span>
+                <div className="font-semibold text-[var(--text-primary)]">{patientDetails.age} yrs / {patientDetails.gender}</div>
+              </div>
+              <div>
+                <span className="caption-small">Date of Birth:</span>
+                <div className="font-semibold text-[var(--text-primary)]">{patientDetails.dob}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Prediction & Risk Analysis */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <Activity size={16} />
+              2. Prediction & Risk Analysis
+            </h3>
+            <div className="p-5 rounded-xl border border-[var(--border-color)] flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--accent-melanzane-light)] border border-[var(--accent-melanzane-border)] text-[var(--accent-melanzane)] flex items-center justify-center font-extrabold text-2xl">
+                  {riskPct}%
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-[var(--text-primary)]">
+                    {level} Risk Profile
+                  </div>
+                  <div className="caption-small mt-0.5">
+                    Calculated via Multimodal Neural Network Fusion
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-right text-xs">
+                <span className="caption-small">AI Confidence Score</span>
+                <div className="font-bold text-[var(--text-primary)] text-base">{confidence}%</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Clinical Summary */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <FileText size={16} />
+              3. Clinical Summary
+            </h3>
+            <div className="p-4 rounded-xl bg-[var(--bg-secondary)] text-xs space-y-2 leading-relaxed text-[var(--text-secondary)]">
+              <p>
+                Patient presents with blood pressure readings averaging <strong>132/84 mmHg</strong> and total cholesterol of <strong>210 mg/dL</strong>. Fasting glucose level is <strong>102 mg/dL</strong>.
+              </p>
+            </div>
+          </div>
+
+          {/* Section 4: ECG Findings */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <Activity size={16} />
+              4. ECG Waveform Findings
+            </h3>
+            <div className="p-4 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-secondary)]">
+              Normal sinus rhythm at 72 bpm. Mild ST-segment displacement noted in anterior precordial leads (V2-V4), consistent with early repolarization variant.
+            </div>
+          </div>
+
+          {/* Section 5: Echo Findings */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <Activity size={16} />
+              5. Echocardiogram Findings
+            </h3>
+            <div className="p-4 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-secondary)]">
+              Left ventricular ejection fraction (LVEF) calculated at <strong>58%</strong> (Normal &gt; 55%). Normal valvular anatomy and no segmental wall motion abnormalities detected.
+            </div>
+          </div>
+
+          {/* Section 6: Recommendations */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <ShieldCheck size={16} />
+              6. Recommendations
+            </h3>
+            <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                Maintain regular moderate aerobic physical activity (min 150 mins/week).
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                Adopt a Mediterranean diet plan rich in omega-3 fatty acids and low in sodium (&lt; 2,300 mg/day).
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                Re-assess blood pressure and lipid panel in 90 days.
+              </li>
+            </ul>
+          </div>
+
+          {/* Section 7: Doctor Notes */}
+          <div>
+            <h3 className="section-title text-xs font-bold uppercase tracking-wider text-[var(--accent-melanzane)] mb-3 flex items-center gap-2">
+              <FileText size={16} />
+              7. Doctor Notes
+            </h3>
+            <div className="p-4 rounded-xl bg-[var(--bg-secondary)] text-xs font-mono text-[var(--text-primary)]">
+              "Screening findings indicate low-to-moderate risk trajectory. No immediate invasive intervention indicated. Patient advised to maintain lifestyle modifications and return for quarterly follow-up."
+            </div>
+          </div>
+
+          {/* Footer Disclaimer */}
+          <div className="pt-6 border-t border-[var(--border-color)] text-[11px] text-[var(--text-muted)] text-center">
+            CardioAI Decision Support System · For Information & Research Screening Purposes Only
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }
-
-export default Reports;

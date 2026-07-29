@@ -1,105 +1,136 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Activity } from "lucide-react";
+import { Activity, ArrowLeft, Sun, Moon } from "lucide-react";
 
-function Navbar() {
+export default function Navbar({ onBack, backLabel, breadcrumb }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const scrollToSection = (sectionId) => {
-    // If already on the landing page
-    if (location.pathname === "/") {
-      const section = document.getElementById(sectionId);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("cardio-theme") || "light";
+  });
 
-      if (section) {
-        section.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("cardio-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const handleBack = () => {
+    const path = location.pathname;
+    let parentRoute = null;
+
+    if (path === "/patient/digital-twin/report") {
+      parentRoute = "/patient/digital-twin";
+    } else if (path.startsWith("/patient/") && path !== "/patient/dashboard") {
+      parentRoute = "/patient/dashboard";
+    } else if (
+      path.startsWith("/doctor/") &&
+      !["/doctor/dashboard", "/doctor/login", "/doctor/register"].includes(path)
+    ) {
+      parentRoute = "/doctor/dashboard";
+    } else if (["/digital-twin", "/reports", "/appointments"].includes(path)) {
+      parentRoute = localStorage.getItem("access_token") ? "/patient/dashboard" : "/";
+    }
+
+    if (onBack) {
+      onBack();
+      if (parentRoute && path !== parentRoute) {
+        navigate(parentRoute);
       }
-    } else {
-      // Navigate to home first, then scroll
+      return;
+    }
+
+    if (parentRoute) {
+      navigate(parentRoute);
+    } else if (path !== "/") {
       navigate("/");
-
-      setTimeout(() => {
-        const section = document.getElementById(sectionId);
-
-        if (section) {
-          section.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, 200);
     }
   };
 
+  const isHome = location.pathname === "/" || location.pathname === "";
+  const isAuthOrDashboard = [
+    "/patient/login",
+    "/patient/signup",
+    "/patient/register",
+    "/patient/dashboard",
+    "/doctor/login",
+    "/doctor/register",
+    "/doctor/dashboard",
+  ].includes(location.pathname);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-sm">
+    <header className="sticky top-0 z-50 bg-[var(--card-bg)]/90 backdrop-blur-md border-b border-[var(--border-color)] transition-colors duration-200">
+      <div className="cardio-container flex items-center justify-between gap-3 py-2.5">
+        
+        {/* Left Section: Back Button + Brand Logo + Breadcrumbs */}
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          {!isHome && (
+            <button
+              onClick={handleBack}
+              className="btn-secondary px-3 py-1.5 text-xs font-medium rounded-lg flex items-center gap-1.5 shrink-0"
+              title="Go back"
+            >
+              <ArrowLeft size={14} />
+              <span className="hidden sm:inline">{backLabel || "Back"}</span>
+            </button>
+          )}
 
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-4">
+          <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-[#39062B] text-white flex items-center justify-center shadow transition-all group-hover:shadow-md group-hover:scale-105">
+              <Activity size={17} className="text-white" />
+            </div>
 
-        {/* Logo */}
+            <div className="flex flex-col leading-none">
+              <span className="text-sm font-bold tracking-tight text-[var(--text-primary)] font-display" style={{ fontFamily: "var(--font-display, 'Plus Jakarta Sans', sans-serif)" }}>
+                CardioAI
+              </span>
+              <span className="text-[10px] text-[var(--text-muted)] font-medium hidden sm:block">
+                Heart Intelligence Platform
+              </span>
+            </div>
+          </Link>
 
-        <Link
-          to="/"
-          className="flex items-center gap-3 group"
-        >
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg transition">
-            <Activity
-              size={22}
-              className="text-white"
-            />
-          </div>
+          {breadcrumb && !isAuthOrDashboard && (
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-muted)] ml-2 pl-3 border-l border-[var(--border-color)]">
+              <span className="opacity-50">/</span>
+              <span className="font-medium text-[var(--text-secondary)]">{breadcrumb}</span>
+            </div>
+          )}
+        </div>
 
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-              CardioAI
-            </h1>
+        {/* Right Section */}
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-medium text-[var(--text-secondary)]">
+            <Link
+              to="/"
+              className={`transition-colors hover:text-[var(--accent-melanzane)] ${
+                isHome ? "text-[var(--accent-melanzane)] font-semibold" : ""
+              }`}
+            >
+              Home
+            </Link>
+          </nav>
 
-            <p className="text-xs text-slate-500">
-              Cardiovascular assessment workspace
-            </p>
-          </div>
-        </Link>
-
-        {/* Center Navigation */}
-
-        <nav className="hidden lg:flex items-center gap-10">
-
+          {/* Theme Toggle Button */}
           <button
-            onClick={() => navigate("/")}
-            className="relative font-semibold text-slate-700 hover:text-blue-600 transition"
+            onClick={toggleTheme}
+            className="w-8 h-8 rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-melanzane-border)] transition-all flex items-center justify-center"
+            title={`Switch to ${theme === "light" ? "Dark" : "Light"} mode`}
+            aria-label="Toggle theme"
           >
-            Home
+            {theme === "light" ? (
+              <Moon size={15} className="text-[var(--text-secondary)]" />
+            ) : (
+              <Sun size={15} className="text-amber-400" />
+            )}
           </button>
-
-          <button
-            onClick={() => scrollToSection("workflow")}
-            className="relative font-semibold text-slate-700 hover:text-blue-600 transition"
-          >
-            Workflow
-          </button>
-
-          <button
-            onClick={() => scrollToSection("features")}
-            className="relative font-semibold text-slate-700 hover:text-blue-600 transition"
-          >
-            Capabilities
-          </button>
-
-          <button
-            onClick={() => scrollToSection("about")}
-            className="relative font-semibold text-slate-700 hover:text-blue-600 transition"
-          >
-            About
-          </button>
-
-        </nav>
-
+        </div>
       </div>
-
     </header>
   );
 }
 
-export default Navbar;

@@ -16,14 +16,13 @@ function Dashboard() {
   const patientEmail = localStorage.getItem("patient_email");
 
   return (
-    <>
+    <div className="cardio-shell">
       <Navbar />
 
-      <div className="relative min-h-screen overflow-hidden py-10 px-6">
-
+      <main className="cardio-container py-8 flex-1 w-full relative overflow-hidden">
         <PageBackground />
 
-        <div className="relative z-10 max-w-6xl mx-auto">
+        <div className="relative z-10 w-full">
 
           {/* ================= Welcome Card ================= */}
 
@@ -293,8 +292,8 @@ function Dashboard() {
 
         </div>
 
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
 

@@ -74,6 +74,35 @@ def book_appointment_as_patient(
 
 
 # ------------------------------------------------------------------
+# Patient — My appointments (patient JWT)
+# ------------------------------------------------------------------
+
+@router.get(
+    "/my",
+    summary="Patient's own appointments",
+    description="Returns all appointments for the authenticated patient with doctor and status details.",
+    response_model=list[AppointmentRichResponse],
+)
+def get_my_appointments(
+    current_patient=Depends(get_current_patient),
+    db: Session = Depends(get_db),
+):
+    service = AppointmentService(db)
+    appointments = service.get_patient_appointments(current_patient.id)
+    out = []
+    for a in appointments:
+        d = AppointmentResponse.model_validate(a).model_dump()
+        if a.doctor:
+            d["doctor_name"] = a.doctor.full_name
+            d["doctor_specialization"] = a.doctor.specialization
+            d["doctor_hospital"] = a.doctor.hospital
+        else:
+            d["doctor_name"] = d["doctor_specialization"] = d["doctor_hospital"] = ""
+        out.append(d)
+    return out
+
+
+# ------------------------------------------------------------------
 # Doctor — My pending / approved appointments (rich with patient info)
 # ------------------------------------------------------------------
 

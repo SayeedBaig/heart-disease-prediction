@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FileText, Activity, ShieldCheck, ArrowRight } from "lucide-react";
+import Navbar from "../components/Navbar";
 import api from "../services/api";
+import { emailPatientReport, getPatientReport, viewPatientReportPdf } from "../services/portalService";
 
 function PatientReports() {
   const navigate = useNavigate();
-  const patient = JSON.parse(localStorage.getItem("patient") || "{}");
+  const patient = JSON.parse(localStorage.getItem("cardio-patient") || "{}");
   const [loading, setLoading] = useState(Boolean(patient.patient_id));
   const [error, setError] = useState("");
   const [reports, setReports] = useState([]);
+  const [mailingReportId, setMailingReportId] = useState(null);
+  const [mailStatus, setMailStatus] = useState("");
+  const [summarizingReportId, setSummarizingReportId] = useState(null);
+  const [reportSummary, setReportSummary] = useState("");
 
   useEffect(() => {
     if (!patient.patient_id) {
@@ -40,136 +47,182 @@ function PatientReports() {
     : "Please sign in to view your reports.";
 
   return (
-    <div className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="cardio-shell">
+      <Navbar breadcrumb="Health Reports" />
 
+      <main className="cardio-container py-8 flex-1 w-full max-w-6xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800">
-            My Health Reports
-          </h1>
-          <p className="text-slate-500 mt-2">
-            View all your heart disease prediction reports.
-          </p>
-        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)] gap-4">
+          <div>
+            <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
+              Diagnostic History
+            </span>
+            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
+              My Health Reports
+            </h1>
+            <p className="body-regular text-xs mt-1">
+              View all your heart disease prediction and screening records.
+            </p>
+          </div>
 
-        {/* Summary Card */}
-        <div className="bg-white rounded-xl shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-slate-700">
-            Total Reports
-          </h2>
-
-          <p className="text-4xl font-bold text-blue-600 mt-2">
-            {reports.length}
-          </p>
+          <div className="cardio-card p-4 flex items-center gap-3 shrink-0 rounded-xl">
+            <div className="w-10 h-10 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center font-bold">
+              <FileText size={20} />
+            </div>
+            <div>
+              <span className="caption-small uppercase text-[10px] font-bold block">Total Reports</span>
+              <span className="text-lg font-bold text-[var(--text-primary)]">{reports.length}</span>
+            </div>
+          </div>
         </div>
 
         {/* Loading */}
         {loading && (
-          <div className="bg-white rounded-xl shadow p-8 text-center">
-            <p className="text-gray-500">Loading reports...</p>
+          <div className="cardio-card p-12 text-center text-xs text-[var(--text-muted)]">
+            Loading reports...
           </div>
         )}
 
         {/* Error */}
         {!loading && displayError && (
-          <div className="bg-red-100 border border-red-300 text-red-600 rounded-xl p-4 mb-6">
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold mb-6">
             {displayError}
           </div>
         )}
 
         {/* Empty State */}
         {!loading && !displayError && reports.length === 0 && (
-          <div className="bg-white rounded-xl shadow p-12 text-center">
-            <h2 className="text-xl font-semibold text-slate-700">
+          <div className="cardio-card p-12 text-center space-y-3 max-w-lg mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mx-auto">
+              <Activity size={24} />
+            </div>
+            <h2 className="section-title text-base text-[var(--text-primary)]">
               No Reports Available
             </h2>
-
-            <p className="text-slate-500 mt-2">
-              Your prediction reports will appear here after your doctor completes a diagnosis.
+            <p className="body-regular text-xs">
+              Your prediction reports will appear here after an assessment or diagnosis.
             </p>
           </div>
         )}
 
         {/* Reports Table */}
         {!loading && !displayError && reports.length > 0 && (
-          <div className="bg-white rounded-xl shadow overflow-hidden">
-
-            <table className="min-w-full">
-
-              <thead className="bg-slate-200">
-
-                <tr>
-                  <th className="px-6 py-4 text-left">Date</th>
-                  <th className="px-6 py-4 text-left">Risk</th>
-                  <th className="px-6 py-4 text-left">Risk %</th>
-                  <th className="px-6 py-4 text-left">Clinical</th>
-                  <th className="px-6 py-4 text-left">ECG</th>
-                  <th className="px-6 py-4 text-left">Echo</th>
-                  <th className="px-6 py-4 text-center">Action</th>
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {reports.map((report) => (
-
-                  <tr
-                    key={report.prediction_id}
-                    className="border-t hover:bg-slate-50"
-                  >
-
-                    <td className="px-6 py-4">
-                      {new Date(report.created_at).toLocaleDateString()}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {report.risk_level}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {report.risk_percentage}%
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {report.clinical_level}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {report.ecg_level}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {report.echo_level}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => {
-                          localStorage.setItem(
-                            "prediction_id", String(report.prediction_id)
-                          );
-                          navigate("/reports");
-                        }}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                      >
-                        View
-                      </button>
-                    </td>
-
+          <div className="cardio-card p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-[var(--bg-secondary)] border-b border-[var(--border-color)] text-[var(--text-muted)] uppercase font-semibold">
+                    <th className="p-4">Date</th>
+                    <th className="p-4">Risk Level</th>
+                    <th className="p-4">Risk %</th>
+                    <th className="p-4">Clinical</th>
+                    <th className="p-4">ECG</th>
+                    <th className="p-4">Echo</th>
+                    <th className="p-4 text-center">Action</th>
                   </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
+                </thead>
+                <tbody className="divide-y divide-[var(--border-color)]">
+                  {reports.map((report) => (
+                    <tr
+                      key={report.prediction_id}
+                      className="hover:bg-[var(--card-hover)] transition-colors"
+                    >
+                      <td className="p-4 font-semibold text-[var(--text-primary)]">
+                        {new Date(report.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          report.risk_level === "Low" ? "bg-emerald-500/10 text-emerald-500" :
+                          report.risk_level === "Moderate" ? "bg-amber-500/10 text-amber-500" :
+                          "bg-red-500/10 text-red-500"
+                        }`}>
+                          {report.risk_level || "Unknown"}
+                        </span>
+                      </td>
+                      <td className="p-4 font-bold text-[var(--text-primary)]">
+                        {report.risk_percentage}%
+                      </td>
+                      <td className="p-4 text-[var(--text-secondary)]">
+                        {report.clinical_level || "—"}
+                      </td>
+                      <td className="p-4 text-[var(--text-secondary)]">
+                        {report.ecg_level || "—"}
+                      </td>
+                      <td className="p-4 text-[var(--text-secondary)]">
+                        {report.echo_level || "—"}
+                      </td>
+                      <td className="p-4 text-center">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => viewPatientReportPdf(report.prediction_id).catch((requestError) => {
+                              setError(requestError.response?.data?.detail || "Unable to open this report.");
+                            })}
+                            className="btn-primary text-xs py-1.5 px-3 rounded-lg"
+                          >
+                            View
+                          </button>
+                          <button
+                            disabled={mailingReportId === report.prediction_id}
+                            onClick={async () => {
+                              setMailStatus("");
+                              setError("");
+                              setMailingReportId(report.prediction_id);
+                              try {
+                                await emailPatientReport(report.prediction_id);
+                                setMailStatus("Report sent to your registered email address.");
+                              } catch (requestError) {
+                                setError(requestError.response?.data?.detail || "Unable to email this report.");
+                              } finally {
+                                setMailingReportId(null);
+                              }
+                            }}
+                            className="btn-secondary text-xs py-1.5 px-3 rounded-lg disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {mailingReportId === report.prediction_id ? "Sending..." : "Mail"}
+                          </button>
+                          <button
+                            disabled={summarizingReportId === report.prediction_id}
+                            onClick={async () => {
+                              setReportSummary("");
+                              setError("");
+                              setSummarizingReportId(report.prediction_id);
+                              try {
+                                const reportData = await getPatientReport(report.prediction_id);
+                                const summary = reportData.summary || reportData.details || "No written summary is available for this report yet.";
+                                setReportSummary(summary);
+                              } catch (requestError) {
+                                setError(requestError.response?.data?.detail || "Unable to summarize this report.");
+                              } finally {
+                                setSummarizingReportId(null);
+                              }
+                            }}
+                            className="btn-secondary text-xs py-1.5 px-3 rounded-lg disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {summarizingReportId === report.prediction_id ? "Loading..." : "Summarize"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
-      </div>
+        {mailStatus && (
+          <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-600">
+            {mailStatus}
+          </div>
+        )}
+
+        {reportSummary && (
+          <div className="mt-5 rounded-xl border border-[var(--accent-melanzane-border)] bg-[var(--accent-melanzane-light)] p-5 text-sm text-[var(--text-secondary)]">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--accent-melanzane)]">Report Summary</div>
+            <p className="leading-6">{reportSummary}</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
