@@ -51,7 +51,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
 
-  const endpoint = mode === "doctor" ? "/rag/doctor/ask" : "/rag/patient/ask";
+  const endpoint = "/rag/ask"; // single endpoint handles both modes
   const headerTitle = mode === "doctor" ? "Clinical AI Assistant" : "AI Health Assistant";
 
   useEffect(() => {
@@ -73,20 +73,16 @@ export default function ChatbotWidget({ mode = "patient" }) {
     // for conversation memory; doctor mode sends the case context fields
     // the backend's history_context_builder.py expects.
     const context = getPredictionContext();
-    const body =
-      mode === "doctor"
-        ? {
-            question,
-            risk_level: context.risk_level,
-            ecg_class: context.ecg_class,
-            ef_value: context.ef_value,
-          }
-        : {
-            question,
-            session_id: getPatientSessionId(),
-            risk_level: context.risk_level,
-            risk_percentage: context.risk_percentage,
-          };
+    // /rag/ask accepts: { question, context?: { risk_level, risk_percentage, ecg_class, ef_value } }
+    const body = {
+      question,
+      context: {
+        risk_level: context.risk_level || null,
+        risk_percentage: context.risk_percentage || null,
+        ecg_class: context.ecg_class || null,
+        ef_value: context.ef_value || null,
+      },
+    };
 
     try {
       const token = getAuthToken(mode);
