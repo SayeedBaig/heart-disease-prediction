@@ -7,6 +7,7 @@ import Header from "../components/dashboard/Header";
 import StatCard from "../components/dashboard/StatCard";
 import QuickActionCard from "../components/dashboard/QuickActionCard";
 import RecentActivity from "../components/dashboard/RecentActivity";
+import ChatbotWidget from "../components/ChatbotWidget";
 
 import {
   Users,
@@ -255,6 +256,7 @@ useEffect(() => {
       </div>
 
     </div>
+    <ChatbotWidget mode="doctor" />
   );
 }
 

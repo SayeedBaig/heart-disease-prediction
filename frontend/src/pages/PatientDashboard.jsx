@@ -8,6 +8,7 @@ import {
   User,
   Activity,
 } from "lucide-react";
+import ChatbotWidget from "../components/ChatbotWidget";
 
 function PatientDashboard() {
   const navigate = useNavigate();
@@ -175,6 +176,7 @@ function PatientDashboard() {
       </div>
 
     </div>
+    <ChatbotWidget mode="patient" />
   );
 }
 
