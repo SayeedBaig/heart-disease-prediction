@@ -84,21 +84,21 @@ function PatientRegister() {
   };
 
   return (
-    <>
-      <div className="flex min-h-screen bg-slate-100">
+    <div className="cardio-shell">
+      <div className="flex min-h-screen">
         <Sidebar />
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <Header />
 
-          <main className="p-10">
-            <div className="max-w-5xl mx-auto">
+          <main className="p-6 md:p-10 flex-1 w-full max-w-6xl mx-auto">
+            <div className="w-full">
               <div className="mb-8">
-                <h1 className="text-4xl font-bold text-slate-800">
+                <h1 className="h2-semibold text-[var(--text-primary)]">
                   Register New Patient
                 </h1>
 
-                <p className="mt-2 text-slate-500">
+                <p className="body-regular text-xs mt-1">
                   Register the patient before starting AI diagnosis.
                 </p>
               </div>

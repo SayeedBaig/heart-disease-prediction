@@ -2,7 +2,7 @@ const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 /* ── Shared fetch helper (always sends doctor_token, no interceptor) ── */
 async function doctorFetch(path, { method = "GET", body, responseType } = {}) {
-  const token = localStorage.getItem("doctor_token");
+  const token = localStorage.getItem("doctor_token") || localStorage.getItem("doctor_access_token") || localStorage.getItem("access_token");
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
@@ -88,17 +88,42 @@ export async function rejectAppointment(appointmentId) {
 /* ── Patients ────────────────────────────────────────────────────── */
 
 export async function getAllPatients() {
-  return doctorFetch("/patients/");
+  const result = await doctorFetch("/doctor/patients?page_size=100");
+  return result.items;
+}
+
+export async function getDoctorPatientDetails(patientId) {
+  return doctorFetch(`/doctor/patients/${patientId}`);
 }
 
 export async function getPatientPredictions(patientId) {
   return doctorFetch(`/patients/${patientId}/predictions`);
 }
 
+// The patient list is derived from approved appointments, while this endpoint
+// returns the complete registration profile for the read-only detail view.
+export async function getPatientRecord(patientId) {
+  return doctorFetch(`/patients/${patientId}`);
+}
+
 /* ── Reports ─────────────────────────────────────────────────────── */
 
 export async function getDoctorReport(predictionId) {
-  return doctorFetch(`/reports/${predictionId}/doctor`);
+  const report = await doctorFetch(`/reports/${predictionId}/doctor`);
+  return {
+    ...report,
+    prediction: report.prediction ?? {
+      risk_level: report.final_prediction?.final_level,
+      risk_percentage: report.final_prediction?.risk_percentage,
+      clinical_level: report.clinical_analysis?.level,
+      ecg_level: report.ecg_analysis?.level,
+      echo_level: report.echo_analysis?.level,
+    },
+    clinical: report.clinical ?? {
+      ...report.clinical_analysis,
+      reason: report.ai_recommendation?.explanation || report.medical_explanation?.summary,
+    },
+  };
 }
 
 export async function downloadDoctorReport(predictionId) {
@@ -109,4 +134,22 @@ export async function downloadDoctorReport(predictionId) {
   a.download = `cardio-doctor-report-${predictionId}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+export async function viewDoctorReportPdf(predictionId) {
+  const previewWindow = window.open("", "_blank");
+  try {
+    const blob = await doctorFetch(`/reports/${predictionId}/doctor/pdf`, { responseType: "blob" });
+    const url = URL.createObjectURL(blob);
+    if (previewWindow) previewWindow.location.href = url;
+    else window.open(url, "_blank");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (error) {
+    previewWindow?.close();
+    throw error;
+  }
+}
+
+export async function emailDoctorReport(predictionId) {
+  return doctorFetch(`/reports/${predictionId}/doctor/email`, { method: "POST" });
 }

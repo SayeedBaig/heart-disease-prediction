@@ -1,46 +1,133 @@
 import { useNavigate } from "react-router-dom";
-import { Stethoscope, UserRound } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Stethoscope,
+  HeartPulse,
+  LogIn,
+  UserPlus,
+  ArrowRight,
+  Activity,
+} from "lucide-react";
+import Navbar from "../components/Navbar";
 
-function RoleSelection() {
+export default function RoleSelection() {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-cyan-100 flex items-center justify-center p-6">
-      <section className="w-full max-w-3xl rounded-3xl bg-white p-10 shadow-2xl">
-        <p className="text-center font-semibold text-blue-600">CardioAI</p>
-        <h1 className="mt-2 text-center text-4xl font-bold text-slate-900">
-          Continue to sign in or register
-        </h1>
-        <p className="mt-3 text-center text-slate-500">
-          Choose the portal you want to access.
-        </p>
+    <div className="cardio-shell">
+      <Navbar breadcrumb="Portal Selection" />
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <button
-            onClick={() => navigate("/doctor/login")}
-            className="rounded-2xl border border-blue-200 bg-blue-50 p-8 text-left transition hover:border-blue-500"
-          >
-            <Stethoscope className="text-blue-600" size={40} />
-            <h2 className="mt-5 text-2xl font-bold text-slate-900">Doctor Portal</h2>
-            <p className="mt-2 text-slate-600">
-              Manage patients, appointments, diagnoses, reports, and history.
-            </p>
-          </button>
+      <main className="flex-1 cardio-container flex flex-col justify-center items-center py-10 my-auto w-full">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-3xl mx-auto mb-10"
+        >
 
-          <button
-            onClick={() => navigate("/patient/login")}
-            className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-left transition hover:border-emerald-500"
+
+          <h1 className="h1-large text-[var(--text-primary)] tracking-tight mb-3">
+            Select Your Portal
+          </h1>
+
+          <p className="body-regular text-sm md:text-base text-[var(--text-secondary)] leading-relaxed">
+            Welcome to CardioAI. Choose your workspace below to sign in or register for a new account.
+          </p>
+        </motion.div>
+
+        {/* Portal Cards Grid - Significantly Wider (80-90% width) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl">
+          {/* Doctor Portal Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="cardio-card p-8 flex flex-col justify-between hover:border-[var(--accent-melanzane-border)] transition-all duration-300 shadow-md hover:shadow-xl rounded-2xl group"
           >
-            <UserRound className="text-emerald-600" size={40} />
-            <h2 className="mt-5 text-2xl font-bold text-slate-900">Patient Portal</h2>
-            <p className="mt-2 text-slate-600">
-              Track appointments, reports, health insights, and your profile.
-            </p>
-          </button>
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center transition-transform group-hover:scale-105">
+                  <Stethoscope size={28} />
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--accent-melanzane)] transition-colors">
+                Doctor Portal
+              </h2>
+
+              <p className="body-regular text-xs md:text-sm mb-8 leading-relaxed">
+                Comprehensive workspace for medical practitioners to manage patient cohorts, analyze ECG/Echo diagnostics, and issue signed clinical assessments.
+              </p>
+            </div>
+
+            {/* Doctor Actions */}
+            <div className="space-y-3 pt-4 border-t border-[var(--border-color)]">
+              <button
+                onClick={() => navigate("/doctor/login")}
+                className="btn-primary w-full py-3.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <LogIn size={18} />
+                Doctor Login
+              </button>
+
+              <button
+                onClick={() => navigate("/doctor/register")}
+                className="btn-secondary w-full py-3.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all"
+              >
+                <UserPlus size={18} />
+                Doctor Sign Up
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Patient Portal Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="cardio-card p-8 flex flex-col justify-between hover:border-[var(--accent-melanzane-border)] transition-all duration-300 shadow-md hover:shadow-xl rounded-2xl group"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center transition-transform group-hover:scale-105">
+                  <HeartPulse size={28} />
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--accent-melanzane)] transition-colors">
+                Patient Portal
+              </h2>
+
+              <p className="body-regular text-xs md:text-sm mb-8 leading-relaxed">
+                Personalized cardiovascular health suite to evaluate heart disease risk, explore Digital Twin simulations, view reports, and book doctor consultations.
+              </p>
+            </div>
+
+            {/* Patient Actions */}
+            <div className="space-y-3 pt-4 border-t border-[var(--border-color)]">
+              <button
+                onClick={() => navigate("/patient/login")}
+                className="btn-primary w-full py-3.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+              >
+                <LogIn size={18} />
+                Patient Login
+              </button>
+
+              <button
+                onClick={() => navigate("/patient/signup")}
+                className="btn-secondary w-full py-3.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all"
+              >
+                <UserPlus size={18} />
+                Patient Sign Up
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </section>
-    </main>
+
+
+      </main>
+    </div>
   );
 }
 
-export default RoleSelection;

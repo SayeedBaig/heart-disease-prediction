@@ -1,5 +1,15 @@
 import api from "./api";
 
+const patientSessionKeys = [
+  "access_token", "patient", "cardio-patient", "cardio-prediction", "prediction_id",
+  "cardio-data", "cardio-digital-twin", "cardio-digital-twin-report",
+  "patient_id", "patient_name", "patient_email",
+];
+
+export function clearPatientSession() {
+  patientSessionKeys.forEach((key) => localStorage.removeItem(key));
+}
+
 const numberOr = (v) => v === "" || v === null || v === undefined ? null : Number(v);
 
 function clinicalPayload(data, patient, paths) {
@@ -34,6 +44,7 @@ export async function createPatientAccount(account) {
 }
 
 export async function loginPatient(email, password) {
+  clearPatientSession();
   const { data } = await api.post("/patients/login", { email, password });
   localStorage.setItem("access_token", data.access_token);
   const profile = await api.get("/patients/me");
@@ -60,6 +71,11 @@ export async function getPatientReport(predictionId) {
   return data;
 }
 
+export async function getPatientPredictions(patientId) {
+  const { data } = await api.get(`/patients/${patientId}/predictions`);
+  return data;
+}
+
 export async function downloadPatientReport(predictionId) {
   const response = await api.get(`/reports/${predictionId}/patient/pdf`, { responseType: "blob" });
   const url = URL.createObjectURL(response.data);
@@ -70,8 +86,27 @@ export async function downloadPatientReport(predictionId) {
   URL.revokeObjectURL(url);
 }
 
+export async function viewPatientReportPdf(predictionId) {
+  const previewWindow = window.open("", "_blank");
+  try {
+    const response = await api.get(`/reports/${predictionId}/patient/pdf`, { responseType: "blob" });
+    const url = URL.createObjectURL(response.data);
+    if (previewWindow) previewWindow.location.href = url;
+    else window.open(url, "_blank");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (error) {
+    previewWindow?.close();
+    throw error;
+  }
+}
+
 export async function emailPatientReport(predictionId) {
   const { data } = await api.post(`/reports/${predictionId}/patient/email`);
+  return data;
+}
+
+export async function emailDigitalTwinReport(report) {
+  const { data } = await api.post("/reports/digital-twin/email", report);
   return data;
 }
 

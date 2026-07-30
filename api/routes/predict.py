@@ -6,6 +6,7 @@ from api.repositories.patient_repository import PatientRepository
 from api.schemas.request import ClinicalInput
 from api.schemas.response import PredictEndpointResponse
 from api.services.prediction_service import PredictionService
+from api.utils.authorization import get_current_actor, resolve_patient
 from api.utils.validators import validate_patient_data
 from api.utils.exception_handler import handle_prediction_exception
 from api.models.diagnosis import DiagnosisStatus
@@ -26,6 +27,7 @@ router = APIRouter()
 def predict(
     clinical_data: ClinicalInput,
     db: Session = Depends(get_db),
+    actor=Depends(get_current_actor),
 ):
     try:
         patient = clinical_data.model_dump()
@@ -33,17 +35,13 @@ def predict(
         echo_path = patient.pop("echo_path", None)
         patient_id = patient.pop("patient_id", None)
 
-        # Resolve registered patient if patient_id was supplied
-        patient_record = None
-        if patient_id:
-            repo = PatientRepository(db)
-            patient_record = repo.get_by_public_id(patient_id)
-            
-            if patient_record is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Patient '{patient_id}' not found.",
-                )
+        if not patient_id:
+            raise HTTPException(status_code=422, detail="A registered patient ID is required.")
+
+        patient_record = resolve_patient(patient_id, db)
+        role, account = actor
+        if role == "patient" and account.id != patient_record.id:
+            raise HTTPException(status_code=403, detail="You can only create predictions for your own record.")
 
         errors = validate_patient_data(patient)
 
@@ -52,14 +50,6 @@ def predict(
                 "success": False,
                 "errors": errors
             }
-        print("Patient ID received:", patient_id)
-        print("Patient Record:", patient_record)
-        print("Diagnoses:", patient_record.diagnoses)
-        print("Diagnosis Count:", len(patient_record.diagnoses))
-
-        for d in patient_record.diagnoses:
-            print("Diagnosis:", d.diagnosis_id, d.status)
-
         prediction_service = PredictionService(db)
         
 
@@ -71,17 +61,22 @@ def predict(
         )
 
         result["diagnosis_id"] = None
-        if patient_record and patient_record.diagnoses:
-            pending_diagnoses = [
-                d for d in patient_record.diagnoses 
-                if d.status == DiagnosisStatus.PENDING
-            ]
-            if pending_diagnoses:
-                latest_diagnosis = sorted(pending_diagnoses, key=lambda d: d.created_at)[-1]
-                latest_diagnosis.prediction_id = result.get("prediction_id")
-                latest_diagnosis.status = DiagnosisStatus.COMPLETED
-                db.commit()
-                result["diagnosis_id"] = latest_diagnosis.diagnosis_id
+        if patient_record:
+            try:
+                diagnoses = patient_record.diagnoses or []
+                pending_diagnoses = [
+                    d for d in diagnoses
+                    if d.status == DiagnosisStatus.PENDING
+                ]
+                if pending_diagnoses:
+                    latest_diagnosis = sorted(pending_diagnoses, key=lambda d: d.created_at)[-1]
+                    latest_diagnosis.prediction_id = result.get("prediction_id")
+                    latest_diagnosis.status = DiagnosisStatus.COMPLETED
+                    db.commit()
+                    result["diagnosis_id"] = latest_diagnosis.diagnosis_id
+            except Exception:
+                # diagnoses relationship may not be loaded; continue without it
+                pass
 
         return result
 

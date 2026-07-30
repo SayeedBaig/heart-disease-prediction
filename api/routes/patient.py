@@ -21,6 +21,7 @@ from api.services.patient_registration_service import PatientRegistrationService
 from api.services.patient_service import PatientService
 from api.services.prediction_history_service import PredictionHistoryService
 from api.utils.auth import get_current_doctor, get_current_patient
+from api.utils.authorization import ensure_patient_access, get_current_actor, resolve_patient
 
 
 router = APIRouter(
@@ -105,13 +106,22 @@ def get_my_profile(
 )
 def search_patients(
     q: str = Query(..., min_length=1, description="Search query"),
-    _current_doctor=Depends(get_current_doctor),
+    actor=Depends(get_current_actor),
     db: Session = Depends(get_db),
 ):
+    if actor[0] != "doctor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Doctor access is required.")
     service = PatientService(db)
     patients = service.search_patients(q)
-
-    return [PatientResponse.model_validate(p) for p in patients]
+    visible = []
+    for patient in patients:
+        try:
+            ensure_patient_access(patient, actor, db)
+            visible.append(patient)
+        except HTTPException as exc:
+            if exc.status_code != status.HTTP_403_FORBIDDEN:
+                raise
+    return [PatientResponse.model_validate(p) for p in visible]
 
 
 # ------------------------------------------------------------------
@@ -128,13 +138,22 @@ def search_patients(
 def list_patients(
     skip: int = 0,
     limit: int = 100,
-    _current_doctor=Depends(get_current_doctor),
+    actor=Depends(get_current_actor),
     db: Session = Depends(get_db),
 ):
+    if actor[0] != "doctor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Doctor access is required.")
     service = PatientService(db)
     patients = service.get_all_patients(skip=skip, limit=limit)
-
-    return [PatientResponse.model_validate(p) for p in patients]
+    visible = []
+    for patient in patients:
+        try:
+            ensure_patient_access(patient, actor, db)
+            visible.append(patient)
+        except HTTPException as exc:
+            if exc.status_code != status.HTTP_403_FORBIDDEN:
+                raise
+    return [PatientResponse.model_validate(p) for p in visible]
 
 
 # ------------------------------------------------------------------
@@ -150,7 +169,7 @@ def list_patients(
 )
 def get_patient(
     patient_id: int,
-    _current_doctor=Depends(get_current_doctor),
+    actor=Depends(get_current_actor),
     db: Session = Depends(get_db),
 ):
     service = PatientService(db)
@@ -160,6 +179,9 @@ def get_patient(
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
+    if actor[0] != "doctor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Doctor access is required.")
+    ensure_patient_access(patient, actor, db)
     return PatientResponse.model_validate(patient)
 
 
@@ -220,19 +242,14 @@ def delete_patient(
 def get_prediction_history(
     patient_id: str,
     db: Session = Depends(get_db),
+    actor=Depends(get_current_actor),
 ):
-    service = PredictionHistoryService(db)
-
-    predictions = service.get_prediction_history(patient_id)
-
-    if predictions is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Patient not found.",
-        )
+    patient = resolve_patient(patient_id, db)
+    ensure_patient_access(patient, actor, db)
+    predictions = PredictionHistoryService(db).get_prediction_history(patient.patient_id)
 
     return PredictionHistoryResponse(
-        patient_id=patient_id,
+        patient_id=patient.patient_id,
         total_predictions=len(predictions),
         predictions=[
             PredictionHistoryItem(

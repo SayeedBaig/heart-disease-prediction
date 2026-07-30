@@ -1,6 +1,7 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile
 
 from api.services.upload_service import UploadService
+from api.utils.authorization import get_current_actor
 
 router = APIRouter(
     prefix="/upload",
@@ -18,6 +19,7 @@ upload_service = UploadService()
 )
 def upload_ecg(
     file: UploadFile = File(...),
+    _actor=Depends(get_current_actor),
 ):
 
     filepath = upload_service.save_ecg_file(
@@ -39,6 +41,7 @@ def upload_ecg(
 )
 def upload_echo(
     file: UploadFile = File(...),
+    _actor=Depends(get_current_actor),
 ):
 
     filepath = upload_service.save_echo_file(

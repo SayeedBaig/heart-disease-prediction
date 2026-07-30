@@ -25,3 +25,15 @@ class DiagnosisRepository:
 
     def get_by_prediction_id(self, prediction_id: int) -> Diagnosis | None:
         return self.db.query(Diagnosis).filter(Diagnosis.prediction_id == prediction_id).first()
+
+    def get_latest_by_patient_id(self, patient_id: int) -> Diagnosis | None:
+        """Return the most recently completed diagnosis for a patient."""
+        return (
+            self.db.query(Diagnosis)
+            .filter(
+                Diagnosis.patient_id == patient_id,
+                Diagnosis.status == DiagnosisStatus.COMPLETED,
+            )
+            .order_by(Diagnosis.created_at.desc())
+            .first()
+        )

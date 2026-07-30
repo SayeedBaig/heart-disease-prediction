@@ -1,124 +1,114 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, HeartPulse, Activity, Shield } from "lucide-react";
 import Navbar from "../components/Navbar";
-import Hero from "../components/Hero";
-import Workflow from "../components/Workflow";
-import FeatureCard from "../components/FeatureCard";
-import Footer from "../components/Footer";
 
-import {
-  Stethoscope,
-  Activity,
-  HeartPulse,
-} from "lucide-react";
-
-function LandingPage() {
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-
-      {/* ================= Navbar ================= */}
-
+    <div className="cardio-shell overflow-x-hidden flex flex-col min-h-screen">
       <Navbar />
 
-      {/* ================= Hero ================= */}
+      {/* HERO SECTION */}
+      <main className="flex-1 flex flex-col justify-center items-center">
+        <section className="relative cardio-container flex w-full flex-col items-center py-20 md:py-28 text-center max-w-5xl mx-auto">
+          {/* Eyebrow label */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--accent-melanzane-border)] bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] text-xs font-semibold"
+          >
+            <HeartPulse size={14} />
+            <span>AI-Powered Cardiovascular Diagnostics</span>
+          </motion.div>
 
-      <Hero />
+          {/* Large Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="max-w-4xl text-[var(--text-primary)] text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.08]"
+            style={{ fontFamily: "var(--font-display, 'Plus Jakarta Sans', sans-serif)" }}
+          >
+            Predict Heart Disease with{" "}
+            <br className="hidden sm:block" />
+            <span className="text-[var(--accent-melanzane)]">Multimodal AI Precision</span>
+          </motion.h1>
 
-      {/* ================= Workflow ================= */}
+          {/* Subheading */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-6 text-sm md:text-lg text-[var(--text-secondary)] max-w-2xl font-normal leading-relaxed"
+          >
+            Combine clinical metrics, ECG waveforms, and echocardiography signals into explainable cardiovascular risk assessments and interactive Digital Twin simulations.
+          </motion.p>
 
-      <section id="workflow">
-        <Workflow />
-      </section>
+          {/* Primary & Secondary CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          >
+            <Link
+              to="/get-started"
+              className="btn-primary py-3.5 px-8 text-sm rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl"
+            >
+              <span>Get Started</span>
+              <ArrowRight size={16} />
+            </Link>
 
-      {/* ================= AI MODULES ================= */}
+            <Link
+              to="/explore-capabilities"
+              className="btn-secondary py-3.5 px-7 text-sm rounded-xl font-semibold flex items-center gap-2"
+            >
+              <span>Explore Capabilities</span>
+              <ArrowRight size={14} />
+            </Link>
+          </motion.div>
 
-      <section
-        id="features"
-        className="relative overflow-hidden py-28"
-      >
+          {/* Stats strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-center"
+          >
+            {[
+              { icon: Activity, value: "3-Modal", label: "AI Analysis" },
+              { icon: HeartPulse, value: "Real-time", label: "Risk Assessment" },
+              { icon: Shield, value: "HIPAA", label: "Data Security" },
+            ].map(({ icon: Icon, value, label }) => (
+              <div key={label} className="flex flex-col items-center gap-1">
+                <div className="w-9 h-9 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mb-1">
+                  <Icon size={18} />
+                </div>
+                <span className="text-base font-bold text-[var(--text-primary)]">{value}</span>
+                <span className="text-xs text-[var(--text-muted)]">{label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </section>
+      </main>
 
-        {/* Decorative Background */}
-
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/60 via-white to-slate-50"></div>
-
-        {/* Decorative Blur */}
-
-        <div className="absolute -top-16 left-10 w-72 h-72 bg-blue-200 rounded-full blur-3xl opacity-25"></div>
-
-        <div className="absolute bottom-0 right-10 w-80 h-80 bg-cyan-200 rounded-full blur-3xl opacity-20"></div>
-
-        <div className="relative max-w-7xl mx-auto px-6">
-
-          {/* Badge */}
-
-          <div className="flex justify-center mb-6">
-
-            <span className="px-5 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold tracking-wide shadow-sm">
-              AI Powered Healthcare Platform
-            </span>
-
+      {/* FOOTER */}
+      <footer className="py-6 border-t border-[var(--border-color)] text-xs text-[var(--text-muted)] bg-[var(--card-bg)]">
+        <div className="cardio-container max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 font-semibold text-[var(--text-secondary)] text-sm">
+            <div className="w-6 h-6 rounded-md bg-[#39062B] text-white flex items-center justify-center text-[10px] font-black">
+              AI
+            </div>
+            <span>CardioAI Intelligence Platform</span>
           </div>
 
-          {/* Heading */}
-
-          <div className="text-center max-w-4xl mx-auto">
-
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
-
-              Powered by{" "}
-
-              <span className="text-blue-600">
-                Advanced AI Models
-              </span>
-
-            </h2>
-
-            <p className="mt-8 text-lg md:text-xl leading-8 text-slate-600">
-
-              CardioAI integrates Clinical Analysis,
-              ECG Deep Learning, and Echocardiography
-              Intelligence into a single intelligent
-              platform for accurate, explainable,
-              and reliable cardiovascular disease prediction.
-
-            </p>
-
+          <div className="text-center md:text-right text-[var(--text-muted)]">
+            © {new Date().getFullYear()} CardioAI. All rights reserved. · For clinical decision support only.
           </div>
-
-          {/* Feature Cards */}
-
-          <div className="mt-20 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-
-            <FeatureCard
-              icon={Stethoscope}
-              title="Clinical Analysis"
-              description="Predict cardiovascular risk using patient demographics, blood pressure, cholesterol, glucose levels, and lifestyle information."
-            />
-
-            <FeatureCard
-              icon={Activity}
-              title="ECG Analysis"
-              description="Deep Learning powered ECG interpretation detects cardiac abnormalities and significantly improves prediction accuracy."
-            />
-
-            <FeatureCard
-              icon={HeartPulse}
-              title="Echo Analysis"
-              description="AI-driven Echocardiography analysis evaluates cardiac structure and function for comprehensive multi-modal diagnosis."
-            />
-
-          </div>
-
         </div>
-
-      </section>
-
-      {/* ================= Footer ================= */}
-
-      <section id="about">
-        <Footer />
-      </section>
-
+      </footer>
     </div>
   );
 }
 
-export default LandingPage;
