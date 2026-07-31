@@ -7,7 +7,6 @@ import {
   EyeOff,
   Stethoscope,
   ArrowRight,
-  ShieldCheck,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import api from "../services/api";
@@ -74,57 +73,50 @@ function DoctorLogin() {
   };
 
   return (
-    <div className="cardio-shell">
+    <div className="auth-page-wrapper">
       <Navbar onBack={() => navigate("/get-started")} backLabel="Portals" />
 
-      <main className="cardio-container flex-1 flex flex-col items-center justify-center py-6 sm:py-10 my-auto w-full max-w-md">
-        <div className="cardio-card p-6 sm:p-8 w-full shadow-lg rounded-2xl">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mx-auto mb-3">
-              <Stethoscope size={24} />
-            </div>
-            <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
-              Clinician Authentication
-            </span>
-            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
-              Doctor Login
-            </h1>
-            <p className="body-regular text-xs mt-1">
-              Access your CardioAI diagnostic workspace
+      <main className="auth-content-container">
+        <div className="auth-card">
+          <div className="auth-logo-badge">
+            <Stethoscope size={24} />
+          </div>
+
+          <div className="auth-header">
+            <span className="auth-eyebrow">Clinician Portal</span>
+            <h1 className="auth-title">Doctor Login</h1>
+            <p className="auth-subtitle">
+              Sign in to access your CardioAI clinical workspace
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                Medical Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+            <div className="auth-form-group">
+              <label className="auth-label">Medical Email Address</label>
+              <div className="auth-input-wrapper">
+                <Mail className="auth-input-icon" size={18} />
                 <input
                   type="email"
                   placeholder="doctor@cardioai.org"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="cardio-input text-xs !pl-11"
+                  className="auth-input"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+            <div className="auth-form-group">
+              <label className="auth-label">Password</label>
+              <div className="auth-input-wrapper">
+                <Lock className="auth-input-icon" size={18} />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="cardio-input text-xs !pl-11 !pr-11"
+                  className="auth-input !pr-11"
                 />
                 <button
                   type="button"
@@ -142,18 +134,18 @@ function DoctorLogin() {
               </div>
             )}
 
-            <div className="pt-2">
+            <div className="pt-1">
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-3.5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md"
+                className="btn-primary auth-btn-primary flex items-center justify-center gap-2"
               >
                 {loading ? "Signing In..." : "Sign In to Clinician Workspace"}
                 <ArrowRight size={16} />
               </button>
             </div>
 
-            <div className="text-center pt-2 text-xs text-[var(--text-secondary)]">
+            <div className="auth-footer">
               Don't have a doctor account?{" "}
               <Link to="/doctor/register" className="font-semibold text-[var(--accent-melanzane)] hover:underline">
                 Register here
@@ -167,4 +159,3 @@ function DoctorLogin() {
 }
 
 export default DoctorLogin;
-

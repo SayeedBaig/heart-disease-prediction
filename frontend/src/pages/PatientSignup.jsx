@@ -10,7 +10,6 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  ShieldCheck,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import api from "../services/api";
@@ -79,38 +78,33 @@ function PatientSignup() {
   };
 
   return (
-    <div className="cardio-shell">
+    <div className="auth-page-wrapper">
       <Navbar onBack={() => navigate("/get-started")} backLabel="Portals" />
 
-      <main className="cardio-container flex-1 flex flex-col items-center justify-center py-6 sm:py-10 my-auto w-full max-w-xl">
-        <div className="cardio-card p-6 sm:p-8 w-full shadow-lg rounded-2xl">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mx-auto mb-3">
-              <HeartPulse size={24} />
-            </div>
-            <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
-              Patient Registration
-            </span>
-            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">
-              Create Patient Account
-            </h1>
-            <p className="body-regular text-xs mt-1">
+      <main className="auth-content-container">
+        <div className="auth-card auth-card-wide">
+          <div className="auth-logo-badge">
+            <HeartPulse size={24} />
+          </div>
+
+          <div className="auth-header">
+            <span className="auth-eyebrow">Patient Registration</span>
+            <h1 className="auth-title">Create Patient Account</h1>
+            <p className="auth-subtitle">
               Sign up for full access to CardioAI risk tracking and reports
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+            <div className="auth-form-group">
+              <label className="auth-label">Full Name</label>
+              <div className="auth-input-wrapper">
+                <User className="auth-input-icon" size={18} />
                 <input
                   type="text"
                   name="full_name"
                   placeholder="Jane Doe"
-                  className="cardio-input text-xs !pl-11"
+                  className="auth-input"
                   value={formData.full_name}
                   onChange={handleChange}
                   required
@@ -118,17 +112,15 @@ function PatientSignup() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+            <div className="auth-form-group">
+              <label className="auth-label">Email Address</label>
+              <div className="auth-input-wrapper">
+                <Mail className="auth-input-icon" size={18} />
                 <input
                   type="email"
                   name="email"
                   placeholder="jane.doe@example.com"
-                  className="cardio-input text-xs !pl-11"
+                  className="auth-input"
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -137,17 +129,15 @@ function PatientSignup() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Password</label>
+                <div className="auth-input-wrapper">
+                  <Lock className="auth-input-icon" size={18} />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="••••••••"
-                    className="cardio-input text-xs !pl-11 !pr-11"
+                    className="auth-input !pr-11"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -162,15 +152,13 @@ function PatientSignup() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                  Confirm Password
-                </label>
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Confirm Password</label>
                 <input
                   type={showPassword ? "text" : "password"}
                   name="confirm_password"
                   placeholder="••••••••"
-                  className="cardio-input text-xs"
+                  className="auth-input !pl-3.5"
                   value={formData.confirm_password}
                   onChange={handleChange}
                   required
@@ -178,17 +166,15 @@ function PatientSignup() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                Phone Number
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+            <div className="auth-form-group">
+              <label className="auth-label">Phone Number</label>
+              <div className="auth-input-wrapper">
+                <Phone className="auth-input-icon" size={18} />
                 <input
                   type="text"
                   name="phone"
                   placeholder="+1 (555) 000-0000"
-                  className="cardio-input text-xs !pl-11"
+                  className="auth-input"
                   value={formData.phone}
                   onChange={handleChange}
                   required
@@ -197,13 +183,11 @@ function PatientSignup() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                  Gender
-                </label>
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Gender</label>
                 <select
                   name="gender"
-                  className="cardio-input text-xs"
+                  className="auth-input !pl-3.5"
                   value={formData.gender}
                   onChange={handleChange}
                 >
@@ -213,16 +197,14 @@ function PatientSignup() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
-                  Date of Birth
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" size={18} />
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Date of Birth</label>
+                <div className="auth-input-wrapper">
+                  <Calendar className="auth-input-icon" size={18} />
                   <input
                     type="date"
                     name="date_of_birth"
-                    className="cardio-input text-xs !pl-11"
+                    className="auth-input"
                     value={formData.date_of_birth}
                     onChange={handleChange}
                     required
@@ -243,18 +225,18 @@ function PatientSignup() {
               </div>
             )}
 
-            <div className="pt-2">
+            <div className="pt-1">
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-3.5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shadow-md"
+                className="btn-primary auth-btn-primary flex items-center justify-center gap-2"
               >
                 {loading ? "Creating Account..." : "Register Patient Account"}
                 <ArrowRight size={16} />
               </button>
             </div>
 
-            <div className="text-center pt-2 text-xs text-[var(--text-secondary)]">
+            <div className="auth-footer">
               Already have an account?{" "}
               <Link to="/patient/login" className="font-semibold text-[var(--accent-melanzane)] hover:underline">
                 Sign in here
@@ -268,5 +250,3 @@ function PatientSignup() {
 }
 
 export default PatientSignup;
-
-

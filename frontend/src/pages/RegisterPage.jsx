@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { HeartPulse, ArrowRight } from "lucide-react";
 import Navbar from "../components/Navbar";
 import api from "../services/api";
 
@@ -37,7 +38,7 @@ function RegisterPage() {
         "patient_name",
         response.data.full_name
       );
-     localStorage.setItem("patient_email", formData.email);
+      localStorage.setItem("patient_email", formData.email);
 
       navigate("/dashboard");
 
@@ -55,91 +56,109 @@ function RegisterPage() {
   };
 
   return (
-    <>
+    <div className="auth-page-wrapper">
       <Navbar />
 
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10">
-
-        <div className="bg-white shadow-xl rounded-xl p-10 w-full max-w-xl">
-
-          <h1 className="text-4xl font-bold text-blue-900 mb-2">
-            Patient Registration
-          </h1>
-
-          <p className="text-gray-500 mb-8">
-            Register before starting the diagnosis.
-          </p>
-
-          <div className="space-y-5">
-
-            <input
-              type="text"
-              name="full_name"
-              placeholder="Full Name"
-              value={formData.full_name}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            >
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-
-            <input
-              type="date"
-              name="date_of_birth"
-              value={formData.date_of_birth}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3"
-            />
-
-            {error && (
-              <p className="text-red-600">
-                {error}
-              </p>
-            )}
-
-            <button
-              onClick={handleRegister}
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold"
-            >
-              {loading
-                ? "Registering..."
-                : "Continue to Diagnosis"}
-            </button>
-
+      <main className="auth-content-container">
+        <div className="auth-card auth-card-wide">
+          <div className="auth-logo-badge">
+            <HeartPulse size={24} />
           </div>
 
-        </div>
+          <div className="auth-header">
+            <span className="auth-eyebrow">Diagnostic Registration</span>
+            <h1 className="auth-title">Patient Registration</h1>
+            <p className="auth-subtitle">
+              Register details before starting your AI diagnosis
+            </p>
+          </div>
 
-      </div>
-    </>
+          <div className="space-y-4">
+            <div className="auth-form-group">
+              <label className="auth-label">Full Name</label>
+              <input
+                type="text"
+                name="full_name"
+                placeholder="Full Name"
+                value={formData.full_name}
+                onChange={handleChange}
+                className="auth-input !pl-3.5"
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label className="auth-label">Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                className="auth-input !pl-3.5"
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label className="auth-label">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="auth-input !pl-3.5"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Gender</label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="auth-input !pl-3.5"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              <div className="auth-form-group mb-0">
+                <label className="auth-label">Date of Birth</label>
+                <input
+                  type="date"
+                  name="date_of_birth"
+                  value={formData.date_of_birth}
+                  onChange={handleChange}
+                  className="auth-input !pl-3.5"
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium">
+                {error}
+              </div>
+            )}
+
+            <div className="pt-2">
+              <button
+                onClick={handleRegister}
+                disabled={loading}
+                className="btn-primary auth-btn-primary flex items-center justify-center gap-2"
+              >
+                {loading
+                  ? "Registering..."
+                  : "Continue to Diagnosis"}
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }
 
