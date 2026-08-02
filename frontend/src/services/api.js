@@ -1,0 +1,26 @@
+import axios from "axios";
+
+const api = axios.create({
+  // Vite only exposes variables from the frontend .env file. Keeping a
+  // localhost fallback prevents registration requests from going to Vite.
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Automatically attach JWT token if available
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export default api;

@@ -1,4 +1,4 @@
-// Akash — floating chatbot widget (bottom-left), CardioAI Phase-2
+﻿// Akash - floating chatbot widget (bottom-left), CardioAI Phase-2
 // Reusable across Patient and Doctor dashboards via the `mode` prop.
 // Does NOT use services/api.js on purpose: that axios instance only ever
 // attaches "access_token", which would break doctor-mode auth. Token
@@ -11,7 +11,7 @@ import { Bot, MessageCircle, Send, X } from "lucide-react";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-// Akash — same localStorage key AIHealthAssistant.jsx already uses,
+// Akash - same localStorage key AIHealthAssistant.jsx already uses,
 // so we don't need any new data plumbing to get risk context.
 function getPredictionContext() {
   try {
@@ -27,7 +27,7 @@ function getPredictionContext() {
   }
 }
 
-// Akash — patient conversation memory needs a stable session_id across
+// Akash - patient conversation memory needs a stable session_id across
 // messages (and ideally across a browser session). Generate once, reuse.
 function getPatientSessionId() {
   let sessionId = localStorage.getItem("cardio-chat-session");
@@ -38,7 +38,7 @@ function getPatientSessionId() {
   return sessionId;
 }
 
-// Akash — mirrors doctorService.js's doctorFetch token resolution exactly,
+// Akash - mirrors doctorService.js's doctorFetch token resolution exactly,
 // so doctor-mode auth behaves identically to the rest of the doctor portal.
 function getAuthToken(mode) {
   if (mode === "doctor") {
@@ -58,7 +58,8 @@ export default function ChatbotWidget({ mode = "patient" }) {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
 
-  const endpoint = mode === "doctor" ? "/rag/doctor/ask" : "/rag/patient/ask";
+  const endpoint =
+    mode === "doctor" ? "/rag/doctor/ask" : mode === "public" ? "/rag/public/ask" : "/rag/patient/ask";
   const headerTitle = mode === "doctor" ? "Clinical AI Assistant" : "AI Health Assistant";
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
     setInput("");
     setIsLoading(true);
 
-    // Akash — build the request body per mode. Patient mode adds session_id
+    // Akash - build the request body per mode. Patient mode adds session_id
     // for conversation memory; doctor mode sends the case context fields
     // the backend's history_context_builder.py expects.
     const context = getPredictionContext();
@@ -88,6 +89,8 @@ export default function ChatbotWidget({ mode = "patient" }) {
             ecg_class: context.ecg_class,
             ef_value: context.ef_value,
           }
+        : mode === "public"
+        ? { question }
         : {
             question,
             session_id: getPatientSessionId(),
@@ -132,23 +135,23 @@ export default function ChatbotWidget({ mode = "patient" }) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start">
+    <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="cardio-card mb-3 w-[340px] h-[440px] flex flex-col overflow-hidden shadow-2xl border border-[var(--border-color)] rounded-2xl"
+            className="fixed bottom-24 right-6 z-50 w-[400px] h-[560px] cardio-card flex flex-col overflow-hidden shadow-2xl border border-[var(--border-color)] rounded-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-color)] bg-[var(--card-bg)]">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center">
-                  <Bot size={18} />
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-color)] bg-[var(--card-bg)]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[var(--accent-primary-light)] text-[var(--accent-primary)] flex items-center justify-center">
+                  <Bot size={20} />
                 </div>
-                <span className="text-sm font-bold text-[var(--text-primary)]">
+                <span className="text-base font-bold text-[var(--text-primary)]">
                   {headerTitle}
                 </span>
               </div>
@@ -157,16 +160,16 @@ export default function ChatbotWidget({ mode = "patient" }) {
                 className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 aria-label="Close chat"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
             {/* Messages */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4 w-full">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center px-2">
-                  <Bot size={28} className="text-[var(--accent-melanzane)] mb-2" />
-                  <p className="text-xs text-[var(--text-secondary)]">
+                  <Bot size={40} className="text-[var(--accent-primary)] mb-3" />
+                  <p className="text-sm text-[var(--text-secondary)]">
                     Ask about {mode === "doctor" ? "this case, guidelines, or visit history" : "your results, food, or heart health"}.
                   </p>
                 </div>
@@ -177,9 +180,9 @@ export default function ChatbotWidget({ mode = "patient" }) {
                     className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                         msg.sender === "user"
-                          ? "bg-[var(--accent-melanzane)] text-white rounded-br-none"
+                          ? "bg-[var(--accent-primary)] text-white rounded-br-none"
                           : "bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-bl-none"
                       }`}
                     >
@@ -190,16 +193,16 @@ export default function ChatbotWidget({ mode = "patient" }) {
               )}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl px-3 py-2 text-xs bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)]">
-                    Thinking…
+                  <div className="rounded-2xl px-4 py-2.5 text-sm bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)]">
+                    Thinking...
                   </div>
                 </div>
               )}
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-[var(--border-color)] bg-[var(--card-bg)]">
-              <div className="flex items-center gap-2">
+            <div className="p-4 border-t border-[var(--border-color)] bg-[var(--card-bg)]">
+              <div className="flex items-center gap-2 w-full">
                 <input
                   type="text"
                   value={input}
@@ -208,16 +211,16 @@ export default function ChatbotWidget({ mode = "patient" }) {
                     if (e.key === "Enter") handleSend();
                   }}
                   placeholder="Type a message..."
-                  className="cardio-input text-xs flex-1"
+                  className="cardio-input text-sm flex-1"
                   disabled={isLoading}
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
-                  className="btn-primary text-xs p-2.5 rounded-xl disabled:opacity-50"
+                  className="btn-primary text-xs p-3 rounded-xl disabled:opacity-50"
                   aria-label="Send"
                 >
-                  <Send size={14} />
+                  <Send size={16} />
                 </button>
               </div>
             </div>
@@ -225,14 +228,16 @@ export default function ChatbotWidget({ mode = "patient" }) {
         )}
       </AnimatePresence>
 
-      {/* Launcher bubble */}
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="w-14 h-14 rounded-full bg-[var(--accent-melanzane)] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
-        aria-label="Open AI Assistant"
-      >
-        {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
-      </button>
-    </div>
+      {/* Launcher bubble - always bottom-right, independent of panel size */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="w-14 h-14 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+          aria-label="Open AI Assistant"
+        >
+          {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
+        </button>
+      </div>
+    </>
   );
 }
