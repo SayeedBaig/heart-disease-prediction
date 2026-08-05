@@ -69,7 +69,7 @@ function AIHealthAssistant() {
     <div className="cardio-shell">
       <Navbar breadcrumb="AI Health Assistant" />
 
-      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+      <main className="cardio-container flex-1">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-6 border-b border-[var(--border-color)] gap-4">
           <div>

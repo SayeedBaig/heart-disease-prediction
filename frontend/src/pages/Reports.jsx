@@ -75,10 +75,8 @@ CardioAI Intelligence System
   };
 
   return (
-    <div className="cardio-shell">
-      <Navbar breadcrumb="Medical Report" />
-
-      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+    <>
+      <div>
         {/* Actions Bar (hidden during print) */}
         <div className="no-print flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)] gap-4">
           <div>
@@ -130,12 +128,12 @@ CardioAI Intelligence System
         )}
 
         {/* PRINTABLE MEDICAL REPORT CARD */}
-        <div className="cardio-card p-8 space-y-8 bg-white dark:bg-[#1A1A1E]">
+        <div className="cardio-card p-8 space-y-8">
           {/* Header */}
           <div className="flex justify-between items-start border-b border-[var(--border-color)] pb-6">
             <div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#39062B] text-white flex items-center justify-center font-bold text-sm">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-melanzane)] text-white flex items-center justify-center font-bold text-sm">
                   AI
                 </div>
                 <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
@@ -250,15 +248,15 @@ CardioAI Intelligence System
             </h3>
             <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                 Maintain regular moderate aerobic physical activity (min 150 mins/week).
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                 Adopt a Mediterranean diet plan rich in omega-3 fatty acids and low in sodium (&lt; 2,300 mg/day).
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                 Re-assess blood pressure and lipid panel in 90 days.
               </li>
             </ul>
@@ -280,7 +278,7 @@ CardioAI Intelligence System
             CardioAI Decision Support System · For Information & Research Screening Purposes Only
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

@@ -60,6 +60,12 @@ export default function ChatbotWidget({ mode = "patient" }) {
     }
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener("open-chatbot", handleOpen);
+    return () => window.removeEventListener("open-chatbot", handleOpen);
+  }, []);
+
   const handleSend = async () => {
     const question = input.trim();
     if (!question || isLoading) return;
@@ -121,7 +127,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -129,7 +135,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ duration: 0.18 }}
-            className="cardio-card mb-3 w-[340px] h-[440px] flex flex-col overflow-hidden shadow-2xl border border-[var(--border-color)] rounded-2xl"
+            className="cardio-card mb-3 w-[min(360px,calc(100vw-2rem))] h-[min(480px,calc(100vh-6rem))] flex flex-col overflow-hidden shadow-2xl border border-[var(--border-color)] rounded-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-color)] bg-[var(--card-bg)]">
@@ -202,7 +208,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
+                  disabled={input.trim().length < 3 || isLoading}
                   className="btn-primary text-xs p-2.5 rounded-xl disabled:opacity-50"
                   aria-label="Send"
                 >

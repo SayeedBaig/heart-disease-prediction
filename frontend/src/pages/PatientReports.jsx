@@ -47,10 +47,8 @@ function PatientReports() {
     : "Please sign in to view your reports.";
 
   return (
-    <div className="cardio-shell">
-      <Navbar breadcrumb="Health Reports" />
-
-      <main className="cardio-container py-8 flex-1 w-full max-w-6xl">
+    <>
+      <div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)] gap-4">
           <div>
@@ -222,8 +220,8 @@ function PatientReports() {
             <p className="leading-6">{reportSummary}</p>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
 

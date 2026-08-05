@@ -73,10 +73,8 @@ export default function Appointments() {
   };
 
   return (
-    <div className="cardio-shell">
-      <Navbar breadcrumb="Book Appointment" />
-
-      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+    <>
+      <div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)]">
           <div>
@@ -95,7 +93,7 @@ export default function Appointments() {
 
         {/* Workflow Progress Bar */}
         {step <= 4 && (
-          <div className="flex items-center justify-between mb-8 text-xs font-medium border-b border-[var(--border-color)] pb-4">
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-8 text-xs font-medium border-b border-[var(--border-color)] pb-4 overflow-x-auto">
             <div className={`flex items-center gap-2 ${step >= 1 ? "text-[var(--accent-melanzane)] font-bold" : "text-[var(--text-muted)]"}`}>
               <span className="w-5 h-5 rounded-full bg-[var(--accent-melanzane-light)] flex items-center justify-center text-[10px]">1</span>
               1. Choose Doctor
@@ -228,7 +226,7 @@ export default function Appointments() {
                     onClick={() => setForm(prev => ({ ...prev, time: t }))}
                     className={`py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all ${
                       form.time === t
-                        ? "bg-[#39062B] text-white border-[#39062B]"
+                        ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                         : "bg-[var(--input-bg)] text-[var(--text-primary)] border-[var(--input-border)] hover:border-[var(--accent-melanzane-border)]"
                     }`}
                   >
@@ -327,7 +325,7 @@ export default function Appointments() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

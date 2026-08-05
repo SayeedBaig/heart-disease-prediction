@@ -14,22 +14,30 @@ import Appointments from "./pages/Appointments";
 import ResultsPage from "./pages/ResultsPage";
 import ChatbotWidget from "./components/ChatbotWidget";
 
-// Show chatbot only on authenticated pages; pick the right mode automatically
+// Show global chatbot across application pages (doctor mode on doctor routes, patient/public mode elsewhere); hide on auth pages
 function GlobalChatbot() {
   const { pathname } = useLocation();
 
+  // Hide on auth forms and landing page (which has its own mock) to prevent obstructing input fields
+  const isAuthPage =
+    pathname.startsWith("/doctor/login") ||
+    pathname.startsWith("/doctor/register") ||
+    pathname.startsWith("/patient/login") ||
+    pathname.startsWith("/patient/signup") ||
+    pathname.startsWith("/patient/register") ||
+    pathname === "/get-started" ||
+    pathname === "/role-selection" ||
+    pathname === "/";
+
+  if (isAuthPage) return null;
+
   // Doctor portal pages → doctor mode
-  if (pathname.startsWith("/doctor") && !pathname.startsWith("/doctor/login") && !pathname.startsWith("/doctor/register")) {
+  if (pathname.startsWith("/doctor")) {
     return <ChatbotWidget mode="doctor" />;
   }
 
-  // Patient portal pages → patient mode
-  if (pathname.startsWith("/patient") && !pathname.startsWith("/patient/login") && !pathname.startsWith("/patient/signup") && !pathname.startsWith("/patient/register")) {
-    return <ChatbotWidget mode="patient" />;
-  }
-
-  // Hide on landing / auth / public pages
-  return null;
+  // All other pages (Patient Portal, Digital Twin, Reports, Appointments, etc.) → patient/public mode
+  return <ChatbotWidget mode="patient" />;
 }
 
 function App() {

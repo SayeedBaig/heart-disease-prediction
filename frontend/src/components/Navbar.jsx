@@ -64,7 +64,7 @@ export default function Navbar({ onBack, backLabel, breadcrumb }) {
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--card-bg)]/90 backdrop-blur-md border-b border-[var(--border-color)] transition-colors duration-200">
-      <div className="cardio-container flex items-center justify-between gap-3 py-2.5">
+      <div className="cardio-container flex items-center justify-between gap-3">
         
         {/* Left Section: Back Button + Brand Logo + Breadcrumbs */}
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -80,7 +80,7 @@ export default function Navbar({ onBack, backLabel, breadcrumb }) {
           )}
 
           <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-[#39062B] text-white flex items-center justify-center shadow transition-all group-hover:shadow-md group-hover:scale-105">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent-melanzane)] text-white flex items-center justify-center shadow transition-all group-hover:shadow-md group-hover:scale-105">
               <Activity size={17} className="text-white" />
             </div>
 
@@ -103,8 +103,8 @@ export default function Navbar({ onBack, backLabel, breadcrumb }) {
         </div>
 
         {/* Right Section */}
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-medium text-[var(--text-secondary)]">
+        <div className="flex shrink-0 items-center gap-3">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[var(--text-secondary)]">
             <Link
               to="/"
               className={`transition-colors hover:text-[var(--accent-melanzane)] ${
@@ -113,21 +113,55 @@ export default function Navbar({ onBack, backLabel, breadcrumb }) {
             >
               Home
             </Link>
+            <a
+              href="#capabilities"
+              className="transition-colors hover:text-[var(--accent-melanzane)]"
+            >
+              Capabilities
+            </a>
+            <a
+              href="#workflow"
+              className="transition-colors hover:text-[var(--accent-melanzane)]"
+            >
+              Workflow
+            </a>
+            <a
+              href="#digital-twin"
+              className="transition-colors hover:text-[var(--accent-melanzane)]"
+            >
+              Digital Twin
+            </a>
+            <a
+              href="#faq"
+              className="transition-colors hover:text-[var(--accent-melanzane)]"
+            >
+              FAQ
+            </a>
           </nav>
 
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="w-8 h-8 rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-melanzane-border)] transition-all flex items-center justify-center"
-            title={`Switch to ${theme === "light" ? "Dark" : "Light"} mode`}
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? (
-              <Moon size={15} className="text-[var(--text-secondary)]" />
-            ) : (
-              <Sun size={15} className="text-amber-400" />
-            )}
-          </button>
+          {/* Action CTAs & Theme Toggle */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/get-started"
+              className="btn-primary py-1.5 px-3.5 text-xs font-semibold rounded-lg shadow-sm hidden sm:inline-flex"
+            >
+              Access Portals
+            </Link>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--accent-melanzane-border)] transition-all flex items-center justify-center shrink-0"
+              title={`Switch to ${theme === "light" ? "Dark" : "Light"} mode`}
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? (
+                <Moon size={15} className="text-[var(--text-secondary)]" />
+              ) : (
+                <Sun size={15} className="text-amber-400" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </header>

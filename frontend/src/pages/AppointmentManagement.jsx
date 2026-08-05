@@ -22,11 +22,9 @@ export default function AppointmentManagement() {
         { appointment_id: 102, patient_id: "PT-73819", patient_name: "Robert Smith", preferred_date: "2026-08-02", preferred_time: "11:00", symptoms: "Shortness of breath", reason: "Echo review", status: "Approved" },
         { appointment_id: 103, patient_id: "PT-61928", patient_name: "Maria Garcia", preferred_date: "2026-08-03", preferred_time: "14:30", symptoms: "Palpitations", reason: "Holter monitoring inquiry", status: "Rejected" }
       ]);
-    } flexFinally();
-  };
-
-  const flexFinally = () => {
-    setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -78,10 +76,8 @@ export default function AppointmentManagement() {
   });
 
   return (
-    <div className="cardio-shell">
-      <Navbar breadcrumb="Appointment Management" />
-
-      <main className="cardio-container py-8 flex-1 w-full max-w-6xl">
+    <>
+      <div>
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)]">
           <div>
@@ -119,7 +115,7 @@ export default function AppointmentManagement() {
                 onClick={() => setStatusFilter(status)}
                 className={`py-1.5 px-3 rounded-lg text-xs font-semibold transition-all ${
                   statusFilter === status
-                    ? "bg-[#39062B] text-white"
+                    ? "bg-[var(--accent-melanzane)] text-white"
                     : "bg-[var(--card-bg)] text-[var(--text-secondary)] border border-[var(--border-color)] hover:border-[var(--accent-melanzane-border)]"
                 }`}
               >
@@ -226,7 +222,7 @@ export default function AppointmentManagement() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

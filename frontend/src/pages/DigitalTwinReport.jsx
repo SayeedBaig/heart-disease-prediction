@@ -28,9 +28,8 @@ export default function DigitalTwinReport({ onBack }) {
 
   if (!report) {
     return (
-      <div className="cardio-shell">
-        <Navbar onBack={onBack} backLabel="Digital Twin" breadcrumb="Simulation Report" />
-        <main className="cardio-container flex flex-1 items-center justify-center py-20">
+      <div>
+        <main className="cardio-container flex flex-1 items-center justify-center">
           <div className="cardio-card max-w-md p-8 text-center space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mx-auto">
               <FileText size={28} />
@@ -46,10 +45,8 @@ export default function DigitalTwinReport({ onBack }) {
   }
 
   return (
-    <div className="cardio-shell">
-      <Navbar onBack={onBack} backLabel="Digital Twin" breadcrumb="Simulation Report" />
-
-      <main className="cardio-container w-full max-w-5xl flex-1 py-8 space-y-6">
+    <>
+      <div>
 
         {/* ── Header ─────────────────────────────────────────────── */}
         <div className="no-print flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[var(--border-color)]">
@@ -225,7 +222,7 @@ export default function DigitalTwinReport({ onBack }) {
           </div>
         </div>
 
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

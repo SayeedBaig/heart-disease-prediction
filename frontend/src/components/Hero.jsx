@@ -25,122 +25,80 @@ function Hero() {
           transition={{ duration: 0.8 }}
         >
           {/* Badge */}
-
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-medium mb-6">
-            <Activity size={18} />
-            AI Powered Healthcare
+          <div className="inline-flex items-center gap-2 bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] border border-[var(--accent-melanzane-border)] px-4 py-2 rounded-full font-semibold text-xs mb-6">
+            <Activity size={16} />
+            Multi-Modal Cardiovascular Intelligence
           </div>
 
           {/* Heading */}
-
-          <h1 className="text-5xl md:text-6xl xl:text-7xl
-tracking-tight font-extrabold leading-snug text-slate-900 max-w-2xl">
-            Early Detection of
-            <br />
-            <span className="text-blue-600">
-              Heart Disease
-            </span>
-            <br />
-            <span className="text-slate-900">
-              Powered by AI
-            </span>
+          <h1 className="h1-large max-w-2xl">
+            Early Detection of{" "}
+            <span className="text-[var(--accent-melanzane)]">Heart Disease</span>{" "}
+            Powered by AI
           </h1>
 
           {/* Description */}
-
-          <p className="mt-6 text-lg text-slate-600 leading-8 max-w-xl">
-           Combine Clinical Data, ECG signals, and Echocardiography using advanced AI to deliver fast, accurate, and explainable cardiovascular risk predictions with digital twin insights.
+          <p className="body-regular mt-6 max-w-xl text-base md:text-lg">
+            Combine Clinical Data, ECG signals, and Echocardiography using advanced AI to deliver fast, accurate, and explainable cardiovascular risk predictions with digital twin insights.
           </p>
 
           {/* Buttons */}
+          <div className="flex gap-4 mt-8 flex-wrap">
+            <Link to="/get-started" className="btn-primary btn-lg">
+              Get Started
+            </Link>
+          </div>
 
-          <div className="flex gap-5 mt-10 flex-wrap">
-
-            <div className="flex gap-5 mt-10 flex-wrap">
-
-              <Link
-                to="/get-started"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-4 rounded-xl font-semibold shadow-lg transition-all duration-300"
-              >
-                Get Started
-              </Link>
-
+          <div className="flex flex-wrap gap-6 mt-8 text-xs font-semibold text-[var(--text-secondary)]">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="text-emerald-500" size={18} />
+              Secure AI
+            </div>
+            <div className="flex items-center gap-2">
+              <Activity className="text-[var(--accent-melanzane)]" size={18} />
+              Real-time Analysis
+            </div>
+            <div className="flex items-center gap-2">
+              <HeartPulse className="text-red-500" size={18} />
+              Explainable AI
             </div>
           </div>
-          <div className="flex flex-wrap gap-6 mt-8 text-sm text-slate-600">
-
-  <div className="flex items-center gap-2">
-    <ShieldCheck className="text-green-600" size={18}/>
-    Secure AI
-  </div>
-
-  <div className="flex items-center gap-2">
-    <Activity className="text-blue-600" size={18}/>
-    Real-time Analysis
-  </div>
-
-  <div className="flex items-center gap-2">
-    <HeartPulse className="text-red-500" size={18}/>
-    Explainable AI
-  </div>
-
-</div>
 
           {/* Feature List */}
-
-          <div className="grid grid-cols-2 gap-5 mt-10">
-
-            <div className="flex items-center gap-3">
-              <CheckCircle className="text-green-600" />
+          <div className="grid grid-cols-2 gap-4 mt-8 text-xs font-semibold text-[var(--text-primary)]">
+            <div className="flex items-center gap-2.5">
+              <CheckCircle className="text-emerald-500" size={18} />
               Clinical AI
             </div>
-
-            <div className="flex items-center gap-3">
-              <CheckCircle className="text-green-600" />
-              ECG Analysis
+            <div className="flex items-center gap-2.5">
+              <CheckCircle className="text-emerald-500" size={18} />
+              ECG Waveform Analysis
             </div>
-
-            <div className="flex items-center gap-3">
-              <CheckCircle className="text-green-600" />
-              Echo Analysis
+            <div className="flex items-center gap-2.5">
+              <CheckCircle className="text-emerald-500" size={18} />
+              Echo Motion Analysis
             </div>
-
-            <div className="flex items-center gap-3">
-              <CheckCircle className="text-green-600" />
-              Digital Twin
+            <div className="flex items-center gap-2.5">
+              <CheckCircle className="text-emerald-500" size={18} />
+              Digital Twin Simulation
             </div>
-
           </div>
 
           {/* Statistics */}
-
-<div className="grid grid-cols-3 gap-4 mt-12 max-w-xl">
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 transition-all duration-300">
-    <h2 className="text-3xl font-bold text-blue-600">96%</h2>
-    <p className="text-slate-500 mt-2">
-      Prediction Confidence
-    </p>
-  </div>
-
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-5 transition-all duration-300">
-    <h2 className="text-3xl font-bold text-blue-600">
-      3 AI
-    </h2>
-    <p className="text-slate-500 mt-2">
-      Clinical • ECG • Echo
-    </p>
-  </div>
-
-  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-3 transition-all duration-300">
-    <h2 className="text-3xl font-bold text-blue-600">
-      Explainable
-    </h2>
-    <p className="text-slate-500 mt-2">
-      AI Powered Reports
-    </p>
-  </div>
-
-</div>
+          <div className="grid grid-cols-3 gap-4 mt-10 max-w-xl">
+            <div className="cardio-card p-4 text-center">
+              <h2 className="text-2xl font-extrabold text-[var(--accent-melanzane)]">96%</h2>
+              <p className="caption-small mt-1">Prediction Confidence</p>
+            </div>
+            <div className="cardio-card p-4 text-center">
+              <h2 className="text-2xl font-extrabold text-[var(--accent-melanzane)]">3 AI</h2>
+              <p className="caption-small mt-1">Clinical · ECG · Echo</p>
+            </div>
+            <div className="cardio-card p-4 text-center">
+              <h2 className="text-2xl font-extrabold text-[var(--accent-melanzane)]">100%</h2>
+              <p className="caption-small mt-1">Explainable AI Reports</p>
+            </div>
+          </div>
 
         </motion.div>
 

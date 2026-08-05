@@ -193,10 +193,8 @@ export default function DigitalTwin({ initialData, onBack }) {
   };
 
   return (
-    <div className="cardio-shell">
-      <Navbar onBack={onBack} backLabel="Dashboard" breadcrumb="Digital Twin Simulation" />
-
-      <main className="cardio-container py-8 flex-1 w-full">
+    <>
+      <div>
         {/* Header Bar */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 mb-8 border-b border-[var(--border-color)]">
           <div>
@@ -519,7 +517,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("smoking", "0")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.smoking === "0"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -529,7 +527,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("smoking", "former")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.smoking === "former"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -539,7 +537,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("smoking", "active")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.smoking === "active"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -559,7 +557,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("alcohol", "0")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.alcohol === "0"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -569,7 +567,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("alcohol", "occasional")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.alcohol === "occasional"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -579,7 +577,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                       onClick={() => upd("alcohol", "regular")}
                       className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-all ${
                         params.alcohol === "regular"
-                          ? "bg-[#39062B] text-white border-[#39062B]"
+                          ? "bg-[var(--accent-melanzane)] text-white border-[var(--accent-melanzane)]"
                           : "bg-[var(--input-bg)] text-[var(--text-secondary)] border-[var(--input-border)]"
                       }`}
                     >
@@ -675,7 +673,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                   <path
                     d={trajectoryData.map((pt, i) => `${i === 0 ? "M" : "L"} ${i * 60 + 10} ${110 - (pt.risk * 0.9)}`).join(" ")}
                     fill="none"
-                    stroke="#39062B"
+                    stroke="var(--accent-melanzane)"
                     strokeWidth="3"
                     className="transition-all duration-300"
                   />
@@ -687,7 +685,7 @@ export default function DigitalTwin({ initialData, onBack }) {
                         cx={i * 60 + 10}
                         cy={110 - (pt.risk * 0.9)}
                         r="4"
-                        fill="#39062B"
+                        fill="var(--accent-melanzane)"
                         stroke="#ffffff"
                         strokeWidth="2"
                       />
@@ -713,15 +711,15 @@ export default function DigitalTwin({ initialData, onBack }) {
               </h3>
               <ul className="space-y-2 text-xs text-[var(--text-secondary)]">
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                   Systolic BP: {params.systolic > 130 ? "High elevation increases load" : "Optimal range"}
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                   Cholesterol Ratio: LDL {params.ldl} vs HDL {params.hdl}
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#39062B]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)]" />
                   Exercise Mitigation: -{(params.exercise * 2.2).toFixed(1)}% risk reduction
                 </li>
               </ul>
@@ -800,7 +798,7 @@ export default function DigitalTwin({ initialData, onBack }) {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

@@ -91,7 +91,7 @@ function PatientRegister() {
         <div className="flex-1 flex flex-col min-w-0">
           <Header />
 
-          <main className="p-6 md:p-10 flex-1 w-full max-w-6xl mx-auto">
+          <main className="p-6 md:p-10 flex-1 cardio-container">
             <div className="w-full">
               <div className="mb-8">
                 <h1 className="h2-semibold text-[var(--text-primary)]">

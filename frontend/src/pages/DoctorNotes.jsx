@@ -52,7 +52,7 @@ function DoctorNotes() {
     <div className="cardio-shell">
       <Navbar breadcrumb="Clinical Observations" />
 
-      <main className="cardio-container py-8 flex-1 w-full max-w-4xl">
+      <main className="cardio-container flex-1">
         <div className="cardio-card p-8">
           <div className="border-b border-[var(--border-color)] pb-4 mb-6">
             <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">

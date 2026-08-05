@@ -19,275 +19,135 @@ function Dashboard() {
     <div className="cardio-shell">
       <Navbar />
 
-      <main className="cardio-container py-8 flex-1 w-full relative overflow-hidden">
+      <main className="cardio-container flex-1 relative overflow-hidden">
         <PageBackground />
 
         <div className="relative z-10 w-full">
 
           {/* ================= Welcome Card ================= */}
+          <div className="relative overflow-hidden rounded-2xl bg-[var(--accent-melanzane)] border border-[var(--accent-melanzane-border)] shadow-xl p-8 md:p-10 text-white">
+            <Activity className="absolute right-6 top-1/2 -translate-y-1/2 w-48 h-48 text-white/10 pointer-events-none" />
 
-          <div
-            className="
-            relative
-            overflow-hidden
-            rounded-3xl
-            bg-gradient-to-r
-            from-blue-600
-            via-blue-700
-            to-indigo-800
-            shadow-2xl
-            p-10
-            text-white"
-          >
-
-            <Activity
-              className="
-              absolute
-              right-8
-              top-1/2
-              -translate-y-1/2
-              w-56
-              h-56
-              text-white/10"
-            />
-
-            <div className="relative z-10">
-
-              <h1 className="text-4xl font-bold">
-                Welcome 👋
+            <div className="relative z-10 space-y-2">
+              <span className="text-xs uppercase font-bold tracking-widest text-white/70">
+                Patient Workspace
+              </span>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+                Welcome 👋 {patientName || "Patient"}
               </h1>
 
-              <p className="text-2xl mt-3 font-medium">
-                {patientName || "Patient"}
-              </p>
-
-              <p className="mt-5 text-blue-100">
-                Patient ID :
-                <span className="font-semibold ml-2">
-                  {patientId || "Not Available"}
-                </span>
-              </p>
-
-              <p className="mt-2 text-blue-100">
-                Email :
-                <span className="font-semibold ml-2">
-                  {patientEmail || "Not Available"}
-                </span>
-              </p>
-
+              <div className="flex flex-wrap gap-x-6 gap-y-1 pt-3 text-xs md:text-sm text-white/80 font-medium">
+                <p>
+                  Patient ID: <span className="font-bold text-white ml-1">{patientId || "Not Available"}</span>
+                </p>
+                <p>
+                  Email: <span className="font-bold text-white ml-1">{patientEmail || "Not Available"}</span>
+                </p>
+              </div>
             </div>
-
           </div>
 
           {/* ================= Dashboard Cards ================= */}
-
-          <div className="grid md:grid-cols-3 gap-8 mt-10">
-
-            {/* Patient */}
-
-            <div
-              className="
-              bg-white
-              rounded-2xl
-              border
-              border-slate-100
-              shadow-lg
-              p-7
-              transition-all
-              duration-300"
-            >
-
-              <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-5">
-                <User
-                  size={30}
-                  className="text-blue-600"
-                />
+          <div className="grid md:grid-cols-3 gap-6 mt-8">
+            {/* Patient Profile */}
+            <div className="cardio-card p-6 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center mb-4">
+                  <User size={24} />
+                </div>
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                  Patient Profile
+                </h2>
+                <p className="caption-small text-[var(--text-secondary)] mt-2">
+                  Registered patient account active.
+                </p>
               </div>
-
-              <h2 className="text-2xl font-bold">
-                Patient Profile
-              </h2>
-
-              <p className="text-gray-500 mt-3">
-                Registered successfully.
-              </p>
-
             </div>
 
             {/* Latest Prediction */}
-
-            <div
-              className="
-              bg-white
-              rounded-2xl
-              border
-              border-slate-100
-              shadow-lg
-              p-7
-              transition-all
-              duration-300"
-            >
-
-              <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mb-5">
-
-                <HeartPulse
-                  size={30}
-                  className="text-red-500"
-                />
-
+            <div className="cardio-card p-6 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center mb-4">
+                  <HeartPulse size={24} />
+                </div>
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                  Latest Prediction
+                </h2>
+                <p className="caption-small text-[var(--text-secondary)] mt-2">
+                  No prediction available yet.
+                </p>
               </div>
-
-              <h2 className="text-2xl font-bold">
-                Latest Prediction
-              </h2>
-
-              <p className="text-gray-500 mt-3">
-                No prediction available yet.
-              </p>
-
             </div>
 
             {/* History */}
-
-            <div
-              className="
-              bg-white
-              rounded-2xl
-              border
-              border-slate-100
-              shadow-lg
-              p-7
-              transition-all
-              duration-300"
-            >
-
-              <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mb-5">
-
-                <History
-                  size={30}
-                  className="text-green-600"
-                />
-
+            <div className="cardio-card p-6 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
+                  <History size={24} />
+                </div>
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                  Prediction History
+                </h2>
+                <p className="caption-small text-[var(--text-secondary)] mt-2">
+                  View all previous predictions and clinical assessments.
+                </p>
               </div>
-
-              <h2 className="text-2xl font-bold">
-                Prediction History
-              </h2>
-
-              <p className="text-gray-500 mt-3">
-                View all previous predictions.
-              </p>
-
             </div>
-
           </div>
 
           {/* ================= Quick Actions ================= */}
-
-          <div
-            className="
-            bg-white
-            rounded-3xl
-            border
-            border-slate-100
-            shadow-xl
-            p-8
-            mt-10"
-          >
-
-            <h2 className="text-3xl font-bold mb-8">
+          <div className="cardio-card p-8 mt-8">
+            <h2 className="h2-semibold text-xl md:text-2xl mb-6 text-[var(--text-primary)]">
               Quick Actions
             </h2>
 
             <div className="grid md:grid-cols-3 gap-6">
-
               {/* Diagnosis */}
-
               <Link
-                to="/diagnose"
-                className="
-                bg-gradient-to-r
-                from-blue-600
-                to-indigo-700
-                rounded-2xl
-                p-6
-                text-white
-                transition-all
-                duration-300"
+                to="/patient/intake"
+                className="btn-primary flex-col items-start p-6 text-left h-auto gap-3 rounded-2xl shadow-md hover:shadow-lg"
               >
-
-                <HeartPulse size={36} />
-
-                <h3 className="mt-4 text-xl font-bold">
-                  Start Diagnosis
-                </h3>
-
-                <p className="mt-2 text-blue-100">
-                  Begin a new AI heart disease assessment.
-                </p>
-
+                <HeartPulse size={32} />
+                <div>
+                  <h3 className="text-base font-bold">Start AI Diagnosis</h3>
+                  <p className="caption-small text-white/80 mt-1">
+                    Begin a new multi-modal cardiovascular risk assessment.
+                  </p>
+                </div>
               </Link>
 
               {/* Reports */}
-
               <Link
                 to="/reports"
-                className="
-                bg-white
-                border
-                border-slate-200
-                rounded-2xl
-                p-6
-                transition-all
-                duration-300"
+                className="cardio-card-interactive p-6 flex-col items-start text-left h-auto gap-3 rounded-2xl"
               >
-
-                <FileText
-                  size={36}
-                  className="text-green-600"
-                />
-
-                <h3 className="mt-4 text-xl font-bold">
-                  Reports
-                </h3>
-
-                <p className="mt-2 text-gray-500">
-                  Download patient and doctor reports.
-                </p>
-
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                  <FileText size={24} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)]">Clinical Reports</h3>
+                  <p className="caption-small text-[var(--text-secondary)] mt-1">
+                    Download and print generated risk reports.
+                  </p>
+                </div>
               </Link>
 
               {/* History */}
-
               <Link
-                to="/history"
-                className="
-                bg-white
-                border
-                border-slate-200
-                rounded-2xl
-                p-6
-                transition-all
-                duration-300"
+                to="/digital-twin"
+                className="cardio-card-interactive p-6 flex-col items-start text-left h-auto gap-3 rounded-2xl"
               >
-
-                <History
-                  size={36}
-                  className="text-blue-600"
-                />
-
-                <h3 className="mt-4 text-xl font-bold">
-                  Prediction History
-                </h3>
-
-                <p className="mt-2 text-gray-500">
-                  Review previous AI predictions.
-                </p>
-
+                <div className="w-10 h-10 rounded-xl bg-[var(--accent-melanzane-light)] text-[var(--accent-melanzane)] flex items-center justify-center">
+                  <History size={24} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)]">Digital Twin</h3>
+                  <p className="caption-small text-[var(--text-secondary)] mt-1">
+                    Simulate lifestyle & therapeutic parameter shifts.
+                  </p>
+                </div>
               </Link>
-
             </div>
-
           </div>
 
         </div>

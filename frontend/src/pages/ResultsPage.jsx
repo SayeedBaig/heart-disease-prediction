@@ -30,10 +30,8 @@ export default function ResultsPage() {
   const levelColor = level === "Low" ? "#10b981" : level === "Moderate" ? "#f59e0b" : "#ef4444";
 
   return (
-    <div className="cardio-shell">
-      <Navbar breadcrumb="Assessment Results" />
-
-      <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
+    <>
+      <div>
         <div className="text-center mb-10">
           <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold tracking-wider">
             AI Screening Result
@@ -72,7 +70,7 @@ export default function ResultsPage() {
             <ul className="space-y-2.5 text-xs text-[var(--text-secondary)]">
               {recs.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#39062B] mt-1.5 flex-shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-melanzane)] mt-1.5 flex-shrink-0" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -109,7 +107,7 @@ export default function ResultsPage() {
             Book Appointment
           </Link>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

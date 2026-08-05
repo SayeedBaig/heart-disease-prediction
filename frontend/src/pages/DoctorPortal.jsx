@@ -67,7 +67,7 @@ export default function DoctorPortal() {
       <div className="cardio-shell">
         <Navbar onBack={() => navigate("/")} breadcrumb="Doctor Login" />
 
-        <main className="max-w-md mx-auto w-full px-6 py-14">
+        <main className="cardio-container flex-1">
           <div className="cardio-card p-8">
             <div className="text-center mb-6">
               <span className="caption-small text-[var(--accent-melanzane)] uppercase font-bold">
@@ -115,36 +115,43 @@ export default function DoctorPortal() {
     );
   }
 
+  const renderDashboardWrap = (children, activeTab) => (
+    <DoctorDashboard
+      doctor={doctor}
+      activeTab={activeTab}
+      onNavigate={(target) => setScreen(target)}
+      onLogout={handleLogout}
+    >
+      {children}
+    </DoctorDashboard>
+  );
+
   // Doctor Dashboard (Minimal 5 Cards View)
   if (screen === "dashboard") {
-    return (
-      <DoctorDashboard
-        doctor={doctor}
-        onNavigate={(target) => setScreen(target)}
-        onLogout={handleLogout}
-      />
-    );
+    return renderDashboardWrap(null, "dashboard");
   }
 
   // Appointments Management
   if (screen === "appointments") {
-    return <AppointmentManagement />;
+    return renderDashboardWrap(<AppointmentManagement />, "appointments");
   }
 
   // Reports Management
   if (screen === "reports") {
-    return <Reports />;
+    return renderDashboardWrap(<Reports />, "reports");
   }
 
   // Patients Management
   if (screen === "patients") {
-    return (
-      <div className="cardio-shell">
-        <Navbar onBack={() => setScreen("dashboard")} breadcrumb="Patients Management" />
-        <main className="cardio-container py-8 flex-1 w-full max-w-5xl">
-          <div className="cardio-card p-8">
-            <h1 className="h2-semibold text-[var(--text-primary)] mb-4">Patient Roster</h1>
-            <p className="body-regular text-xs mb-6">Live patient records with each patient&apos;s latest assessment.</p>
+    return renderDashboardWrap(
+      <div>
+          <div className="mb-8 border-b border-[var(--border-color)] pb-6">
+            <span className="caption-small font-bold uppercase tracking-wider text-[var(--accent-melanzane)]">Patient Management</span>
+            <h1 className="h2-semibold text-[var(--text-primary)] mt-1">Patient Roster</h1>
+            <p className="body-regular text-xs mt-2">Live patient records with each patient&apos;s latest assessment.</p>
+          </div>
+          <div className="cardio-card p-6">
+
 
             {patientsLoading && <p className="caption-small">Loading patient records…</p>}
             {patientsError && <p className="text-xs font-semibold text-red-500">{patientsError}</p>}
@@ -245,19 +252,21 @@ export default function DoctorPortal() {
               </div>
             )}
           </div>
-        </main>
-      </div>
+      </div>,
+      "patients"
     );
   }
 
   // Profile View
   if (screen === "profile") {
-    return (
-      <div className="cardio-shell">
-        <Navbar onBack={() => setScreen("dashboard")} breadcrumb="Doctor Profile" />
-        <main className="cardio-container py-8 flex-1 w-full max-w-2xl">
-          <div className="cardio-card p-8 space-y-4 text-xs">
-            <h1 className="h2-semibold text-[var(--text-primary)]">Clinician Credentials</h1>
+    return renderDashboardWrap(
+      <div>
+        <div className="mb-8 border-b border-[var(--border-color)] pb-6">
+          <span className="caption-small font-bold uppercase tracking-wider text-[var(--accent-melanzane)]">Doctor Profile</span>
+          <h1 className="h2-semibold text-[var(--text-primary)] mt-1">Clinician Credentials</h1>
+          <p className="body-regular text-xs mt-2">Your verified medical credentials.</p>
+        </div>
+        <div className="cardio-card p-8 space-y-4 text-xs">
             <div>
               <span className="caption-small">Full Name</span>
               <div className="font-bold text-sm text-[var(--text-primary)]">{doctor.full_name}</div>
@@ -270,20 +279,11 @@ export default function DoctorPortal() {
               <span className="caption-small">Affiliate Hospital</span>
               <div className="font-bold text-[var(--text-primary)]">{doctor.hospital}</div>
             </div>
-            <button onClick={() => setScreen("dashboard")} className="btn-primary w-full py-2.5 mt-4">
-              Return to Dashboard
-            </button>
           </div>
-        </main>
-      </div>
+      </div>,
+      "profile"
     );
   }
 
-  return (
-    <DoctorDashboard
-      doctor={doctor}
-      onNavigate={(target) => setScreen(target)}
-      onLogout={handleLogout}
-    />
-  );
+  return renderDashboardWrap(null, "dashboard");
 }
