@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "test": "High risk + MI + Low EF",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 0.5,
+      "category_coverage": 0.5,
+      "avg_confidence": 0.08,
+      "duplicate_sources": 3,
+      "sources": [
+        "ESC_2021_CVD_Prevention.pdf p.4",
+        "ESC_2021_CVD_Prevention.pdf p.82",
+        "ESC_2021_CVD_Prevention.pdf p.69",
+        "ESC_2021_CVD_Prevention.pdf p.66"
+      ]
+    },
+    {
+      "test": "Low risk + NORM",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.124,
+      "duplicate_sources": 2,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.5",
+        "WHO_2020_HEARTS_Package.pdf p.10",
+        "WHO_2020_HEARTS_Package.pdf p.79",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.34"
+      ]
+    },
+    {
+      "test": "Medium risk + STTC",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 1.0,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.021,
+      "duplicate_sources": 0,
+      "sources": [
+        "AHA_2021_Heart_Stroke_Statistics.pdf p.343",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.3",
+        "ESC_2021_CVD_Prevention.pdf p.1",
+        "WHO_2020_HEARTS_Package.pdf p.79"
+      ]
+    },
+    {
+      "test": "High risk + HYP",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 0.667,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.028,
+      "duplicate_sources": 2,
+      "sources": [
+        "ESC_2021_CVD_Prevention.pdf p.81",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.39",
+        "ACC_AHA_2019_Primary_Prevention.pdf p.30",
+        "ESC_2021_CVD_Prevention.pdf p.58"
+      ]
+    },
+    {
+      "test": "Medium risk + CD",
+      "chunks_retrieved": 4,
+      "keyword_coverage": 0.667,
+      "category_coverage": 1.0,
+      "avg_confidence": 0.08,
+      "duplicate_sources": 1,
+      "sources": [
+        "ACC_AHA_2019_Primary_Prevention.pdf p.3",
+        "WHO_2020_HEARTS_Package.pdf p.21",
+        "WHO_2020_HEARTS_Package.pdf p.1",
+        "ESC_2021_CVD_Prevention.pdf p.1"
+      ]
+    }
+  ],
+  "summary": {
+    "total_tests": 5,
+    "avg_keyword_coverage": 0.767,
+    "avg_category_coverage": 0.9,
+    "avg_confidence": 0.067,
+    "total_duplicates_found": 8,
+    "overall_quality": "GOOD"
+  }
+}
