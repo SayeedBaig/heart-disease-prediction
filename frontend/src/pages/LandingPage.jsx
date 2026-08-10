@@ -13,6 +13,8 @@ import { Section } from "../components/ui/Section";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Grid } from "../components/ui/Grid";
+import HeroHeart from "../components/hero/HeroHeart";
+import ECGBackground from "../components/hero/ECGBackground";
 
 import { stats, capabilities, reasons, faqs, twinMetrics } from "../components/landing/landingData";
 
@@ -34,17 +36,29 @@ export default function LandingPage() {
     <AppLayout className="bg-background overflow-hidden selection:bg-primary/20">
       
       {/* ================= HERO SECTION ================= */}
-      <Section className="relative pt-20 md:pt-32 pb-24 md:pb-40 border-b border-border z-10">
-        {/* Background Glow Effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-70 pointer-events-none -z-10" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[100px] opacity-50 pointer-events-none -z-10" />
+      <Section
+        className="relative pt-20 md:pt-28 pb-16 md:pb-32 border-b border-border z-10 bg-background"
+        style={{ overflow: "visible" }}
+      >
+        {/* Animated ECG background — opacity adapts to theme inside the component */}
+        <ECGBackground />
 
-        <Container>
-          <Grid cols={2} gap={12} className="items-center">
-            {/* Left Content */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
+        {/* Center ambient glow — primary/20 in light, stronger in dark */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px] rounded-full pointer-events-none -z-10"
+          style={{ background: "radial-gradient(ellipse, rgba(37,99,235,0.18) 0%, rgba(59,130,246,0.05) 50%, transparent 75%)", filter: "blur(60px)" }} />
+        {/* Right-side glow */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none -z-10"
+          style={{ background: "radial-gradient(ellipse, rgba(37,99,235,0.14) 0%, transparent 65%)", filter: "blur(80px)" }} />
+
+        <Container className="relative z-10">
+          {/* Flex: left text (42%) | right visualization (58%) */}
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-2">
+
+            {/* ── Left Content (unchanged) ── */}
+            <motion.div
+              className="flex-shrink-0 w-full lg:w-[42%]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur-sm cursor-default">
@@ -53,7 +67,7 @@ export default function LandingPage() {
               </div>
               <h1 className="mt-8 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl text-foreground leading-[1.1]">
                 AI-Powered Heart <br className="hidden lg:block"/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
                   Disease Screening
                 </span>
               </h1>
@@ -62,17 +76,17 @@ export default function LandingPage() {
               </p>
               <div className="mt-10 flex flex-wrap gap-4 items-center">
                 <Link to="/get-started">
-                  <Button size="lg" className="h-14 px-8 text-base font-semibold shadow-lg shadow-primary/20 group transition-all hover:-translate-y-0.5 cursor-pointer">
+                  <Button size="lg" className="h-14 px-8 text-base font-semibold shadow-lg shadow-primary/30 group transition-all hover:-translate-y-0.5 cursor-pointer">
                     Start Screening
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button variant="outline" size="lg" onClick={scrollToCapabilities} className="h-14 px-6 text-base font-semibold bg-background/50 backdrop-blur hover:bg-accent transition-all hover:-translate-y-0.5 cursor-pointer">
+                <Button variant="outline" size="lg" onClick={scrollToCapabilities} className="h-14 px-6 text-base font-semibold bg-background/30 backdrop-blur hover:bg-accent/20 border-primary/30 transition-all hover:-translate-y-0.5 cursor-pointer">
                   Explore Capabilities
                   <ChevronDown className="ml-2 h-5 w-5" />
                 </Button>
               </div>
-              
+
               <div className="mt-12 flex items-center gap-4 text-sm text-muted-foreground font-medium">
                 <div className="flex -space-x-2">
                   {[1,2,3,4].map(i => (
@@ -81,86 +95,19 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <div>Secure & Private Health Platform</div>
+                <div>Secure &amp; Private Health Platform</div>
               </div>
             </motion.div>
 
-            {/* Right Content - Interactive AI Mock */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }} 
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative w-full max-w-[540px] mx-auto lg:ml-auto perspective-1000 cursor-default"
+            {/* ── Right Content — Premium AI Heart Visualization ── */}
+            <div
+              className="flex-1 flex items-center justify-center lg:justify-end"
+              style={{ overflow: "visible", minHeight: 520 }}
             >
-              {/* Floating element 1 */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }} 
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-6 -right-6 z-20 bg-background border border-border shadow-xl rounded-xl p-4 flex items-center gap-3 backdrop-blur-md"
-              >
-                <div className="h-10 w-10 bg-success/10 rounded-full flex items-center justify-center">
-                  <Activity className="h-5 w-5 text-success" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-muted-foreground uppercase">ECG Analysis</div>
-                  <div className="text-sm font-extrabold">Normal Sinus Rhythm</div>
-                </div>
-              </motion.div>
+              <HeroHeart />
+            </div>
 
-              {/* Main Dashboard Panel */}
-              <div className="relative rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl overflow-hidden group">
-                <div className="h-1.5 w-full bg-gradient-to-r from-primary via-blue-400 to-indigo-500" />
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1">Live AI Evaluation</div>
-                      <h3 className="text-xl font-extrabold text-white">Patient Risk Profile</h3>
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Analyzing
-                    </div>
-                  </div>
-
-                  {/* Animated ECG Line */}
-                  <div className="h-24 w-full bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-center mb-6 overflow-hidden relative">
-                    <svg viewBox="0 0 400 100" className="w-full h-full opacity-60 stroke-blue-500" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <motion.path 
-                        d="M 0 50 L 50 50 L 70 20 L 90 80 L 110 50 L 180 50 L 200 10 L 220 90 L 240 50 L 320 50 L 340 30 L 360 70 L 380 50 L 450 50"
-                        initial={{ pathLength: 0, x: 0 }}
-                        animate={{ pathLength: 1, x: -50 }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-transparent to-slate-950" />
-                  </div>
-
-                  {/* Metrics Grid */}
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-900">
-                      <div className="text-xs text-slate-400 font-medium mb-1">AI Confidence Score</div>
-                      <div className="text-2xl font-extrabold text-emerald-400">96.4%</div>
-                    </div>
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-900">
-                      <div className="text-xs text-slate-400 font-medium mb-1">Calculated Risk</div>
-                      <div className="text-2xl font-extrabold text-amber-400">Moderate</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-900 border border-slate-800 text-slate-200">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                      <div className="text-sm font-medium">Ejection Fraction evaluated at 58%</div>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-900 border border-slate-800 text-slate-200">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                      <div className="text-sm font-medium">Lipid panels within nominal ranges</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </Grid>
+          </div>
         </Container>
       </Section>
       
