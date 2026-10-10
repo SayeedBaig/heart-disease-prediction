@@ -74,3 +74,5 @@ class Patient(Base):
         back_populates="patient",
         cascade="all, delete-orphan"
     )
+
+    
