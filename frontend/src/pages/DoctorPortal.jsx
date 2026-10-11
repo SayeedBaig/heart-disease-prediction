@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import DoctorDashboard from "./DoctorDashboard";
 import AppointmentManagement from "./AppointmentManagement";
 import Reports from "./Reports";
+import DigitalTwin from "./DigitalTwin";
 import { emailDoctorReport, getAllPatients, getDoctorReport, viewDoctorReportPdf } from "../services/doctorService";
 
 export default function DoctorPortal() {
@@ -16,8 +17,19 @@ export default function DoctorPortal() {
     if (path.includes("/reports")) return "reports";
     if (path.includes("/patients")) return "patients";
     if (path.includes("/profile")) return "profile";
+    if (path.includes("/digital-twin")) return "twin";
     return "dashboard";
   });
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes("/appointments")) setScreen("appointments");
+    else if (path.includes("/reports")) setScreen("reports");
+    else if (path.includes("/patients")) setScreen("patients");
+    else if (path.includes("/profile")) setScreen("profile");
+    else if (path.includes("/digital-twin")) setScreen("twin");
+    else if (path.includes("/dashboard")) setScreen("dashboard");
+  }, [location.pathname]);
 
   const [auth, setAuth] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -139,6 +151,11 @@ export default function DoctorPortal() {
   // Reports Management
   if (screen === "reports") {
     return renderDashboardWrap(<Reports />, "reports");
+  }
+
+  // Digital Twin Viewer
+  if (screen === "twin" || screen === "digital-twin") {
+    return renderDashboardWrap(<DigitalTwin onBack={() => setScreen("dashboard")} />, "twin");
   }
 
   // Patients Management

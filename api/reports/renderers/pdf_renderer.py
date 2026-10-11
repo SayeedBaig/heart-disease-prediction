@@ -80,6 +80,15 @@ class PdfRenderer:
             report_data.get("medical_explanation")
         ))
 
+        # ── Clinical Alerts and Recommendations ─────────────────────────
+        # Rendered for ALL report types.  Evaluated independently of the
+        # ML prediction score — a low risk score does NOT suppress alerts.
+        # The list is empty for historical reports where raw inputs were not
+        # persisted; in that case, format_clinical_alerts renders the
+        # "no alerts triggered" notice.
+        clinical_alerts = report_data.get("clinical_alerts") or []
+        elements.extend(fmt.format_clinical_alerts(clinical_alerts))
+
         # ── Supporting references (doctor) ───────────────────────────────
         elements.extend(fmt.format_references(
             report_data.get("supporting_references")
@@ -91,3 +100,4 @@ class PdfRenderer:
         document.build(elements)
         buffer.seek(0)
         return buffer
+

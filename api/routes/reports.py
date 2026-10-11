@@ -23,6 +23,10 @@ async def email_digital_twin_report(
     current_patient=Depends(get_current_patient),
 ):
     risk = simulation.get("risk", {})
+    # clinical_alerts may be present in the simulation payload (from the frontend
+    # buildReport function).  We pass them through so the PDF includes them.
+    # Both baseline and per-scenario alerts may be present.
+    clinical_alerts = simulation.get("clinical_alerts") or []
     report = {
         "report_type": "patient",
         "patient": {
@@ -40,6 +44,7 @@ async def email_digital_twin_report(
         "digital_twin": {"scenarios": simulation.get("scenarios", []), "parameters": simulation.get("metrics", [])},
         "lifestyle_recommendations": simulation.get("recommendations", []),
         "follow_up_advice": ["Review this simulation with your treating clinician before making health decisions."],
+        "clinical_alerts": clinical_alerts,
     }
     pdf_buffer = PdfRenderer().render(report)
     await EmailService().send_report(
@@ -49,6 +54,7 @@ async def email_digital_twin_report(
         filename=f"digital_twin_report_{current_patient.patient_id}.pdf",
     )
     return {"success": True, "message": "Digital Twin Report sent successfully."}
+
 
 
 @router.get(

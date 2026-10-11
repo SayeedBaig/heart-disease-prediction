@@ -26,6 +26,8 @@ WHITE      = colors.white
 LIGHT_GRAY = colors.HexColor("#F7F9FA")
 MID_GRAY   = colors.HexColor("#CBD5E0")
 BLACK      = colors.black
+AMBER      = colors.HexColor("#B45309")   # clinical alert accent colour
+AMBER_BG   = colors.HexColor("#FFFBEB")  # light amber background for alert rows
 
 # Page content width (A4 minus margins)
 CONTENT_W = 170 * mm
@@ -57,6 +59,11 @@ def build_styles() -> Dict[str, ParagraphStyle]:
             textColor=WHITE, alignment=TA_LEFT,
             spaceAfter=0, spaceBefore=0,
         ),
+        "alert_title": ParagraphStyle(
+            "alert_title", fontName="Helvetica-Bold", fontSize=11,
+            textColor=WHITE, alignment=TA_LEFT,
+            spaceAfter=0, spaceBefore=0,
+        ),
         "sub_section": ParagraphStyle(
             "sub_section", fontName="Helvetica-Bold", fontSize=10,
             textColor=NAVY, spaceBefore=6, spaceAfter=2,
@@ -75,6 +82,15 @@ def build_styles() -> Dict[str, ParagraphStyle]:
             "plain", fontName="Helvetica", fontSize=9,
             textColor=SLATE, spaceAfter=4, leading=13,
             alignment=TA_JUSTIFY,
+        ),
+        "alert_body": ParagraphStyle(
+            "alert_body", fontName="Helvetica", fontSize=9,
+            textColor=AMBER, spaceAfter=3, leading=13,
+            alignment=TA_JUSTIFY,
+        ),
+        "alert_label": ParagraphStyle(
+            "alert_label", fontName="Helvetica-Bold", fontSize=9,
+            textColor=AMBER,
         ),
         "risk_box_label": ParagraphStyle(
             "risk_box_label", fontName="Helvetica-Bold", fontSize=11,
@@ -547,6 +563,134 @@ class PdfFormatter:
                 out.append(Paragraph(f"[{i}]  {text}", self.s["bullet"]))
 
         return out
+
+    # ── Clinical alerts ───────────────────────────────────────────────────
+
+    _SEVERITY_LABELS = {
+        "urgent":  "⚠ URGENT",
+        "warning": "⚠ Warning",
+        "info":    "ℹ Note",
+    }
+
+    def format_clinical_alerts(self, alerts: list) -> List:
+        """
+        Render the 'Clinical Alerts and Recommendations' section.
+
+        Parameters
+        ----------
+        alerts : list[dict]
+            Serialised ClinicalAlert dicts as produced by
+            ``clinical_alert_engine.alerts_to_dicts()``.
+            Each dict contains: alert_id, parameter, measured_value, unit,
+            category, severity, threshold_rule, explanation, recommendation,
+            is_hypothetical, context_id.
+
+        Returns
+        -------
+        list[Flowable]
+            Ready-to-append PDF flowables.
+        """
+        # Banner with amber background to distinguish from teal sections
+        banner_text = "Clinical Alerts and Recommendations"
+        banner_table = Table(
+            [[Paragraph(banner_text.upper(), self.s["alert_title"] if "alert_title" in self.s else self.s["section_title"])]],
+            colWidths=[CONTENT_W],
+        )
+        banner_table.setStyle(TableStyle([
+            ("BACKGROUND",    (0, 0), (-1, -1), AMBER),
+            ("TOPPADDING",    (0, 0), (-1, -1), 5),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("LEFTPADDING",   (0, 0), (-1, -1), 8),
+        ]))
+
+        out = [self.spacer(3), banner_table, self.spacer(2)]
+
+        if not alerts:
+            out.append(Paragraph(
+                "No clinical screening alerts were triggered by the configured rules "
+                "for the available measurements. This does not rule out disease or other "
+                "medical concerns. Always consult a qualified healthcare professional.",
+                self.s["plain"],
+            ))
+            out.append(self.spacer(2))
+            out.append(self._ml_disclaimer())
+            return out
+
+        for idx, alert in enumerate(alerts, 1):
+            if not isinstance(alert, dict):
+                continue
+
+            severity     = alert.get("severity", "info")
+            severity_lbl = self._SEVERITY_LABELS.get(severity, "ℹ Note")
+            parameter    = alert.get("parameter", "")
+            measured_val = alert.get("measured_value", "")
+            unit         = alert.get("unit", "")
+            threshold    = alert.get("threshold_rule", "")
+            explanation  = alert.get("explanation", "")
+            rec          = alert.get("recommendation", "")
+            is_hypo      = alert.get("is_hypothetical", False)
+            context      = alert.get("context_id") or ""
+
+            hypo_marker = " [HYPOTHETICAL SCENARIO]" if is_hypo else " [OBSERVED MEASUREMENT]"
+            header_text = f"{severity_lbl}  —  {parameter}{hypo_marker}"
+
+            rows = [
+                [
+                    Paragraph("<b>Alert</b>", self.s["alert_label"] if "alert_label" in self.s else self.s["kv_key"]),
+                    Paragraph(header_text, self.s["alert_label"] if "alert_label" in self.s else self.s["kv_key"]),
+                ],
+                [
+                    Paragraph("<b>Value</b>", self.s["kv_key"]),
+                    Paragraph(f"{measured_val} {unit}".strip(), self.s["kv_val"]),
+                ],
+                [
+                    Paragraph("<b>Rule</b>", self.s["kv_key"]),
+                    Paragraph(threshold, self.s["kv_val"]),
+                ],
+                [
+                    Paragraph("<b>Explanation</b>", self.s["kv_key"]),
+                    Paragraph(explanation, self.s["plain"]),
+                ],
+                [
+                    Paragraph("<b>Recommendation</b>", self.s["kv_key"]),
+                    Paragraph(rec, self.s["plain"]),
+                ],
+            ]
+            if context:
+                rows.append([
+                    Paragraph("<b>Context</b>", self.s["kv_key"]),
+                    Paragraph(context, self.s["kv_val"]),
+                ])
+
+            t = Table(rows, colWidths=[COL_LABEL, COL_VALUE])
+            t.setStyle(TableStyle([
+                ("BACKGROUND",    (0, 0), (-1, -1), AMBER_BG),
+                ("BACKGROUND",    (0, 0), (-1, 0), AMBER_BG),
+                ("BOX",           (0, 0), (-1, -1), 0.8, AMBER),
+                ("LINEBELOW",     (0, 0), (-1, 0), 0.5, AMBER),
+                ("GRID",          (0, 0), (-1, -1), 0.2, MID_GRAY),
+                ("TOPPADDING",    (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("LEFTPADDING",   (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING",  (0, 0), (-1, -1), 6),
+                ("VALIGN",        (0, 0), (-1, -1), "TOP"),
+            ]))
+            out.append(t)
+            out.append(self.spacer(2))
+
+        out.append(self._ml_disclaimer())
+        return out
+
+    def _ml_disclaimer(self) -> "Paragraph":
+        """Return the standard ML model disclaimer paragraph."""
+        text = (
+            "These results are generated by a machine-learning model and are intended to "
+            "support clinical assessment. They do not constitute a diagnosis or replace "
+            "evaluation by a qualified healthcare professional. Clinical alerts are evaluated "
+            "independently of the model's heart disease prediction score."
+        )
+        style = self.s.get("plain", next(iter(self.s.values())))
+        return Paragraph(text, style)
 
     # ── Header ────────────────────────────────────────────────────────────
 

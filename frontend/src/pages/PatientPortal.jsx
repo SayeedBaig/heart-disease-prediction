@@ -22,12 +22,12 @@ export default function PatientPortal() {
   const [screen, setScreen] = useState(() => {
     const path = location.pathname;
     if (path.includes("/intake") || path.includes("/diagnose")) return "intake";
-    if (path.includes("/dashboard") || (localStorage.getItem("access_token") && localStorage.getItem("cardio-patient"))) return "hub";
     if (path.includes("/digital-twin/report")) return "twin-report";
     if (path.includes("/digital-twin")) return "twin";
     if (path.includes("/reports")) return "report";
     if (path.includes("/appointments")) return "appointment";
     if (path.includes("/profile")) return "profile";
+    if (path.includes("/dashboard") || (localStorage.getItem("access_token") && localStorage.getItem("cardio-patient"))) return "hub";
     return "landing";
   });
 

@@ -127,3 +127,23 @@ export async function bookAppointment({ doctorId, date, time, symptoms, reason }
   });
   return data;
 }
+
+/**
+ * Run multi-scenario Digital Twin simulation on the backend.
+ *
+ * @param {string} patientId  - registered patient_id
+ * @param {object} baseline   - current clinical baseline parameter object
+ * @param {object} scenarios  - { scenarioName: { ...overrides } } map
+ * @returns Promise<ScenarioResponse>
+ *
+ * NOTE: scores returned are TwinEngine rule-based composites,
+ * NOT calibrated ML probabilities from the main prediction model.
+ */
+export async function runDigitalTwinScenarios(patientId, baseline, scenarios) {
+  const { data } = await api.post("/digital-twin/simulate", {
+    patient_id: patientId,
+    baseline,
+    scenarios,
+  });
+  return data;
+}

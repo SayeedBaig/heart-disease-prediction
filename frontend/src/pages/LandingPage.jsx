@@ -235,7 +235,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ================= DIGITAL TWIN SECTION ================= */}
-      <Section className="bg-background border-b border-border overflow-hidden">
+      <Section id="digital-twin" className="bg-background border-b border-border overflow-hidden scroll-mt-20">
         <Container>
           <Grid cols={2} gap={8} className="items-center">
             <motion.div 
@@ -255,7 +255,7 @@ export default function LandingPage() {
                 Our physiological Digital Twin models how targeted risk interventions—like blood pressure management or lifestyle adjustments—impact a patient's 10-year cardiac trajectory dynamically.
               </p>
               <div className="mt-8">
-                <Link to="/get-started">
+                <Link to="/digital-twin">
                   <Button size="lg" className="h-12 px-6 font-semibold shadow-md hover:-translate-y-0.5 transition-transform cursor-pointer">
                     <Play className="mr-2 h-4 w-4 fill-current" />
                     Launch Digital Twin Demo
@@ -520,7 +520,7 @@ export default function LandingPage() {
                 <div className="flex flex-col space-y-4 font-medium">
                   <button onClick={scrollToCapabilities} className="hover:text-primary transition-colors text-left w-fit cursor-pointer">Capabilities</button>
                   <Link to="/get-started" className="hover:text-primary transition-colors w-fit cursor-pointer">Clinical Workflow</Link>
-                  <Link to="/get-started" className="hover:text-primary transition-colors w-fit cursor-pointer">Digital Twin</Link>
+                  <Link to="/digital-twin" className="hover:text-primary transition-colors w-fit cursor-pointer">Digital Twin</Link>
                   <Link to="/get-started" className="hover:text-primary transition-colors w-fit cursor-pointer">Access Portals</Link>
                 </div>
             </div>

@@ -21,6 +21,7 @@ from api.routes.diagnosis import router as diagnosis_router
 from api.routes.rag import router as rag_router
 from api.routes.dashboard import router as dashboard_router
 from api.routes.doctor_portal import router as doctor_portal_router
+from api.routes.digital_twin import router as digital_twin_router
 
 
 logger = get_logger(__name__)
@@ -87,6 +88,7 @@ app.include_router(doctor_note_router)
 app.include_router(rag_router)
 app.include_router(dashboard_router)
 app.include_router(doctor_portal_router)
+app.include_router(digital_twin_router)
 
 @app.get("/")
 def root():

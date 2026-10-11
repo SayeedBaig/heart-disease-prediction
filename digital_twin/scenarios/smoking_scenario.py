@@ -9,8 +9,4 @@ def simulate(patient: PatientProfile):
 
     updated.smoking_status = False
 
-<<<<<<< HEAD
     return updated
-=======
-    return updated
->>>>>>> develop

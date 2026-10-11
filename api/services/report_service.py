@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
@@ -7,6 +7,7 @@ from api.repositories.patient_repository import PatientRepository
 from api.repositories.prediction_repository import PredictionRepository
 from api.repositories.diagnosis_repository import DiagnosisRepository
 from api.repositories.doctor_note_repository import DoctorNoteRepository
+from api.services.shared_memory_service import SharedMemoryService
 from reports.report_generator import ReportGenerator
 
 class ReportService:
@@ -17,6 +18,7 @@ class ReportService:
         self._diagnosis_repo = DiagnosisRepository(db)
         self._note_repo = DoctorNoteRepository(db)
         self._generator = ReportGenerator()
+        self._shared_memory = SharedMemoryService()
 
     def _resolve_patient(self, patient_id: int) -> Optional[Dict[str, Any]]:
         patient = self._patient_repo.get_by_id(patient_id)
@@ -67,17 +69,27 @@ class ReportService:
                     "created_at": str(n.created_at)
                 })
 
-        return prediction_dict, explanation_dict, digital_twin_dict, patient_dict, notes
+        # Pull alerts from shared memory if this is the most recent prediction.
+        # Alerts are NOT stored in the database (raw inputs are not persisted);
+        # for historical predictions the alerts list will be empty, which is the
+        # safe default — we must not fabricate alerts from stale data.
+        clinical_alerts: List[Dict[str, Any]] = self._shared_memory.get(
+            "latest_clinical_alerts"
+        ) or []
+
+        return prediction_dict, explanation_dict, digital_twin_dict, patient_dict, notes, clinical_alerts
 
     def generate_doctor_report(self, prediction_id: int) -> Dict[str, Any]:
-        pred, exp, dt, patient, notes = self._load_prediction_data(prediction_id)
+        pred, exp, dt, patient, notes, alerts = self._load_prediction_data(prediction_id)
         report = self._generator.generate_doctor_report(pred, exp, dt, patient=patient)
         report["doctor_notes"] = notes
+        report["clinical_alerts"] = alerts
         return report
 
     def generate_patient_report(self, prediction_id: int) -> Dict[str, Any]:
-        pred, exp, _, patient, notes = self._load_prediction_data(prediction_id)
+        pred, exp, _, patient, notes, alerts = self._load_prediction_data(prediction_id)
         report = self._generator.generate_patient_report(pred, exp, patient=patient)
         report["doctor_notes"] = notes
+        report["clinical_alerts"] = alerts
         return report
 

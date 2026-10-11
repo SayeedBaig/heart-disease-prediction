@@ -17,8 +17,4 @@ def simulate(patient: PatientProfile):
         patient.bmi - 3
     )
 
-<<<<<<< HEAD
     return updated
-=======
-    return updated
->>>>>>> develop

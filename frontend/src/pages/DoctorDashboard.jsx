@@ -322,7 +322,7 @@ export default function DoctorDashboard({ doctor, onNavigate, onLogout, children
                         <Button variant="outline" onClick={() => handleAction("assistant")} className="gap-2 shadow-sm bg-background border-border hover:bg-secondary cursor-pointer">
                           <Zap className="h-4 w-4 text-warning" /> AI Prediction Review
                         </Button>
-                        <Button variant="outline" className="gap-2 shadow-sm bg-background border-border hover:bg-secondary cursor-pointer">
+                        <Button variant="outline" onClick={() => handleAction("twin", "/doctor/digital-twin")} className="gap-2 shadow-sm bg-background border-border hover:bg-secondary cursor-pointer">
                           <Activity className="h-4 w-4 text-success" /> Digital Twin Viewer
                         </Button>
                         <Button variant="outline" onClick={() => handleAction("reports", "/doctor/reports")} className="gap-2 shadow-sm bg-background border-border hover:bg-secondary cursor-pointer">
