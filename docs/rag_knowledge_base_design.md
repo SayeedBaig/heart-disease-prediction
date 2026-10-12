@@ -8,7 +8,7 @@
 This document defines the structure, sources, and categorization strategy
 for the RAG knowledge base used in CardioAI's recommendation pipeline.
 The RAG module retrieves relevant clinical guideline text and passes it
-to the Claude API to generate evidence-cited, patient-specific recommendations.
+to the Groq API (openai/gpt-oss-120b) to generate evidence-cited, patient-specific recommendations.
 
 ---
 
@@ -27,7 +27,7 @@ RAG Retriever (rag/retriever.py)
 
 RAG Generator (rag/generator.py)
 
-→ Claude API call with chunks + fusion output
+→ Groq API call with chunks + fusion output
 
 → {summary, details, recommendations[]} with citations
 
@@ -97,7 +97,7 @@ build_query() maps fusion output to search queries:
 ---
 
 ## 8. Generator Output Format
-Claude API must return exactly this JSON (no markdown, no preamble):
+Groq API must return exactly this JSON (no markdown, no preamble):
 
 {
   "summary": "One sentence clinical summary.",

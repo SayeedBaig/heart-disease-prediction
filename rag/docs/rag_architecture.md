@@ -6,7 +6,7 @@
 
 ## 1. Overview
 The RAG (Retrieval-Augmented Generation) module retrieves relevant
-medical guideline chunks and passes them to the Claude API to generate
+medical guideline chunks and passes them to the Groq API (openai/gpt-oss-120b) to generate
 evidence-cited, patient-specific recommendations after every prediction.
 
 ---
@@ -32,7 +32,7 @@ ChromaDB Vector Store — top-4 relevant chunks
 
 ↓
 
-RAG Generator — Claude API call
+RAG Generator — Groq API call
 
 ↓
 
@@ -69,7 +69,7 @@ rag/
 
 ├── retriever.py                 # (Week 2) query builder + top-k retrieval
 
-└── generator.py                 # (Week 2) Claude API call with context
+└── generator.py                 # (Week 2) Groq API call with context
 
 ---
 
@@ -134,7 +134,7 @@ retrieve() returns top-4 chunks from ChromaDB for the query.
 
 ## 8. Generator Output Format
 
-Claude API returns strictly this JSON:
+Groq API (openai/gpt-oss-120b) returns strictly this JSON:
 
 ```json
 {
