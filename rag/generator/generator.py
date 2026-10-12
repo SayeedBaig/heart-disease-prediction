@@ -6,7 +6,7 @@ Week: 4 — RAG Implementation (Core)
 Purpose:
     Takes retrieved medical chunks and prediction data,
     builds a structured prompt, and generates a medical
-    explanation using the Groq API (llama-3.1-70b).
+    explanation using the Groq API (openai/gpt-oss-120b).
 """
 
 import os
