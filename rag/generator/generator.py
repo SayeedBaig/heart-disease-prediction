@@ -142,10 +142,10 @@ def build_chat_prompt(question: str, chunks: list) -> str:
         A prompt string ready to be passed to call_groq_api().
     """
     context_text = ""
-    for i, chunk in enumerate(chunks[:4]):
+    for i, chunk in enumerate(chunks[:6]):
         context_text += (
             f"\n[Reference {i + 1}] Source: {chunk['source']} "
-            f"(Page {chunk['page']})\n{chunk['text'][:300]}\n"
+            f"(Page {chunk['page']})\n{chunk['text'][:800]}\n"
         )
 
     prompt = f"""You are CardioAI, a clinical decision support assistant specialising in \

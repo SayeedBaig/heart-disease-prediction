@@ -99,7 +99,7 @@ class RAGService:
                     query += " reduced ejection fraction"
 
             # ── Step 2: Retrieve relevant guideline chunks ─────────────────
-            chunks = self._get_pipeline().retriever.retrieve(query, top_k=4)
+            chunks = self._get_pipeline().retriever.retrieve(query, top_k=6)
             self.logger.info("RAG chatbot: retrieved %d chunks", len(chunks))
 
             # ── Step 3 & 4: Build prompt and call LLM ─────────────────────
