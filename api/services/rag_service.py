@@ -1,9 +1,35 @@
 import os
+import re
 from typing import Optional
 
 from rag.generator.generator import build_chat_prompt, call_groq_api, GROQ_MODEL
 from rag.pipeline.rag_pipeline import RAGPipeline
 from api.utils.logger import get_logger
+
+
+# ?? Small talk (no guideline lookup needed) ???????????????????????????????????
+_GREETING_RE = re.compile(
+    r"^\s*((hi+|hello+|hey+)(\s+there)?|hola|namaste|good\s+(morning|afternoon|evening))\W*\s*$",
+    re.IGNORECASE,
+)
+_THANKS_BYE_RE = re.compile(
+    r"^\s*(thanks?|thank\s+you|ok(ay)?|bye|goodbye)\W*\s*$",
+    re.IGNORECASE,
+)
+GREETING_REPLY = (
+    "Hi! I'm the CardioAI assistant. You can ask me about heart health, "
+    "cardiovascular risk factors, ECG findings, or ejection fraction."
+)
+THANKS_BYE_REPLY = "Anytime! Ask me anything else about heart health."
+
+
+def _small_talk_reply(question: str) -> Optional[str]:
+    """Return a canned reply for greetings and thanks, else None."""
+    if _GREETING_RE.match(question):
+        return GREETING_REPLY
+    if _THANKS_BYE_RE.match(question):
+        return THANKS_BYE_REPLY
+    return None
 
 
 class RAGService:
@@ -79,6 +105,10 @@ class RAGService:
         Returns:
             dict with keys: answer (str), sources (list[dict]), status (str).
         """
+        reply = _small_talk_reply(question)
+        if reply:
+            return {"answer": reply, "sources": [], "status": "success"}
+
         try:
             self.logger.info("RAG chatbot: question received")
 
