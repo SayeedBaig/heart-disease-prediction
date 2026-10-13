@@ -2,7 +2,12 @@ import os
 import re
 from typing import Optional
 
-from rag.generator.generator import build_chat_prompt, call_groq_api, GROQ_MODEL
+from rag.generator.generator import (
+    build_chat_prompt,
+    call_groq_api,
+    CHAT_SYSTEM_PROMPT,
+    GROQ_MODEL,
+)
 from rag.pipeline.rag_pipeline import RAGPipeline
 from api.utils.logger import get_logger
 
@@ -134,7 +139,7 @@ class RAGService:
 
             # ── Step 3 & 4: Build prompt and call LLM ─────────────────────
             prompt = build_chat_prompt(question, chunks)
-            raw_answer = call_groq_api(prompt)
+            raw_answer = call_groq_api(prompt, system_prompt=CHAT_SYSTEM_PROMPT)
 
             # ── Step 5: Shape the response ─────────────────────────────────
             sources = [

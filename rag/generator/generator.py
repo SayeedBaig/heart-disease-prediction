@@ -81,7 +81,17 @@ Base everything strictly on the retrieved guidelines provided above."""
 
 # ── API Caller ────────────────────────────────────────────────────────────────
 
-def call_groq_api(prompt: str) -> str:
+JSON_SYSTEM_PROMPT = (
+    "You are a clinical decision support AI. "
+    "Always respond with valid JSON only."
+)
+CHAT_SYSTEM_PROMPT = (
+    "You are CardioAI, a cardiovascular health assistant. "
+    "Reply in plain text only. Never use JSON."
+)
+
+
+def call_groq_api(prompt: str, system_prompt: str = JSON_SYSTEM_PROMPT) -> str:
     if not GROQ_API_KEY:
         raise ValueError("GROQ_API_KEY not set. Add it to your .env file.")
 
@@ -94,8 +104,7 @@ def call_groq_api(prompt: str) -> str:
         messages=[
             {
                 "role": "system",
-                "content": "You are a clinical decision support AI. "
-                           "Always respond with valid JSON only."
+                "content": system_prompt
             },
             {"role": "user", "content": prompt}
         ]

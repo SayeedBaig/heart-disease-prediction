@@ -37,7 +37,7 @@ class ChatAskRequest(BaseModel):
 
     question: str = Field(
         ...,
-        min_length=3,
+        min_length=1,
         max_length=500,
         description="Free-text medical question from the user.",
         examples=["What are common symptoms of heart disease?"],
