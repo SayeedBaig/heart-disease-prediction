@@ -12,6 +12,8 @@ venv/
 # Environment Variables
 
 .env
+.env.local
+node_modules/
 
 # Frontend
 
@@ -47,3 +49,4 @@ uploads/echo/*
 # Keep folders in Git
 !uploads/ecg/.gitkeep
 !uploads/echo/.gitkeep
+.neon
