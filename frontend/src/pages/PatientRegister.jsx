@@ -120,7 +120,7 @@ function PatientRegister() {
         patientName={successData?.full_name}
         onContinue={handleContinue}
       />
-    </>
+      </div>
   );
 }
 

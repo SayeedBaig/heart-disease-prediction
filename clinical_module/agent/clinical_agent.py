@@ -7,14 +7,10 @@
 
 import json
 import os
-import warnings
 
 import joblib
 import numpy as np
 import pandas as pd
-
-warnings.filterwarnings("ignore")
-
 
 MODEL_DIR = os.environ.get("CLINICAL_MODEL_DIR", os.path.dirname(__file__))
 MODEL_PATH = os.path.join(MODEL_DIR, "stack_model.pkl")
@@ -346,10 +342,12 @@ def _rule_based_clinical(data: dict) -> dict:
     }
 
 
-def clinical_agent(input_data: dict) -> dict:
+def clinical_agent_with_status(input_data: dict) -> tuple[dict, str]:
     """
-    Run the clinical model and return a standardized response.
-    Falls back to rule-based assessment if the ML model is unavailable.
+    Run clinical inference and return a result plus an internal source status.
+
+    Status is one of ``ml``, ``rule_based``, or ``validation_error``. Callers
+    that need the legacy response contract should use ``clinical_agent``.
     """
 
     errors = _validate_input(input_data)
@@ -358,15 +356,13 @@ def clinical_agent(input_data: dict) -> dict:
             "level": None,
             "score": 0.0,
             "reason": "Validation errors: " + " | ".join(errors),
-        }
+        }, "validation_error"
 
     # ── Fallback: ML model not loaded ────────────────────────────────────
     if _stack_model is None or _scaler is None:
         result = _rule_based_clinical(input_data)
-        result["reason"] = (
-            "[Rule-based fallback — ML model unavailable] " + result["reason"]
-        )
-        return result
+        result["reason"] = "[Rule-based fallback — ML model unavailable] " + result["reason"]
+        return result, "rule_based"
 
     # ── ML model path ─────────────────────────────────────────────────────
     try:
@@ -374,8 +370,8 @@ def clinical_agent(input_data: dict) -> dict:
         scaled = _scaler.transform(features)
     except Exception as exc:
         result = _rule_based_clinical(input_data)
-        result["reason"] = f"[Rule-based fallback — feature error: {exc}] " + result["reason"]
-        return result
+        result["reason"] = "[Rule-based fallback — feature processing failed] " + result["reason"]
+        return result, "rule_based"
 
     try:
         probabilities = _stack_model.predict_proba(scaled)[0]
@@ -384,8 +380,8 @@ def clinical_agent(input_data: dict) -> dict:
         confidence = float(probabilities[predicted_label])
     except Exception as exc:
         result = _rule_based_clinical(input_data)
-        result["reason"] = f"[Rule-based fallback — model error: {exc}] " + result["reason"]
-        return result
+        result["reason"] = "[Rule-based fallback — model inference failed] " + result["reason"]
+        return result, "rule_based"
 
     level_map = {"Low Risk": "Low", "Medium Risk": "Medium", "High Risk": "High"}
     level = level_map[predicted_class]
@@ -396,7 +392,14 @@ def clinical_agent(input_data: dict) -> dict:
         "level": level,
         "score": round(confidence, 6),
         "reason": reason,
-    }
+    }, "ml"
+
+
+def clinical_agent(input_data: dict) -> dict:
+    """Run clinical inference while preserving the existing response shape."""
+
+    result, _inference_status = clinical_agent_with_status(input_data)
+    return result
 
 
 def clinical_agent_batch(patient_list: list[dict]) -> list[dict]:

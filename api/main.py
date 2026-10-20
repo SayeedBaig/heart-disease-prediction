@@ -4,9 +4,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.database.base import Base
-from api.database.connection import engine
-import api.models  # noqa: F401 — register every table before create_all
 from api.routes.health import router as health_router
 from api.routes.patient import router as patient_router
 from api.routes.predict import router as predict_router
@@ -32,7 +29,14 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting CardioAI Backend...")
 
-    Base.metadata.create_all(bind=engine)
+    if os.getenv("AUTO_CREATE_SCHEMA", "false").strip().lower() == "true":
+        # Convenience for disposable local development only. Production schema
+        # changes are applied explicitly with Alembic before service startup.
+        from api.database.base import Base
+        from api.database.connection import engine
+        import api.models  # noqa: F401 — register all models before create_all
+
+        Base.metadata.create_all(bind=engine)
 
     if os.getenv("CLEANUP_UPLOADS_ON_STARTUP", "false").strip().lower() == "true":
         cleanup_summary = UploadCleanupService().cleanup_all()

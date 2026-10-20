@@ -10,14 +10,18 @@ Purpose:
 
 import os
 import pickle
+from pathlib import Path
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from rag.model_config import EMBEDDING_MODEL, EMBEDDING_MODEL_REVISION
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-VECTOR_STORE_DIR = "rag/vector_store"
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+VECTOR_STORE_DIR = Path(
+    os.getenv("RAG_VECTOR_STORE_DIR", PROJECT_ROOT / "rag" / "vector_store")
+).expanduser().resolve()
 TOP_K = 4
 
 # ── Query Builder ─────────────────────────────────────────────────────────────
@@ -78,22 +82,37 @@ class RAGRetriever:
 
     def __init__(self):
         print("Initializing RAG Retriever...")
-        self.model = SentenceTransformer(EMBEDDING_MODEL)
+        self.model = SentenceTransformer(
+            EMBEDDING_MODEL,
+            revision=EMBEDDING_MODEL_REVISION,
+        )
 
-        index_path = os.path.join(VECTOR_STORE_DIR, "index.faiss")
-        metadata_path = os.path.join(VECTOR_STORE_DIR, "metadata.pkl")
+        index_path = VECTOR_STORE_DIR / "index.faiss"
+        metadata_path = VECTOR_STORE_DIR / "metadata.pkl"
 
-        if not os.path.exists(index_path):
+        if not index_path.is_file():
             raise FileNotFoundError(
-                "FAISS index not found. Run index_builder.py first."
+                f"FAISS index not found at {index_path}. Run index_builder.py first."
             )
+        if not metadata_path.is_file():
+            raise FileNotFoundError(f"FAISS metadata not found at {metadata_path}.")
 
-        self.index = faiss.read_index(index_path)
+        # FAISS's SWIG bindings expect a string path on Windows as well as Linux.
+        self.index = faiss.read_index(str(index_path))
 
         with open(metadata_path, "rb") as f:
             data = pickle.load(f)
             self.chunks = data["chunks"]
             self.metadata = data["metadata"]
+
+        expected_dimension = self.model.get_embedding_dimension()
+        if not (len(self.chunks) == len(self.metadata) == self.index.ntotal):
+            raise ValueError("FAISS index, chunks, and metadata entry counts do not match.")
+        if self.index.d != expected_dimension:
+            raise ValueError(
+                f"FAISS index dimension {self.index.d} does not match embedding dimension "
+                f"{expected_dimension}."
+            )
 
         print(f"Loaded {len(self.chunks)} chunks from vector store.")
         print("RAG Retriever ready.\n")
