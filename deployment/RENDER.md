@@ -111,8 +111,9 @@ python -c "from sqlalchemy import text; from api.database.connection import engi
 
 ## Deployment checklist
 
-1. Push the reviewed changes to the GitHub repository yourself; no commit or
-   push has been made by this task.
+1. The current deployment preparation is pushed to the `main` branch of the
+   GitHub repository. Future code changes should also be reviewed and pushed
+   before deployment.
 2. Create/verify the Neon database and copy its pooled, TLS-enabled connection
    string.
 3. Connect the repository in Render and create the Blueprint service, or enter
