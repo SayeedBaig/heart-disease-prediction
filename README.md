@@ -1,8 +1,8 @@
-# CardioAI — Multimodal Heart Disease Prediction System
+# CardioAI – Multimodal Heart Disease Prediction System
 
-An AI-powered healthcare platform for cardiovascular risk assessment using Clinical Data, ECG Signals, and Echocardiography.
+A cutting‑edge AI platform that assesses cardiovascular risk by integrating clinical data, ECG signals, and echocardiography images.
 
-CardioAI is a multimodal heart disease prediction platform that combines clinical parameters, electrocardiogram (ECG) signals, and echocardiography data to support cardiovascular risk assessment. It integrates modality-specific prediction models with an intelligent feature fusion mechanism to generate a unified risk assessment, supported by patient reports and additional healthcare services.
+CardioAI fuses modality‑specific predictions using an intelligent feature‑fusion engine and provides explainable AI insights, a RAG‑powered medical assistant, and a Digital Twin simulation for patient‑specific scenario analysis.
 
 The platform extends beyond prediction through patient and doctor portals, a Retrieval-Augmented Generation (RAG) based medical assistant, Digital Twin simulation, prediction history, and appointment management.
 
@@ -244,8 +244,8 @@ CardioAI is developed as a collaborative major project.
 |---|---|
 | **Sayeed Baig** | Backend architecture, FastAPI services, database integration, prediction workflow, feature fusion, API integration, and overall system integration |
 | **Sowmya** | Frontend implementation, UI/UX, application pages, and frontend integration |
-| **Rishitha** | Literature review, research background, related work, research objectives, and literature comparison |
-| **Akash** | Dataset preparation, preprocessing, feature engineering, experimental setup, evaluation metrics, and results analysis |
+| **Rishitha** | Clinical data module, Digital Twin, Literature review, research background, related work, research objectives, and literature comparison |
+| **Akash** | RAG based medical assistant, Echocardiography module, Dataset preparation, preprocessing, feature engineering, experimental setup, evaluation metrics, and results analysis |
 
 *Responsibilities are summarized from the team's project work distribution.*
 

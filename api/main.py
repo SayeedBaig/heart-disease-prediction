@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.database.base import Base
 from api.database.connection import engine
+import api.models  # noqa: F401 — register every table before create_all
 from api.routes.health import router as health_router
 from api.routes.patient import router as patient_router
 from api.routes.predict import router as predict_router
@@ -33,13 +34,9 @@ async def lifespan(app: FastAPI):
 
     Base.metadata.create_all(bind=engine)
 
-    cleanup_service = UploadCleanupService()
-    cleanup_summary = cleanup_service.cleanup_all()
-
-    logger.info(
-        "Upload Cleanup: %d file(s) removed.",
-        cleanup_summary["total_deleted"],
-    )
+    if os.getenv("CLEANUP_UPLOADS_ON_STARTUP", "false").strip().lower() == "true":
+        cleanup_summary = UploadCleanupService().cleanup_all()
+        logger.info("Upload Cleanup: %d file(s) removed.", cleanup_summary["total_deleted"])
 
     yield
 
@@ -65,13 +62,36 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+from urllib.parse import urlsplit
+
+_cors_origins = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+if not _cors_origins or any("*" in origin for origin in _cors_origins):
+    raise RuntimeError(
+        "CORS_ORIGINS must contain one or more explicit comma-separated origins; "
+        "wildcard origins are not allowed."
+    )
+for origin in _cors_origins:
+    parsed_origin = urlsplit(origin)
+    if (
+        parsed_origin.scheme not in {"http", "https"}
+        or not parsed_origin.netloc
+        or parsed_origin.path
+        or parsed_origin.query
+        or parsed_origin.fragment
+        or parsed_origin.username
+        or parsed_origin.password
+    ):
+        raise RuntimeError(f"Invalid CORS origin {origin!r}; provide scheme and host only.")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o.strip() for o in _cors_origins],
+    allow_origins=_cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
 

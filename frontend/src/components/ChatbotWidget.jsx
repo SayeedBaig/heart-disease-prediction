@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, MessageCircle, Send, X } from "lucide-react";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { requireApiBaseUrl } from "../services/apiConfig";
 
 // Read the last prediction result from localStorage so the chatbot can
 // include risk context in every request (avoids asking the user to repeat it).
@@ -95,7 +94,7 @@ export default function ChatbotWidget({ mode = "patient" }) {
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const res = await fetch(`${BASE_URL}${endpoint}`, {
+      const res = await fetch(`${requireApiBaseUrl()}${endpoint}`, {
         method: "POST",
         headers,
         body: JSON.stringify(body),

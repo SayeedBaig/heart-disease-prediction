@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { FileText, Download, Mail, Activity, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { requireApiBaseUrl } from "../services/apiConfig";
 
 function DoctorReportCard({ report }) {
   const [emailSent, setEmailSent] = useState(false);
@@ -20,7 +21,7 @@ function DoctorReportCard({ report }) {
 
   const handleDownloadPDF = () => {
     window.open(
-      `http://localhost:8000/reports/${predictionId}/doctor/pdf`,
+      `${requireApiBaseUrl()}/reports/${predictionId}/doctor/pdf`,
       "_blank"
     );
   };
@@ -29,7 +30,7 @@ function DoctorReportCard({ report }) {
     setEmailLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/reports/${predictionId}/doctor/email`,
+        `${requireApiBaseUrl()}/reports/${predictionId}/doctor/email`,
         {
           method: "POST",
         }

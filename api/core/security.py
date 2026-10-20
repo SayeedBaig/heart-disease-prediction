@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
+import os
 from jose import jwt
 from passlib.context import CryptContext
 
-SECRET_KEY = "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET_KEY"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY or len(SECRET_KEY) < 32:
+    raise RuntimeError("Set SECRET_KEY to a unique random value of at least 32 characters.")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 pwd_context = CryptContext(
