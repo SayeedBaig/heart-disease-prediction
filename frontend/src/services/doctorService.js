@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import { requireApiBaseUrl } from "./apiConfig";
 
 /* ── Shared fetch helper (always sends doctor_token, no interceptor) ── */
 async function doctorFetch(path, { method = "GET", body, responseType } = {}) {
@@ -6,7 +6,7 @@ async function doctorFetch(path, { method = "GET", body, responseType } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${requireApiBaseUrl()}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -25,7 +25,7 @@ async function doctorFetch(path, { method = "GET", body, responseType } = {}) {
 /* ── Auth (plain fetch — no patient-token interference) ─────────── */
 
 export async function registerDoctor(form) {
-  const res = await fetch(`${BASE}/doctors/register`, {
+  const res = await fetch(`${requireApiBaseUrl()}/doctors/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -42,7 +42,7 @@ export async function registerDoctor(form) {
 }
 
 export async function loginDoctor(email, password) {
-  const res = await fetch(`${BASE}/doctors/login`, {
+  const res = await fetch(`${requireApiBaseUrl()}/doctors/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
