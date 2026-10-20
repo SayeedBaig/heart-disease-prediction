@@ -21,6 +21,19 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
 
+    # Existing patient records need an approved password reset/recovery plan.
+    # Refuse this migration before making any schema changes until that plan
+    # exists; never replace existing credentials with placeholder hashes.
+    bind = op.get_bind()
+    existing_patients = bind.execute(
+        sa.text("SELECT COUNT(*) FROM patients")
+    ).scalar_one()
+    if existing_patients:
+        raise RuntimeError(
+            "Refusing patient-auth migration: existing patient accounts require "
+            "an explicitly reviewed password recovery plan."
+        )
+
     # Add password_hash temporarily as nullable
     op.add_column(
         "patients",

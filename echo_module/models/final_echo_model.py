@@ -16,8 +16,10 @@ def build_echo_model(weights_path=None):
     Parameters
     ----------
     weights_path : str, optional
-        Path to saved .keras weights file.
-        If None, builds fresh model with ImageNet weights.
+        Path to saved .keras weights file. When provided, initialize the
+        backbone without downloading ImageNet weights because the checkpoint
+        restores the complete model weights. If omitted, initialize from
+        ImageNet for the training workflow.
 
     Returns
     -------
@@ -25,7 +27,7 @@ def build_echo_model(weights_path=None):
         Compiled model ready for training or inference.
     """
     base_model = MobileNetV2(
-        weights     = 'imagenet',
+        weights     = None if weights_path else 'imagenet',
         include_top = False,
         input_shape = (224, 224, 3)
     )
