@@ -28,7 +28,7 @@ Git, `render.yaml`, Vercel, or the frontend's `VITE_*` variables.
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | Neon PostgreSQL connection string from Neon Console → project → **Connect**. Use the pooled connection string for a web app and preserve its `sslmode=require` query parameter. |
 | `SECRET_KEY` | Yes | Generate a unique signing secret locally with `python -c "import secrets; print(secrets.token_urlsafe(48))"`. Use at least 32 characters; do not reuse it elsewhere. |
-| `CORS_ORIGINS` | Yes | Exact Vercel origin, e.g. `https://your-project.vercel.app` (no path or trailing slash). For a Vercel preview URL, list it explicitly after a comma. Do not use `*`. |
+| `CORS_ORIGINS` | Yes | `https://cardio-ai-roan.vercel.app` (no path or trailing slash). For a Vercel preview URL, list it explicitly after a comma. Do not use `*`. |
 | `SQL_ECHO` | No | Set to `false`; SQL logging can expose sensitive patient data. |
 | `CLEANUP_UPLOADS_ON_STARTUP` | No | Defaults to `false`. Set to `true` only if deleting uploads older than seven days at startup is intended. |
 | `GROQ_API_KEY` | Optional | Groq Console → API Keys. The RAG/AI explanation generation feature needs this; without it, that feature returns a degraded response. |
@@ -45,13 +45,21 @@ public API URL in the frontend variable already used by the app, if configured.
 
 ## Neon PostgreSQL
 
-1. Create a Neon project and database. Copy the pooled connection string from
-   **Connect** and select SQLAlchemy/Python if the UI offers driver examples.
-2. Set that full string as Render's `DATABASE_URL`. Confirm it uses PostgreSQL
+1. Sign in at [Neon Console](https://console.neon.tech/), choose **Create
+   project**, use the Free plan, choose a region close to the backend, and
+   create a PostgreSQL project (the default database is `neondb`). Neon's
+   current Free plan lists 1 GB storage and 100 compute-hours per project each
+   month; check the console for current limits.
+2. Open the project **Connect** panel, select the primary branch and database,
+   enable **Pooled connection**, and copy the connection string. Keep it private;
+   do not paste it into chat, GitHub, or Vercel.
+3. Set that full string as Render's `DATABASE_URL`. Confirm it uses PostgreSQL
    and includes TLS (`sslmode=require`). The API normalizes `postgres://` to
    `postgresql://`, uses the installed PostgreSQL driver, and never falls back
    to SQLite.
-3. On startup the app calls SQLAlchemy `create_all`: it creates missing tables
+4. On the Render service, set `CORS_ORIGINS` to
+   `https://cardio-ai-roan.vercel.app`. On startup the app calls SQLAlchemy
+   `create_all`: it creates missing tables
    without dropping or rewriting existing data. This is not a schema migration
    system; apply future schema changes deliberately with reviewed Alembic
    migrations. Back up important data before schema changes.
@@ -115,7 +123,7 @@ python -c "from sqlalchemy import text; from api.database.connection import engi
    GitHub repository. Future code changes should also be reviewed and pushed
    before deployment.
 2. Create/verify the Neon database and copy its pooled, TLS-enabled connection
-   string.
+   string privately.
 3. Connect the repository in Render and create the Blueprint service, or enter
    the settings above manually.
 4. Add `DATABASE_URL`, a generated `SECRET_KEY`, and the exact deployed Vercel
