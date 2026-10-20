@@ -28,7 +28,20 @@ RUN apt-get update \
     && chown -R cardioai:cardioai /app /home/cardioai
 
 COPY requirements.txt ./requirements.txt
-RUN python -m pip install --no-cache-dir -r requirements.txt \
+# Use CPU-only PyTorch and, on AMD64, the smaller CPU XGBoost distribution.
+# XGBoost's CPU distribution does not publish ARM64 wheels, so ARM64 uses the
+# pinned standard distribution. Keep requirements.txt as the version source.
+RUN python -m pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cpu \
+        --extra-index-url https://pypi.org/simple \
+        "torch==2.11.0+cpu" \
+    && if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+        python -m pip install --no-cache-dir "xgboost-cpu==3.2.0"; \
+    else \
+        python -m pip install --no-cache-dir "xgboost==3.2.0"; \
+    fi \
+    && python -c "from pathlib import Path; p=Path('requirements.txt'); lines=p.read_text().splitlines(); p=Path('/tmp/requirements-docker.txt'); p.write_text('\\n'.join(line for line in lines if not line.startswith(('torch==','xgboost=='))) + '\\n')" \
+    && python -m pip install --no-cache-dir -r /tmp/requirements-docker.txt \
     && python -m pip check
 
 # Copy only the runtime code, trained artifacts, migrations, and vector store.
@@ -55,6 +68,6 @@ USER cardioai:cardioai
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+    CMD ["python", "-c", "import os, urllib.request; port=os.environ.get('PORT', '8000'); urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=3)"]
 
 CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

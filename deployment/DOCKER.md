@@ -18,7 +18,12 @@ named by `DATABASE_URL`.
    docker compose up --build -d
    ```
 
-4. Check the liveness endpoint at `http://localhost:8000/health`. The
+   The defaults expose the API at host port 8000. Set `PORT` to change the
+   container port and `HOST_PORT` to change the host port. Compose reads `.env`
+   at runtime; use a disposable test database for initial testing.
+
+4. Check the liveness endpoint at `http://localhost:8000/health` (replace `8000`
+   with your configured `HOST_PORT`). The
    `/ready` endpoint also checks PostgreSQL, the tracked model files, and the
    pinned Sentence Transformers model; it returns `503` if a dependency is not
    available.
@@ -26,11 +31,17 @@ named by `DATABASE_URL`.
    in the ignored `frontend/.env.local` file, then run the frontend as usual.
 
 Compose stores uploads in a named Docker volume so container recreation does
-not remove them. The image contains the clinical, ECG, and echo artifacts, the
+not remove them. A volume is local to this Docker host; it is not backed up or
+shared automatically. Hosted containers may have ephemeral disks, so uploaded
+ECG/echo files can disappear on restart unless persistent storage is configured.
+The image contains the clinical, ECG, and echo artifacts, the
 FAISS files, and the pinned embedding model. It does not contain local `.env`
 files, SQLite databases, uploaded files, the frontend, `node_modules`, or the
 tracked sample video dataset. No database migration runs at image build or
-container startup.
+container startup. Docker installs the pinned CPU-only PyTorch and XGBoost
+packages because application inference uses CPU execution. Package versions in
+`requirements.txt` remain unchanged; the CPU XGBoost distribution provides the
+same `xgboost` Python module. The application does not use GPU-only APIs.
 
 To stop the container without removing uploads, run `docker compose down`. Do
 not use `docker compose down --volumes` if you need to retain the named uploads
