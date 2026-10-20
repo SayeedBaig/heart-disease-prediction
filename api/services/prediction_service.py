@@ -1,6 +1,4 @@
 
-from fusion_module.pipeline.system_pipeline import SystemPipeline
-
 from api.repositories.prediction_repository import PredictionRepository
 from api.services.digital_twin_service import DigitalTwinService
 from api.services.patient_service import PatientService
@@ -18,6 +16,10 @@ from api.utils.validators import validate_patient_data
 
 class PredictionService:
     def __init__(self, db):
+        # Load the ML stack only when a prediction is requested, keeping the
+        # API process and its health check lighter on small instances.
+        from fusion_module.pipeline.system_pipeline import SystemPipeline
+
         self.pipeline = SystemPipeline()
         self.patient_service = PatientService()
         self.shared_memory = SharedMemoryService()

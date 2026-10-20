@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 from typing import Optional
@@ -8,7 +10,6 @@ from rag.generator.generator import (
     CHAT_SYSTEM_PROMPT,
     GROQ_MODEL,
 )
-from rag.pipeline.rag_pipeline import RAGPipeline
 from api.utils.logger import get_logger
 
 
@@ -55,6 +56,9 @@ class RAGService:
 
     def _get_pipeline(self) -> RAGPipeline:
         if RAGService._shared_pipeline is None:
+            # Load FAISS and sentence-transformers only for RAG requests.
+            from rag.pipeline.rag_pipeline import RAGPipeline
+
             RAGService._shared_pipeline = RAGPipeline()
 
         self.pipeline = RAGService._shared_pipeline

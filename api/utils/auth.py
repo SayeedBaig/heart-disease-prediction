@@ -16,6 +16,10 @@ from api.repositories.patient_repository import PatientRepository
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "change_this_to_a_long_random_secret")
+if len(SECRET_KEY) < 32 or SECRET_KEY == "change_this_to_a_long_random_secret":
+    raise RuntimeError(
+        "SECRET_KEY must be set to a unique random value of at least 32 characters."
+    )
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
