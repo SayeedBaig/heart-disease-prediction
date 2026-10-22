@@ -12,6 +12,7 @@ import { Grid } from "../components/ui/Grid";
 import { Container } from "../components/ui/Container";
 import { Section } from "../components/ui/Section";
 import { EmptyState } from "../components/ui/EmptyState";
+import { endChatSession } from "../services/portalService";
 
 export default function PatientDashboard({ onNavigate, onLogout, children, activeTab = "hub" }) {
   const navigate = useNavigate();
@@ -42,9 +43,10 @@ export default function PatientDashboard({ onNavigate, onLogout, children, activ
     if (route) navigate(route);
   };
 
-  const handleLogoutAction = () => {
+  const handleLogoutAction = async () => {
     if (onLogout) onLogout();
     else {
+      await endChatSession();
       localStorage.removeItem("access_token");
       localStorage.removeItem("cardio-patient");
       navigate("/");

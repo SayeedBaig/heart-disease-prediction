@@ -12,6 +12,7 @@ import { Grid } from "../components/ui/Grid";
 import { Container } from "../components/ui/Container";
 import { Section } from "../components/ui/Section";
 import { EmptyState } from "../components/ui/EmptyState";
+import { logoutDoctor } from "../services/doctorService";
 
 export default function DoctorDashboard({ doctor, onNavigate, onLogout, children, activeTab = "hub" }) {
   const navigate = useNavigate();
@@ -45,12 +46,11 @@ export default function DoctorDashboard({ doctor, onNavigate, onLogout, children
     }
   };
 
-  const handleLogoutAction = () => {
+  const handleLogoutAction = async () => {
     if (onLogout) {
-      onLogout();
+      await onLogout();
     } else {
-      localStorage.removeItem("doctor_access_token");
-      localStorage.removeItem("cardio-doctor");
+      await logoutDoctor();
       navigate("/doctor/login");
     }
   };

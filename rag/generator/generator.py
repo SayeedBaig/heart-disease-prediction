@@ -150,29 +150,35 @@ def build_chat_prompt(question: str, chunks: list) -> str:
     Returns:
         A prompt string ready to be passed to call_groq_api().
     """
+    report_chunks = [chunk for chunk in chunks if chunk.get("category") == "patient_report"]
+    guideline_chunks = [chunk for chunk in chunks if chunk.get("category") != "patient_report"]
     context_text = ""
-    for i, chunk in enumerate(chunks[:6]):
+    for i, chunk in enumerate(guideline_chunks[:6]):
         context_text += (
             f"\n[Reference {i + 1}] Source: {chunk['source']} "
             f"(Page {chunk['page']})\n{chunk['text'][:800]}\n"
         )
+    report_text = "\n".join(chunk["text"][:12000] for chunk in report_chunks[:1])
 
     prompt = f"""You are CardioAI, a clinical decision support assistant specialising in \
 cardiovascular health.
 
-RETRIEVED MEDICAL GUIDELINES (your ONLY permitted knowledge source):
+RETRIEVED MEDICAL GUIDELINES:
 {context_text}
+
+LATEST REPORT FOR THE CURRENT AUTHENTICATED SESSION (if present):
+{report_text or "No session report is available."}
 
 USER QUESTION:
 {question}
 
 STRICT RULES — you must follow these without exception:
-1. Answer ONLY using information that appears explicitly in the RETRIEVED MEDICAL GUIDELINES above.
-2. If the retrieved guidelines do not contain enough information to answer the question, \
+1. Use only the retrieved guidelines and the latest session report above. Use report details only to answer questions about that user's report; do not imply the report is a diagnosis.
+2. If neither source contains enough information to answer the question, \
 respond with exactly this sentence: \
-"I don't have enough information in the available guidelines to answer that question reliably. \
+"I don't have enough information in the available report and guidelines to answer that question reliably. \
 Please consult a qualified healthcare professional."
-3. Do NOT add, infer, or extrapolate any medical facts beyond what is written in the guidelines.
+3. Do NOT add, infer, or extrapolate any medical facts beyond what is written in the provided sources.
 4. Do NOT produce advice that contradicts the guidelines.
 
 STYLE RULES:

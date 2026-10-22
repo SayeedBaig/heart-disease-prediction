@@ -5,14 +5,17 @@ services:
       dockerfile: Dockerfile
     image: cardioai-api:local
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
-      PORT: "8000"
+      PORT: "${PORT:-8000}"
+      DATABASE_URL: "${DATABASE_URL:?Set DATABASE_URL in .env or the shell environment}"
       AUTO_CREATE_SCHEMA: "false"
       CLEANUP_UPLOADS_ON_STARTUP: "false"
       SQL_ECHO: "false"
+      CHAT_SESSION_CLEANUP_INTERVAL_SECONDS: "${CHAT_SESSION_CLEANUP_INTERVAL_SECONDS:-900}"
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "${HOST_PORT:-8000}:${PORT:-8000}"
     volumes:
       - cardioai_uploads:/app/uploads
     restart: unless-stopped

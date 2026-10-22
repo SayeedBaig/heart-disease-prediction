@@ -38,6 +38,7 @@ Git, `render.yaml`, Vercel, or the frontend's `VITE_*` variables.
 | `SMTP_PASSWORD` | Optional | App password or provider credential; enter as a Render secret. |
 | `ALGORITHM` | No | JWT algorithm; defaults to `HS256`. |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | No | JWT expiry in minutes; defaults to `60`. |
+| `CHAT_SESSION_CLEANUP_INTERVAL_SECONDS` | No | How often expired assistant report sessions are physically purged; defaults to `900` seconds. Expired sessions are inaccessible immediately. |
 
 The `PORT` variable is assigned by Render; do not set it yourself. Never put a
 Neon connection string or Groq/SMTP credential in Vercel. Vercel only needs the
@@ -58,11 +59,17 @@ public API URL in the frontend variable already used by the app, if configured.
    `postgresql://`, uses the installed PostgreSQL driver, and never falls back
    to SQLite.
 4. On the Render service, set `CORS_ORIGINS` to
-   `https://cardio-ai-roan.vercel.app`. On startup the app calls SQLAlchemy
-   `create_all`: it creates missing tables
-   without dropping or rewriting existing data. This is not a schema migration
-   system; apply future schema changes deliberately with reviewed Alembic
-   migrations. Back up important data before schema changes.
+   `https://cardio-ai-roan.vercel.app`. Before deploying this version, back up
+   the database and apply the Alembic migration from a trusted environment
+   using the same `DATABASE_URL`:
+
+   ```sh
+   pip install -r requirements.txt
+   alembic upgrade head
+   ```
+
+   The app does not apply database migrations automatically. Review each
+   migration and back up important data before schema changes.
 
 The models use PostgreSQL UUIDs and JSONB as well as PostgreSQL enum types, so
 PostgreSQL is required. There is no extension setup in the current model
@@ -106,6 +113,7 @@ a working PostgreSQL URL plus a generated `SECRET_KEY`:
 
 ```powershell
 python -m pip install -r requirements.txt
+alembic upgrade head
 python -c "from api.main import app; print(app.title)"
 uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
@@ -119,9 +127,8 @@ python -c "from sqlalchemy import text; from api.database.connection import engi
 
 ## Deployment checklist
 
-1. The current deployment preparation is pushed to the `main` branch of the
-   GitHub repository. Future code changes should also be reviewed and pushed
-   before deployment.
+1. Deploy from the reviewed GitHub branch containing these changes. Apply the
+   database migration before starting the updated service.
 2. Create/verify the Neon database and copy its pooled, TLS-enabled connection
    string privately.
 3. Connect the repository in Render and create the Blueprint service, or enter

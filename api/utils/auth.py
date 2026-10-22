@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -39,6 +40,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     )
 
     to_encode.update({"exp": expire})
+    to_encode.setdefault("jti", str(uuid.uuid4()))
 
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -79,6 +81,10 @@ def get_current_doctor(
             detail="Invalid token payload.",
         )
 
+    from api.services.chat_session_service import active_session
+    if active_session(db, payload) is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid, expired, or ended session.")
+
     try:
         doctor_id = UUID(doctor_id)
     except (TypeError, ValueError):
@@ -112,6 +118,10 @@ def get_current_patient(
             detail="Invalid or expired patient token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    from api.services.chat_session_service import active_session
+    if active_session(db, payload) is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid, expired, or ended session.")
 
     try:
         patient_id = int(payload["sub"])

@@ -10,6 +10,11 @@ export function clearPatientSession() {
   patientSessionKeys.forEach((key) => localStorage.removeItem(key));
 }
 
+export async function endChatSession() {
+  if (!localStorage.getItem("access_token")) return;
+  try { await api.post("/rag/logout"); } catch { /* token expiry also ends report access */ }
+}
+
 const numberOr = (v) => v === "" || v === null || v === undefined ? null : Number(v);
 
 function clinicalPayload(data, patient, paths) {
@@ -44,6 +49,7 @@ export async function createPatientAccount(account) {
 }
 
 export async function loginPatient(email, password) {
+  await endChatSession();
   clearPatientSession();
   const { data } = await api.post("/patients/login", { email, password });
   localStorage.setItem("access_token", data.access_token);

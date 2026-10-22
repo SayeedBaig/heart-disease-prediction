@@ -93,7 +93,7 @@ class RAGService:
                 "error": str(e),
             }
 
-    def ask(self, question: str, context: Optional[dict] = None) -> dict:
+    def ask(self, question: str, context: Optional[dict] = None, report_text: Optional[str] = None) -> dict:
         """
         Answer a free-text medical question using RAG (AI Health Assistant).
 
@@ -139,6 +139,11 @@ class RAGService:
 
             # ── Step 2: Retrieve relevant guideline chunks ─────────────────
             chunks = self._get_pipeline().retriever.retrieve(query, top_k=6)
+            if report_text:
+                chunks.insert(0, {
+                    "text": report_text[:12000], "source": "Your latest session report",
+                    "category": "patient_report", "page": 1, "score": 0.0,
+                })
             self.logger.info("RAG chatbot: retrieved %d chunks", len(chunks))
 
             # ── Step 3 & 4: Build prompt and call LLM ─────────────────────

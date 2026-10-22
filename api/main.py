@@ -1,4 +1,5 @@
 import os
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -25,6 +26,28 @@ from api.routes.digital_twin import router as digital_twin_router
 logger = get_logger(__name__)
 
 
+async def _cleanup_expired_chat_sessions():
+    from sqlalchemy import delete
+    from api.database.session import SessionLocal
+    from api.models.chat_session import ChatSession
+    from datetime import datetime, timezone
+
+    interval = max(30, int(os.getenv("CHAT_SESSION_CLEANUP_INTERVAL_SECONDS", "900")))
+    while True:
+        await asyncio.sleep(interval)
+        db = SessionLocal()
+        try:
+            result = db.execute(delete(ChatSession).where(ChatSession.expires_at <= datetime.now(timezone.utc)))
+            db.commit()
+            if result.rowcount:
+                logger.info("Removed %d expired assistant session(s)", result.rowcount)
+        except Exception:
+            db.rollback()
+            logger.exception("Expired assistant session cleanup failed")
+        finally:
+            db.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting CardioAI Backend...")
@@ -42,7 +65,15 @@ async def lifespan(app: FastAPI):
         cleanup_summary = UploadCleanupService().cleanup_all()
         logger.info("Upload Cleanup: %d file(s) removed.", cleanup_summary["total_deleted"])
 
-    yield
+    cleanup_task = asyncio.create_task(_cleanup_expired_chat_sessions())
+    try:
+        yield
+    finally:
+        cleanup_task.cancel()
+        try:
+            await cleanup_task
+        except asyncio.CancelledError:
+            pass
 
     logger.info("Shutting down CardioAI Backend...")
 

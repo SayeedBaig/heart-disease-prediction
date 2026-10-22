@@ -12,8 +12,9 @@ from api.models.prediction import Prediction
 from api.reports.renderers.pdf_renderer import PdfRenderer
 from api.repositories.diagnosis_repository import DiagnosisRepository
 from api.services.report_service import ReportService
+from api.services.chat_session_service import replace_report
 from api.utils.auth import get_current_doctor
-from api.utils.authorization import ensure_prediction_access, ensure_patient_access, get_current_actor
+from api.utils.authorization import ensure_prediction_access, ensure_patient_access, get_current_actor, get_current_chat_session
 
 
 router = APIRouter(prefix="/doctor", tags=["Doctor Portal"])
@@ -25,6 +26,14 @@ def _age(value):
         return None
     today = date.today()
     return today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+
+
+def _index_report(db: Session, session, report: dict) -> None:
+    try:
+        replace_report(db, session, report)
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=503, detail="Report context could not be prepared for the assistant.") from exc
 
 
 def _latest_prediction(db: Session, patient_id: int):
@@ -181,17 +190,21 @@ def doctor_reports(
 
 
 @router.get("/reports/{report_id}", summary="View doctor report", description="Detailed generated report for an assigned patient's prediction.")
-def doctor_report(report_id: int, db: Session = Depends(get_db), actor=Depends(get_current_actor)):
+def doctor_report(report_id: int, db: Session = Depends(get_db), actor=Depends(get_current_actor), session=Depends(get_current_chat_session)):
     if actor[0] != "doctor":
         raise HTTPException(status_code=403, detail="Doctor access is required.")
     ensure_prediction_access(report_id, actor, db)
-    return ReportService(db).generate_doctor_report(report_id)
+    report = ReportService(db).generate_doctor_report(report_id)
+    _index_report(db, session, report)
+    return report
 
 
 @router.get("/reports/{report_id}/download", summary="Download doctor report", description="PDF report for an assigned patient's prediction.")
-def download_doctor_report(report_id: int, db: Session = Depends(get_db), actor=Depends(get_current_actor)):
+def download_doctor_report(report_id: int, db: Session = Depends(get_db), actor=Depends(get_current_actor), session=Depends(get_current_chat_session)):
     if actor[0] != "doctor":
         raise HTTPException(status_code=403, detail="Doctor access is required.")
     ensure_prediction_access(report_id, actor, db)
-    pdf = PdfRenderer().render(ReportService(db).generate_doctor_report(report_id))
+    report = ReportService(db).generate_doctor_report(report_id)
+    _index_report(db, session, report)
+    pdf = PdfRenderer().render(report)
     return StreamingResponse(pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="doctor_report_{report_id}.pdf"'})

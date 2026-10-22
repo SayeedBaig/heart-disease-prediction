@@ -17,8 +17,9 @@ node_modules
 **/node_modules
 frontend
 data
-tests
-**/tests
+tests/
+**/tests/
+**/test_*.py
 uploads/**
 !uploads/ecg/.gitkeep
 !uploads/echo/.gitkeep
