@@ -8,9 +8,21 @@ from api.repositories.doctor_repository import DoctorRepository
 from api.repositories.patient_repository import PatientRepository
 from api.repositories.prediction_repository import PredictionRepository
 from api.utils.auth import verify_access_token
+from api.services.chat_session_service import active_session
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/patients/login")
+
+
+def get_current_chat_session(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    payload = verify_access_token(token)
+    session = active_session(db, payload or {})
+    if session is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid, expired, or ended session.")
+    return session
 
 
 def get_current_actor(
@@ -24,6 +36,9 @@ def get_current_actor(
 
     if not subject or role not in {"patient", "doctor"}:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token.")
+
+    if active_session(db, payload) is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid, expired, or ended session.")
 
     if role == "patient":
         try:

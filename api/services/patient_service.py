@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from api.repositories.patient_repository import PatientRepository
 from api.utils.auth import create_access_token, verify_password
+from api.services.chat_session_service import register_token_session
 
 
 class PatientService:
@@ -64,6 +65,7 @@ class PatientService:
                 "role": "patient",
             }
         )
+        register_token_session(self.db, token)
 
         return {
             "access_token": token,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { analyzePatientData, createPatientAccount, loginPatient } from "../services/portalService";
-import { clearPatientSession } from "../services/portalService";
+import { clearPatientSession, endChatSession } from "../services/portalService";
 
 import Navbar from "../components/Navbar";
 import LandingPage from "./LandingPage";
@@ -113,7 +113,8 @@ export default function PatientPortal() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await endChatSession();
     clearPatientSession();
     go("landing");
   };

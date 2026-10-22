@@ -5,7 +5,7 @@ import DoctorDashboard from "./DoctorDashboard";
 import AppointmentManagement from "./AppointmentManagement";
 import Reports from "./Reports";
 import DigitalTwin from "./DigitalTwin";
-import { emailDoctorReport, getAllPatients, getDoctorReport, viewDoctorReportPdf } from "../services/doctorService";
+import { emailDoctorReport, getAllPatients, getDoctorReport, viewDoctorReportPdf, logoutDoctor } from "../services/doctorService";
 
 export default function DoctorPortal() {
   const navigate = useNavigate();
@@ -63,9 +63,8 @@ export default function DoctorPortal() {
     };
   }, [screen, doctor.doctor_id]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("doctor_access_token");
-    localStorage.removeItem("cardio-doctor");
+  const handleLogout = async () => {
+    await logoutDoctor();
     navigate("/");
   };
 

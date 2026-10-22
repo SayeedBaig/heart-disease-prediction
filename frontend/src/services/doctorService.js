@@ -42,6 +42,7 @@ export async function registerDoctor(form) {
 }
 
 export async function loginDoctor(email, password) {
+  await logoutDoctor();
   const res = await fetch(`${requireApiBaseUrl()}/doctors/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -54,8 +55,14 @@ export async function loginDoctor(email, password) {
   return data.doctor;
 }
 
-export function logoutDoctor() {
+export async function logoutDoctor() {
+  const token = localStorage.getItem("doctor_token") || localStorage.getItem("doctor_access_token") || localStorage.getItem("access_token");
+  if (token) {
+    try { await fetch(`${requireApiBaseUrl()}/rag/logout`, { method: "POST", headers: { Authorization: `Bearer ${token}` } }); } catch { /* expiry also clears access */ }
+  }
   localStorage.removeItem("doctor_token");
+  localStorage.removeItem("doctor_access_token");
+  localStorage.removeItem("access_token");
   localStorage.removeItem("cardio-doctor");
 }
 

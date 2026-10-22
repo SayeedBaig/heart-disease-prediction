@@ -19,3 +19,5 @@ services:
         value: "false"
       - key: CLEANUP_UPLOADS_ON_STARTUP
         value: "false"
+      - key: CHAT_SESSION_CLEANUP_INTERVAL_SECONDS
+        value: "900"

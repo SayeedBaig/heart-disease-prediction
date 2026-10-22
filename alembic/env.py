@@ -18,6 +18,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from api.database.base import Base
 import api.models  # noqa: F401 — registers all models with Base.metadata
+import api.models.chat_session  # noqa: F401 — registers expiring assistant sessions
 target_metadata = Base.metadata
 
 import os

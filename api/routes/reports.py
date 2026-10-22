@@ -6,11 +6,20 @@ from api.database.session import get_db
 from api.reports.renderers.pdf_renderer import PdfRenderer
 from api.services.email_service import EmailService
 from api.services.report_service import ReportService
-from api.utils.authorization import ensure_prediction_access, get_current_actor
+from api.utils.authorization import ensure_prediction_access, get_current_actor, get_current_chat_session
 from api.utils.auth import get_current_patient
+from api.services.chat_session_service import replace_report
 
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
+
+
+def _index_report(db: Session, session, report: dict) -> None:
+    try:
+        replace_report(db, session, report)
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=503, detail="Report context could not be prepared for the assistant.") from exc
 
 
 @router.post(
@@ -21,6 +30,8 @@ router = APIRouter(prefix="/reports", tags=["Reports"])
 async def email_digital_twin_report(
     simulation: dict = Body(...),
     current_patient=Depends(get_current_patient),
+    session=Depends(get_current_chat_session),
+    db: Session = Depends(get_db),
 ):
     risk = simulation.get("risk", {})
     # clinical_alerts may be present in the simulation payload (from the frontend
@@ -46,6 +57,7 @@ async def email_digital_twin_report(
         "follow_up_advice": ["Review this simulation with your treating clinician before making health decisions."],
         "clinical_alerts": clinical_alerts,
     }
+    _index_report(db, session, report)
     pdf_buffer = PdfRenderer().render(report)
     await EmailService().send_report(
         recipient_email=current_patient.email,
@@ -67,11 +79,14 @@ def get_doctor_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     if actor[0] != "doctor":
         raise HTTPException(status_code=403, detail="Doctor access is required for this report.")
     ensure_prediction_access(prediction_id, actor, db)
-    return ReportService(db).generate_doctor_report(prediction_id)
+    report = ReportService(db).generate_doctor_report(prediction_id)
+    _index_report(db, session, report)
+    return report
 
 
 @router.get(
@@ -84,9 +99,12 @@ def get_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     ensure_prediction_access(prediction_id, actor, db)
-    return ReportService(db).generate_patient_report(prediction_id)
+    report = ReportService(db).generate_patient_report(prediction_id)
+    _index_report(db, session, report)
+    return report
 
 
 @router.get(
@@ -99,11 +117,13 @@ def download_doctor_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     if actor[0] != "doctor":
         raise HTTPException(status_code=403, detail="Doctor access is required for this report.")
     ensure_prediction_access(prediction_id, actor, db)
     report = ReportService(db).generate_doctor_report(prediction_id)
+    _index_report(db, session, report)
     pdf = PdfRenderer().render(report)
 
     return StreamingResponse(
@@ -125,9 +145,11 @@ def download_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     ensure_prediction_access(prediction_id, actor, db)
     report = ReportService(db).generate_patient_report(prediction_id)
+    _index_report(db, session, report)
     pdf = PdfRenderer().render(report)
 
     return StreamingResponse(
@@ -149,11 +171,13 @@ async def email_patient_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     if actor[0] != "patient":
         raise HTTPException(status_code=403, detail="Patients may email only their own reports.")
     ensure_prediction_access(prediction_id, actor, db)
     report = ReportService(db).generate_patient_report(prediction_id)
+    _index_report(db, session, report)
     pdf_buffer = PdfRenderer().render(report)
 
     patient = report.get("patient")
@@ -186,11 +210,13 @@ async def email_doctor_report(
     prediction_id: int,
     db: Session = Depends(get_db),
     actor=Depends(get_current_actor),
+    session=Depends(get_current_chat_session),
 ):
     if actor[0] != "doctor":
         raise HTTPException(status_code=403, detail="Doctor access is required for this report.")
     ensure_prediction_access(prediction_id, actor, db)
     report = ReportService(db).generate_doctor_report(prediction_id)
+    _index_report(db, session, report)
     pdf_buffer = PdfRenderer().render(report)
 
     patient = report.get("patient")

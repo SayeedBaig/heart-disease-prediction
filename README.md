@@ -199,6 +199,10 @@ Install the backend dependencies:
 pip install -r requirements.txt
 ```
 Configure the required environment variables and PostgreSQL connection before starting the backend.
+Apply schema migrations to the configured database before starting the updated API:
+```bash
+alembic upgrade head
+```
 
 Run the FastAPI application from the project root if `api/main.py` is the configured entry point:
 ```bash
@@ -220,10 +224,17 @@ Vite will display the local development URL in the terminal, typically:
 ### 4. Configure the Database
 - Create the PostgreSQL database required by the application.
 - Configure the database connection using the project's environment variables.
-- Apply the project's database migrations if required.
+- Apply reviewed schema migrations with `alembic upgrade head` before starting the API. Migrations are not run automatically.
 - Ensure the backend can connect to the database before testing the application.
 
 *Important: Follow the actual configuration files and existing migration setup in the repository. The commands above are a starting point, not a substitute for project-specific configuration.*
+
+### Run Backend Tests
+Install the development dependencies and run the suite:
+```bash
+pip install -r requirements-dev.txt
+python -m pytest
+```
 
 ## Configuration
 Create the environment files expected by the application and configure the required values locally.

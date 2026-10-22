@@ -12,15 +12,20 @@ named by `DATABASE_URL`.
    exact `CORS_ORIGINS` value for the frontend origin you are using. Keep
    `.env` private. Use a disposable database for initial testing; never enable
    `AUTO_CREATE_SCHEMA` for a production database.
-3. Build and start the API:
+3. Build the API image and apply the database migrations before starting it:
 
    ```sh
-   docker compose up --build -d
+   docker compose build api
+   docker compose run --rm api alembic upgrade head
+   docker compose up -d
    ```
 
    The defaults expose the API at host port 8000. Set `PORT` to change the
    container port and `HOST_PORT` to change the host port. Compose reads `.env`
    at runtime; use a disposable test database for initial testing.
+
+   Migrations are intentionally not run automatically by the image. Back up
+   the database and review the migration before applying it to a deployment.
 
 4. Check the liveness endpoint at `http://localhost:8000/health` (replace `8000`
    with your configured `HOST_PORT`). The
@@ -42,6 +47,12 @@ container startup. Docker installs the pinned CPU-only PyTorch and XGBoost
 packages because application inference uses CPU execution. Package versions in
 `requirements.txt` remain unchanged; the CPU XGBoost distribution provides the
 same `xgboost` Python module. The application does not use GPU-only APIs.
+Authenticated report context is kept in the PostgreSQL `chat_sessions` table,
+keyed by the JWT session ID; logout removes it, and expired sessions are
+purged periodically. The cleanup interval defaults to 900 seconds and can be
+set with `CHAT_SESSION_CLEANUP_INTERVAL_SECONDS`. Apply the Alembic migration
+before using the updated application. Test dependencies, including pytest,
+are available separately with `pip install -r requirements-dev.txt`.
 
 To stop the container without removing uploads, run `docker compose down`. Do
 not use `docker compose down --volumes` if you need to retain the named uploads

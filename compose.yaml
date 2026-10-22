@@ -13,6 +13,7 @@ services:
       AUTO_CREATE_SCHEMA: "false"
       CLEANUP_UPLOADS_ON_STARTUP: "false"
       SQL_ECHO: "false"
+      CHAT_SESSION_CLEANUP_INTERVAL_SECONDS: "${CHAT_SESSION_CLEANUP_INTERVAL_SECONDS:-900}"
     ports:
       - "${HOST_PORT:-8000}:${PORT:-8000}"
     volumes:
