@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cardioai-api:local
+    env_file:
+      - .env
+    environment:
+      PORT: "8000"
+      AUTO_CREATE_SCHEMA: "false"
+      CLEANUP_UPLOADS_ON_STARTUP: "false"
+      SQL_ECHO: "false"
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - cardioai_uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  cardioai_uploads:
