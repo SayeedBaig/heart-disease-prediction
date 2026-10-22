@@ -51,8 +51,7 @@ Authenticated report context is kept in the PostgreSQL `chat_sessions` table,
 keyed by the JWT session ID; logout removes it, and expired sessions are
 purged periodically. The cleanup interval defaults to 900 seconds and can be
 set with `CHAT_SESSION_CLEANUP_INTERVAL_SECONDS`. Apply the Alembic migration
-before using the updated application. Test dependencies, including pytest,
-are available separately with `pip install -r requirements-dev.txt`.
+before using the updated application.
 
 To stop the container without removing uploads, run `docker compose down`. Do
 not use `docker compose down --volumes` if you need to retain the named uploads

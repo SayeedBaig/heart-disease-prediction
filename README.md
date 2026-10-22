@@ -229,12 +229,6 @@ Vite will display the local development URL in the terminal, typically:
 
 *Important: Follow the actual configuration files and existing migration setup in the repository. The commands above are a starting point, not a substitute for project-specific configuration.*
 
-### Run Backend Tests
-Install the development dependencies and run the suite:
-```bash
-pip install -r requirements-dev.txt
-python -m pytest
-```
 
 ## Configuration
 Create the environment files expected by the application and configure the required values locally.

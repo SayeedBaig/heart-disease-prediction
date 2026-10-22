@@ -112,7 +112,7 @@ From the repository root, after copying `.env.example` to `.env` and filling in
 a working PostgreSQL URL plus a generated `SECRET_KEY`:
 
 ```powershell
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements.txt
 alembic upgrade head
 python -c "from api.main import app; print(app.title)"
 uvicorn api.main:app --host 127.0.0.1 --port 8000
