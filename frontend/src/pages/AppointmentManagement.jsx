@@ -69,7 +69,7 @@ export default function AppointmentManagement() {
 
   const filteredAppointments = appointments.filter(app => {
     const nameStr = app.patient_name || app.full_name || app.name || "";
-    const idStr = String(app.patient_id || "");
+    const idStr = String(app.patient_pid || app.patient_id || "");
     const matchesSearch = !search || idStr.toLowerCase().includes(search.toLowerCase()) || nameStr.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "All" || app.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -148,10 +148,10 @@ export default function AppointmentManagement() {
                     <tr key={app.appointment_id} className="hover:bg-[var(--card-hover)] transition-colors">
                       <td className="p-4">
                         <div className="font-bold text-[var(--text-primary)]">
-                          {app.patient_name || app.full_name || app.name || "Jane Doe"}
+                          {app.patient_name || app.full_name || app.name || "Unknown Patient"}
                         </div>
                         <div className="text-[11px] text-[var(--text-muted)] font-mono">
-                          ID: {app.patient_id}
+                          ID: {app.patient_pid || app.patient_id}
                         </div>
                       </td>
                       <td className="p-4 text-[var(--text-secondary)]">{app.preferred_date} at {app.preferred_time}</td>
@@ -204,11 +204,11 @@ export default function AppointmentManagement() {
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
             <div className="cardio-card max-w-md w-full p-6 space-y-4">
               <h2 className="section-title text-sm font-bold text-[var(--text-primary)]">
-                Appointment Details - {selectedAppointment.patient_name || selectedAppointment.full_name || selectedAppointment.name || "Patient"} ({selectedAppointment.patient_id})
+                Appointment Details - {selectedAppointment.patient_name || selectedAppointment.full_name || selectedAppointment.name || "Patient"} ({selectedAppointment.patient_pid || selectedAppointment.patient_id})
               </h2>
               <div className="space-y-2 text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] p-4 rounded-xl">
-                <div><strong>Patient Name:</strong> {selectedAppointment.patient_name || selectedAppointment.full_name || selectedAppointment.name || "Jane Doe"}</div>
-                <div><strong>Patient ID:</strong> {selectedAppointment.patient_id}</div>
+                <div><strong>Patient Name:</strong> {selectedAppointment.patient_name || selectedAppointment.full_name || selectedAppointment.name || "Unknown Patient"}</div>
+                <div><strong>Patient ID:</strong> {selectedAppointment.patient_pid || selectedAppointment.patient_id}</div>
                 <div><strong>Date & Time:</strong> {selectedAppointment.preferred_date} at {selectedAppointment.preferred_time}</div>
                 <div><strong>Symptoms:</strong> {selectedAppointment.symptoms || "None declared"}</div>
                 <div><strong>Reason:</strong> {selectedAppointment.reason || "General cardiac assessment"}</div>

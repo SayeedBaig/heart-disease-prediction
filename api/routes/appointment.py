@@ -188,7 +188,7 @@ def get_appointment(
     summary="List all appointments",
     description="Returns a paginated list of all appointments.",
     response_description="Appointments list retrieved.",
-    response_model=list[AppointmentResponse],
+    response_model=list[AppointmentRichResponse],
 )
 def get_all_appointments(
     skip: int = 0,
@@ -199,7 +199,7 @@ def get_all_appointments(
     service = AppointmentService(db)
     appointments = service.get_all_appointments(skip=skip, limit=limit)
 
-    return [AppointmentResponse.model_validate(a) for a in appointments]
+    return _enrich(appointments)
 
 
 @router.get(
@@ -207,7 +207,7 @@ def get_all_appointments(
     summary="Get appointments by patient",
     description="Returns all appointments for a specific patient.",
     response_description="Patient appointments retrieved.",
-    response_model=list[AppointmentResponse],
+    response_model=list[AppointmentRichResponse],
 )
 def get_patient_appointments(
     patient_id: int,
@@ -217,7 +217,7 @@ def get_patient_appointments(
     service = AppointmentService(db)
     appointments = service.get_patient_appointments(patient_id)
 
-    return [AppointmentResponse.model_validate(a) for a in appointments]
+    return _enrich(appointments)
 
 
 @router.get(
@@ -225,7 +225,7 @@ def get_patient_appointments(
     summary="Get appointments by doctor",
     description="Returns all appointments for a specific doctor.",
     response_description="Doctor appointments retrieved.",
-    response_model=list[AppointmentResponse],
+    response_model=list[AppointmentRichResponse],
 )
 def get_doctor_appointments(
     doctor_id: str,
@@ -235,7 +235,7 @@ def get_doctor_appointments(
     service = AppointmentService(db)
     appointments = service.get_doctor_appointments(doctor_id)
 
-    return [AppointmentResponse.model_validate(a) for a in appointments]
+    return _enrich(appointments)
 
 
 # ------------------------------------------------------------------

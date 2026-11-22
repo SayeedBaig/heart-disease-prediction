@@ -18,7 +18,7 @@ import ChatbotWidget from "./components/ChatbotWidget";
 function GlobalChatbot() {
   const { pathname } = useLocation();
 
-  // Hide on auth forms and landing page (which has its own mock) to prevent obstructing input fields
+  // Hide on auth forms to prevent obstructing input fields
   const isAuthPage =
     pathname.startsWith("/doctor/login") ||
     pathname.startsWith("/doctor/register") ||
@@ -26,8 +26,7 @@ function GlobalChatbot() {
     pathname.startsWith("/patient/signup") ||
     pathname.startsWith("/patient/register") ||
     pathname === "/get-started" ||
-    pathname === "/role-selection" ||
-    pathname === "/";
+    pathname === "/role-selection";
 
   if (isAuthPage) return null;
 
