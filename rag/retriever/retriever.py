@@ -1,6 +1,6 @@
 """
 RAG Retriever
-Author: Akash Hiremath (1RF23CS013)
+Author: Akash Hiremath 
 Week: 3 — RAG Implementation
 
 Purpose:
@@ -117,31 +117,38 @@ class RAGRetriever:
         print(f"Loaded {len(self.chunks)} chunks from vector store.")
         print("RAG Retriever ready.\n")
 
-    def retrieve(self, query: str, top_k: int = TOP_K) -> list:
+    def retrieve(self, query: str, top_k: int = TOP_K, categories=None) -> list:
         """
         Retrieve top-k relevant chunks from FAISS index.
 
         Args:
-            query: Search query string from build_query()
+            query: Search query string
             top_k: Number of chunks to return
+            categories: Optional list of categories to restrict results to
 
         Returns:
             List of dicts with text, source, category, page
         """
         embedding = self.model.encode([query]).astype("float32")
-        distances, indices = self.index.search(embedding, top_k)
+        search_k = min(max(top_k * 25, 100), self.index.ntotal) if categories else top_k
+        distances, indices = self.index.search(embedding, search_k)
 
         results = []
         for i, idx in enumerate(indices[0]):
             if idx == -1:
                 continue
+            meta = self.metadata[idx]
+            if categories and meta["category"] not in categories:
+                continue
             results.append({
                 "text": self.chunks[idx],
-                "source": self.metadata[idx]["source"],
-                "category": self.metadata[idx]["category"],
-                "page": self.metadata[idx]["page"],
-                "score": float(distances[0][i])
+                "source": meta["source"],
+                "category": meta["category"],
+                "page": meta["page"],
+                "score": float(distances[0][i]),
             })
+            if len(results) >= top_k:
+                break
 
         return results
 

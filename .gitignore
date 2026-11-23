@@ -50,3 +50,7 @@ uploads/echo/*
 !uploads/ecg/.gitkeep
 !uploads/echo/.gitkeep
 .neon
+
+venv/
+rag/corpus/**/*.pdf
+rag/vector_store_backup/
